@@ -29,19 +29,19 @@ nav{
   position:fixed;top:0;left:0;right:0;z-index:200;
   padding:0 60px;height:80px;
   display:flex;align-items:center;justify-content:space-between;
-  background:rgba(1,5,53,0.96);
+  background:rgba(255,255,255,0.98);
   backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(200,149,42,.15);
+  border-bottom:1px solid rgba(2,10,91,.1);
   transition:all .3s;
 }
 .nav-logo img{height:42px;width:auto;}
 .nav-links{display:flex;align-items:center;gap:36px;}
 .nav-links a{
-  color:rgba(255,255,255,.65);font-size:13px;font-weight:500;
+  color:rgba(2,10,91,.7);font-size:13px;font-weight:500;
   letter-spacing:.8px;text-transform:uppercase;
   transition:color .2s;
 }
-.nav-links a:hover{color:var(--gold);}
+.nav-links a:hover{color:var(--navy);}
 .nav-cta{
   background:var(--gold);color:var(--navy)!important;
   padding:11px 24px;border-radius:2px;
@@ -54,42 +54,49 @@ nav{
 
 /* ── HERO ── */
 .hero{
-  min-height:100vh;
-  background:var(--navy-dk);
-  position:relative;overflow:hidden;
-  display:flex;align-items:center;
+  position:relative;
+  height:100vh;min-height:640px;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
 }
-.hero-grid{
+/* Fullscreen slideshow behind everything */
+.hero-slides{
+  position:absolute;inset:0;z-index:0;
+}
+.hero-slide{
   position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(200,149,42,.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(200,149,42,.04) 1px,transparent 1px);
-  background-size:72px 72px;
+  background-size:cover;background-position:center;
+  opacity:0;transition:opacity 1.4s ease-in-out;
 }
-.hero-glow{
-  position:absolute;
-  width:900px;height:900px;
-  border-radius:50%;
-  background:radial-gradient(ellipse,rgba(200,149,42,.12) 0%,transparent 65%);
-  top:50%;left:55%;
-  transform:translate(-50%,-50%);
-  pointer-events:none;
+.hero-slide.active{opacity:1;}
+/* Dark gradient overlay so text is always readable */
+.hero-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(
+    135deg,
+    rgba(1,5,53,0.82) 0%,
+    rgba(1,5,53,0.60) 50%,
+    rgba(1,5,53,0.45) 100%
+  );
 }
-.hero-glow2{
-  position:absolute;
-  width:500px;height:500px;
-  border-radius:50%;
-  background:radial-gradient(ellipse,rgba(2,10,91,.8) 0%,transparent 70%);
-  top:20%;left:10%;
-  pointer-events:none;
+/* slide dot navigation */
+.slide-dots{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  z-index:3;display:flex;gap:10px;
 }
+.slide-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.5);
+  cursor:pointer;transition:all .3s;
+}
+.slide-dot.active{background:var(--gold);border-color:var(--gold);transform:scale(1.2);}
 .hero-content{
   position:relative;z-index:2;
-  max-width:1200px;margin:0 auto;padding:0 60px;
-  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
+  max-width:900px;margin:0 auto;padding:0 60px;
+  text-align:center;
   width:100%;
+  animation:fadeUp 1s ease both;
 }
-.hero-left{animation:fadeUp .8s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(32px);}to{opacity:1;transform:none;}}
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:10px;
@@ -108,9 +115,9 @@ nav{
 }
 .hero-sub{
   font-size:17px;font-weight:300;line-height:1.7;
-  color:rgba(255,255,255,.6);margin-bottom:48px;max-width:480px;
+  color:rgba(255,255,255,.75);margin-bottom:48px;max-width:720px;margin-left:auto;margin-right:auto;
 }
-.hero-btns{display:flex;gap:16px;flex-wrap:wrap;}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
 .btn-gold{
   background:var(--gold);color:var(--navy);
   padding:16px 36px;border-radius:2px;
@@ -129,6 +136,7 @@ nav{
 .hero-stats{
   display:flex;gap:40px;margin-top:56px;padding-top:40px;
   border-top:1px solid rgba(255,255,255,.08);
+justify-content:center;
 }
 .hstat-num{
   font-family:'Cormorant Garamond',serif;
@@ -460,28 +468,21 @@ footer{
 .reveal-delay-3{transition-delay:.3s;}
 .reveal-delay-4{transition-delay:.4s;}
 
-/* ── Hero Slideshow ── */
-.hero-slideshow {
-  position:relative;width:100%;max-width:500px;
-  aspect-ratio:4/3;border-radius:12px;overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,.5);
-  border:1px solid rgba(200,149,42,.25);
-}
-.hero-slide {
-  position:absolute;inset:0;opacity:0;
-  transition:opacity 1s ease-in-out;
-  background-size:cover;background-position:center;
-}
+/* ── Fullscreen Hero Slideshow ── */
+.hero{position:relative;height:100vh;min-height:640px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.hero-slides{position:absolute;inset:0;z-index:0;}
+.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.4s ease-in-out;}
 .hero-slide.active{opacity:1;}
-.slide-caption {
-  position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(transparent,rgba(1,5,53,.85));
-  padding:32px 20px 16px;color:#fff;font-size:14px;
-  font-weight:500;letter-spacing:.5px;
-}
-.slide-dots{position:absolute;bottom:52px;right:16px;display:flex;gap:6px;}
-.slide-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:background .3s;}
-.slide-dot.active{background:var(--gold);}
+.hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(1,5,53,0.82) 0%,rgba(1,5,53,0.60) 50%,rgba(1,5,53,0.40) 100%);}
+.hero-content{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:0 60px;text-align:center;width:100%;animation:fadeUp 1s ease both;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:32px;height:1px;background:var(--gold);}
+.slide-dots{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:12px;}
+.slide-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.5);cursor:pointer;transition:all .3s;}
+.slide-dot.active{background:var(--gold);border-color:var(--gold);transform:scale(1.25);}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.hero-stats{display:flex;gap:48px;margin-top:56px;padding-top:40px;border-top:1px solid rgba(255,255,255,.12);justify-content:center;}
+
 </style>
 </head>
 <body>
@@ -500,50 +501,30 @@ footer{
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-grid"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-glow2"></div>
+  <div class="hero-slides" id="heroSlides">
+    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=1600&q=85')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1560440021-33f9b867899d?w=1600&q=85')"></div>
+  </div>
+  <div class="hero-overlay"></div>
   <div class="hero-content">
-    <div class="hero-left">
-      <div class="hero-eyebrow">Memphis &amp; Nashville</div>
-      <h1 class="hero-h1">Flooring Built for <em>Property Managers</em></h1>
-      <p class="hero-sub">Fast turnovers. Consistent quality. A dedicated portal so you can place orders, track jobs, and manage every property from one place.</p>
-      <div class="hero-btns">
-        <a href="#contact" class="btn-gold">&#128222; Get a Quote</a>
-        <a href="portal.html" target="_blank" class="btn-outline">Client Portal &#8599;</a>
-      </div>
-      <div class="hero-stats">
-        <div><div class="hstat-num">15+</div><div class="hstat-lbl">Years Serving<br>Multifamily</div></div>
-        <div><div class="hstat-num">500+</div><div class="hstat-lbl">Units Per<br>Month</div></div>
-        <div><div class="hstat-num">48hr</div><div class="hstat-lbl">Average<br>Turnaround</div></div>
-      </div>
+    <div class="hero-eyebrow">Memphis &amp; Nashville &mdash; Since 1976</div>
+    <h1 class="hero-h1">Flooring Done Right.<br><em>Every Unit. Every Time.</em></h1>
+    <p class="hero-sub">Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-gold">&#128222; Get a Quote</a>
+      <a href="portal.html" target="_blank" class="btn-outline">Client Portal &#8599;</a>
     </div>
-    <div class="hero-right">
-      <div class="hero-slideshow" id="heroSlideshow">
-        <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80')"></div>
-        <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&q=80')"></div>
-        <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80')"></div>
-        <div class="slide-caption" id="slideCaption">Professional carpet installation — turnover-ready</div>
-        <div class="slide-dots">
-          <div class="slide-dot active" onclick="goSlide(0)"></div>
-          <div class="slide-dot" onclick="goSlide(1)"></div>
-          <div class="slide-dot" onclick="goSlide(2)"></div>
-        </div>
-      </div>
-      <div class="hero-badge">
-        <div class="badge-num">A+</div>
-        <div class="badge-txt">Service<br>Rating</div>
-      </div>
-      <div class="hero-card">
-        <div class="hero-card-title">Flooring Services</div>
-        <div class="service-list">
-          <div class="svc-item"><div class="svc-icon">&#129528;</div><div><div class="svc-name">Carpet Installation</div><div class="svc-desc">Turnover-ready, same-week scheduling</div></div></div>
-          <div class="svc-item"><div class="svc-icon">&#11036;</div><div><div class="svc-name">Luxury Vinyl Plank</div><div class="svc-desc">Durable, waterproof, resident-approved</div></div></div>
-          <div class="svc-item"><div class="svc-icon">&#127959;</div><div><div class="svc-name">Sheet Vinyl &amp; Tile</div><div class="svc-desc">Kitchens, baths, laundry rooms</div></div></div>
-          <div class="svc-item"><div class="svc-icon">&#128062;</div><div><div class="svc-name">Pet Seal Treatment</div><div class="svc-desc">Subfloor odor elimination before install</div></div></div>
-        </div>
-      </div>
+    <div class="hero-stats">
+      <div><div class="hstat-num">15+</div><div class="hstat-lbl">Years<br>Experience</div></div>
+      <div><div class="hstat-num">500+</div><div class="hstat-lbl">Units Per<br>Month</div></div>
+      <div><div class="hstat-num">48hr</div><div class="hstat-lbl">Average<br>Turnaround</div></div>
     </div>
+  </div>
+  <div class="slide-dots">
+    <div class="slide-dot active" onclick="goSlide(0)"></div>
+    <div class="slide-dot" onclick="goSlide(1)"></div>
+    <div class="slide-dot" onclick="goSlide(2)"></div>
   </div>
 </section>
 
@@ -809,12 +790,33 @@ var io = new IntersectionObserver(function(entries) {
 }, {threshold: 0.12});
 revealEls.forEach(function(el) { io.observe(el); });
 
-// Nav scroll effect
+// Nav // ── Hero Slideshow ──
+(function() {
+  var cur = 0;
+  var slides, dots;
+  function init() {
+    slides = document.querySelectorAll('.hero-slide');
+    dots   = document.querySelectorAll('.slide-dot');
+    if (!slides.length) return;
+    setInterval(function() { window.goSlide((cur + 1) % slides.length); }, 5000);
+  }
+  window.goSlide = function(n) {
+    if (!slides) return;
+    slides[cur].classList.remove('active');
+    dots[cur].classList.remove('active');
+    cur = n;
+    slides[cur].classList.add('active');
+    dots[cur].classList.add('active');
+  };
+  document.addEventListener('DOMContentLoaded', init);
+})();
+
+scroll effect
 window.addEventListener('scroll', function() {
   var nav = document.getElementById('mainnav');
   if (window.scrollY > 60) {
     nav.style.height = '64px';
-    nav.style.boxShadow = '0 4px 40px rgba(0,0,0,.3)';
+    nav.style.boxShadow = '0 4px 24px rgba(2,10,91,.08)';
   } else {
     nav.style.height = '80px';
     nav.style.boxShadow = 'none';
@@ -845,19 +847,14 @@ function toast(msg) {
 </script>
 
 <script>
+// Hero Slideshow
 (function() {
-  var captions = [
-    "Professional carpet installation — turnover-ready",
-    "Luxury vinyl plank — durable, beautiful, fast",
-    "Complete flooring makeover — one stop, one call"
-  ];
-  var cur = 0;
-  var slides, dots, cap;
+  var cur = 0, slides, dots;
   function init() {
     slides = document.querySelectorAll('.hero-slide');
-    dots = document.querySelectorAll('.slide-dot');
-    cap = document.getElementById('slideCaption');
-    setInterval(function() { goSlide((cur + 1) % slides.length); }, 4500);
+    dots   = document.querySelectorAll('.slide-dot');
+    if (!slides.length) return;
+    setInterval(function() { window.goSlide((cur + 1) % slides.length); }, 5000);
   }
   window.goSlide = function(n) {
     if (!slides) return;
@@ -866,7 +863,6 @@ function toast(msg) {
     cur = n;
     slides[cur].classList.add('active');
     dots[cur].classList.add('active');
-    if (cap) cap.textContent = captions[cur];
   };
   document.addEventListener('DOMContentLoaded', init);
 })();

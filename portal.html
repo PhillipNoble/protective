@@ -491,6 +491,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
       <div class="nlabel">Management</div>
       <div class="ni" onclick="anav('aprops',this)"><span class="ic">&#127968;</span> Properties</div>
       <div class="ni" onclick="anav('ausers',this)"><span class="ic">&#128101;</span> Client Logins</div>
+      <div class="ni" onclick="anav('ateam',this)"><span class="ic">&#128274;</span> Portal Users</div>
       <div class="nlabel">Settings</div>
       <div class="ni" onclick="anav('aset',this)"><span class="ic">&#9881;</span> Portal Settings</div>
     </nav>
@@ -728,6 +729,33 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
       <!-- ADMIN SETTINGS -->
       <div class="panel" id="aset">
+      <!-- PORTAL USERS PANEL -->
+      <div class="panel" id="ateam">
+        <div class="shd">
+          <h2>Portal Users</h2>
+          <button class="bs gd" onclick="openAddTeamUser()">+ Add User</button>
+        </div>
+        <p style="color:var(--gray);font-size:13px;margin-bottom:24px;">Manage staff and admin accounts. Assign roles to control what each person can access.</p>
+
+        <!-- Role legend -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:8px 14px;border-radius:4px;font-size:12px;">
+            <strong style="color:#15803d;">&#128737; Super Admin</strong> &mdash; Full access: all panels, user management, settings
+          </div>
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;padding:8px 14px;border-radius:4px;font-size:12px;">
+            <strong style="color:#1d4ed8;">&#128274; Admin</strong> &mdash; Orders, properties, client logins. Cannot manage portal users or settings.
+          </div>
+          <div style="background:#fefce8;border:1px solid #fde68a;padding:8px 14px;border-radius:4px;font-size:12px;">
+            <strong style="color:#854d0e;">&#128203; Staff</strong> &mdash; View orders and properties only. Read-only.
+          </div>
+        </div>
+
+        <div class="tw"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th></th></tr></thead>
+          <tbody id="teamTbody"><!-- rendered by renderTeamTable() --></tbody>
+        </table></div>
+      </div>
+
         <div class="fc"><h3>Email Notifications</h3>
           <div class="fg"><label>Order Request Notification Email</label><input type="email" value="info@protectiveflooring.com"></div>
           <div class="fg"><label>Scheduling Confirmation</label><select><option>Client + info@protectiveflooring.com</option><option>Client Only</option></select></div>
@@ -885,6 +913,75 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 </div>
 
 
+<div class="mb" id="mteam">
+  <div class="modal">
+    <div class="mh"><h3>Add Portal User</h3><button class="mx" onclick="closeM('mteam')">&#10005;</button></div>
+    <div class="mbody">
+      <div class="form-row">
+        <div class="fg"><label>First Name *</label><input type="text" id="tm_first" placeholder="Jane"></div>
+        <div class="fg"><label>Last Name *</label><input type="text" id="tm_last" placeholder="Smith"></div>
+      </div>
+      <div class="fg"><label>Email Address *</label><input type="email" id="tm_email" placeholder="jane@protectiveflooring.com"></div>
+      <div class="form-row">
+        <div class="fg"><label>Password *</label><input type="password" id="tm_pw" placeholder="Min 8 characters"></div>
+        <div class="fg"><label>Confirm Password *</label><input type="password" id="tm_pw2" placeholder="Repeat password"></div>
+      </div>
+      <div class="fg"><label>Role / Access Level *</label>
+        <select id="tm_role">
+          <option value="superadmin">&#128737; Super Admin &mdash; Full access including user management</option>
+          <option value="admin" selected>&#128274; Admin &mdash; Orders, properties, client logins</option>
+          <option value="staff">&#128203; Staff &mdash; View orders &amp; properties (read-only)</option>
+        </select>
+      </div>
+      <div id="tm_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
+    </div>
+    <div class="mf">
+      <button class="bl ol" onclick="closeM('mteam')">Cancel</button>
+      <button class="bl gd" onclick="saveNewTeamUser()">Create User</button>
+    </div>
+  </div>
+</div>
+
+<div class="mb" id="mteamedit">
+  <div class="modal">
+    <div class="mh"><h3>Edit Portal User</h3><button class="mx" onclick="closeM('mteamedit')">&#10005;</button></div>
+    <div class="mbody">
+      <input type="hidden" id="te_id">
+      <div class="form-row">
+        <div class="fg"><label>First Name *</label><input type="text" id="te_first"></div>
+        <div class="fg"><label>Last Name *</label><input type="text" id="te_last"></div>
+      </div>
+      <div class="fg"><label>Email Address *</label><input type="email" id="te_email"></div>
+      <div class="ms" style="margin-bottom:16px;">
+        <div class="mst">Reset Password <span style="font-size:10px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">(leave blank to keep current)</span></div>
+        <div class="form-row">
+          <div class="fg" style="margin-bottom:0;"><label>New Password</label><input type="password" id="te_pw" placeholder="Leave blank to keep current"></div>
+          <div class="fg" style="margin-bottom:0;"><label>Confirm</label><input type="password" id="te_pw2"></div>
+        </div>
+      </div>
+      <div class="fg"><label>Role / Access Level</label>
+        <select id="te_role">
+          <option value="superadmin">&#128737; Super Admin &mdash; Full access</option>
+          <option value="admin">&#128274; Admin &mdash; Orders, properties, client logins</option>
+          <option value="staff">&#128203; Staff &mdash; View only</option>
+        </select>
+      </div>
+      <div class="fg"><label>Status</label>
+        <select id="te_status">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive / Suspended</option>
+        </select>
+      </div>
+      <div id="te_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
+    </div>
+    <div class="mf">
+      <button class="bl dn" style="margin-right:auto;padding:10px 20px;font-size:12px;" onclick="deleteTeamUser()">&#128465; Delete</button>
+      <button class="bl ol" onclick="closeM('mteamedit')">Cancel</button>
+      <button class="bl gd" onclick="saveEditTeamUser()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <div class="mb" id="medit">
   <div class="modal">
     <div class="mh"><h3>Edit Client Login</h3><button class="mx" onclick="closeM('medit')">&#10005;</button></div>
@@ -929,10 +1026,17 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 <script>
 // ── DATA ──
 // ── USER STORE (persisted in localStorage) ──
-var ADMIN_USERS = [
-  {email:"admin@protectiveflooring.com", password:"PF-Admin-2025!", name:"PF Admin", initials:"PF", role:"admin"},
-  {email:"ops@protectiveflooring.com",   password:"PFOps2025!",     name:"Ops Manager", initials:"OM", role:"admin"}
+var DEFAULT_TEAM = [
+  {id:"t1", email:"admin@protectiveflooring.com", password:"PF-Admin-2025!", name:"PF Admin",    initials:"PA", role:"superadmin", status:"active", created:"Jan 1, 2025"},
+  {id:"t2", email:"ops@protectiveflooring.com",   password:"PFOps2025!",     name:"Ops Manager", initials:"OM", role:"admin",      status:"active", created:"Jan 1, 2025"}
 ];
+function loadTeam() {
+  try { var s=localStorage.getItem('pf_team'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_TEAM)); } catch(e){return JSON.parse(JSON.stringify(DEFAULT_TEAM));}
+}
+function saveTeam(arr) { try{localStorage.setItem('pf_team',JSON.stringify(arr));}catch(e){} }
+function getTeam() { return loadTeam(); }
+// Keep ADMIN_USERS as alias used by doLogin
+var ADMIN_USERS = loadTeam();
 
 var DEFAULT_CLIENTS = [
   {id:"u1", email:"manager@cherrycreek.com",  password:"Cherry2025!", name:"Jessica Lane",  initials:"JL", props:["Cherry Creek Apartments"],   role:"Property Manager", hub:"nashville", status:"active",  created:"Feb 20, 2025"},
@@ -1032,10 +1136,20 @@ function doLogin() {
   var pw = document.getElementById('lpw').value;
   document.getElementById('lerr').style.display = 'none';
 
-  // Check admin accounts first
-  for (var i = 0; i < ADMIN_USERS.length; i++) {
-    if (ADMIN_USERS[i].email.toLowerCase() === email && ADMIN_USERS[i].password === pw) {
+  // Check portal users (admin/staff accounts)
+  var team = getTeam();
+  for (var i = 0; i < team.length; i++) {
+    var tu = team[i];
+    if (tu.email.toLowerCase() === email && tu.password === pw) {
+      if (tu.status === 'inactive') {
+        document.getElementById('lerr').textContent = 'This account has been deactivated.';
+        document.getElementById('lerr').style.display = 'block';
+        return;
+      }
+      // Store logged-in team user info for permission checks
+      window.currentTeamUser = tu;
       go('ad');
+      applyRoleRestrictions(tu.role);
       return;
     }
   }
@@ -1190,6 +1304,7 @@ function anav(pid, el) {
   if (t) t.classList.add('on');
   var titles = {adash:'Admin Dashboard',aord:'All Orders',aprops:'Properties',ausers:'Client Logins',aset:'Portal Settings'};
   if (pid === 'ausers') renderUserTable();
+  if (pid === 'ateam') renderTeamTable();
   document.getElementById('atitle').textContent = titles[pid] || pid;
 }
 
@@ -1414,6 +1529,162 @@ function saveFp() {
   closeM('mfpe');toast('Floor plan saved.');
 }
 
+
+
+// ── PORTAL USER (TEAM) MANAGEMENT ──
+function roleLabel(role) {
+  if (role==='superadmin') return '<span class="b gd" style="background:rgba(21,128,61,.12);color:#15803d;border:1px solid #bbf7d0;">\u{1F6E1} Super Admin</span>';
+  if (role==='admin')      return '<span class="b nv">\u{1F512} Admin</span>';
+  return '<span class="b in" style="background:#fefce8;color:#854d0e;border-color:#fde68a;">\u{1F4CB} Staff</span>';
+}
+function renderTeamTable() {
+  var team = getTeam();
+  var tb = document.getElementById('teamTbody');
+  if (!tb) return;
+  tb.innerHTML = team.map(function(u) {
+    var sbadge = u.status==='active' ? '<span class="b ac">Active</span>' : '<span class="b in">Inactive</span>';
+    return '<tr>'
+      + '<td><strong>' + u.name + '</strong></td>'
+      + '<td>' + u.email + '</td>'
+      + '<td>' + roleLabel(u.role) + '</td>'
+      + '<td>' + sbadge + '</td>'
+      + '<td>' + (u.created||'--') + '</td>'
+      + '<td><div style="display:flex;gap:6px;">'
+      +   '<button class="bs ol" onclick="openEditTeamUser(\'' + u.id + '\')">Edit</button>'
+      +   (u.status==='active'
+          ? '<button class="bs dn" onclick="toggleTeamStatus(\'' + u.id + '\',\'inactive\')">Suspend</button>'
+          : '<button class="bs gn" onclick="toggleTeamStatus(\'' + u.id + '\',\'active\')">Activate</button>')
+      + '</div></td></tr>';
+  }).join('');
+}
+
+function openAddTeamUser() {
+  ['tm_first','tm_last','tm_email','tm_pw','tm_pw2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('tm_role').value = 'admin';
+  document.getElementById('tm_err').style.display = 'none';
+  openM('mteam');
+}
+
+function saveNewTeamUser() {
+  var first = (document.getElementById('tm_first').value||'').trim();
+  var last  = (document.getElementById('tm_last').value||'').trim();
+  var email = (document.getElementById('tm_email').value||'').trim().toLowerCase();
+  var pw    = document.getElementById('tm_pw').value;
+  var pw2   = document.getElementById('tm_pw2').value;
+  var role  = document.getElementById('tm_role').value;
+  var err   = document.getElementById('tm_err');
+  err.style.display='none';
+  if (!first||!last)           { err.textContent='First and last name required.'; err.style.display='block'; return; }
+  if (!email||!email.includes('@')) { err.textContent='Valid email required.'; err.style.display='block'; return; }
+  if (pw.length<8)             { err.textContent='Password must be at least 8 characters.'; err.style.display='block'; return; }
+  if (pw!==pw2)                { err.textContent='Passwords do not match.'; err.style.display='block'; return; }
+  var team = getTeam();
+  for (var i=0;i<team.length;i++) { if(team[i].email===email){err.textContent='Email already exists.';err.style.display='block';return;} }
+  var today=new Date(), months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  team.push({
+    id:'t'+Date.now(), email:email, password:pw,
+    name:first+' '+last, initials:(first[0]+last[0]).toUpperCase(),
+    role:role, status:'active',
+    created:months[today.getMonth()]+' '+today.getDate()+', '+today.getFullYear()
+  });
+  saveTeam(team);
+  ADMIN_USERS = getTeam();
+  closeM('mteam');
+  renderTeamTable();
+  toast('Portal user created: '+first+' '+last+'.');
+}
+
+function openEditTeamUser(uid) {
+  var team=getTeam(), u=null;
+  for(var i=0;i<team.length;i++){if(team[i].id===uid){u=team[i];break;}}
+  if(!u)return;
+  document.getElementById('te_id').value=u.id;
+  var parts=u.name.split(' ');
+  document.getElementById('te_first').value=parts[0]||'';
+  document.getElementById('te_last').value=parts.slice(1).join(' ')||'';
+  document.getElementById('te_email').value=u.email;
+  document.getElementById('te_pw').value='';
+  document.getElementById('te_pw2').value='';
+  document.getElementById('te_role').value=u.role||'admin';
+  document.getElementById('te_status').value=u.status||'active';
+  document.getElementById('te_err').style.display='none';
+  openM('mteamedit');
+}
+
+function saveEditTeamUser() {
+  var uid   = document.getElementById('te_id').value;
+  var first = (document.getElementById('te_first').value||'').trim();
+  var last  = (document.getElementById('te_last').value||'').trim();
+  var email = (document.getElementById('te_email').value||'').trim().toLowerCase();
+  var pw    = document.getElementById('te_pw').value;
+  var pw2   = document.getElementById('te_pw2').value;
+  var err   = document.getElementById('te_err');
+  err.style.display='none';
+  if(!first||!last){err.textContent='Name required.';err.style.display='block';return;}
+  if(!email||!email.includes('@')){err.textContent='Valid email required.';err.style.display='block';return;}
+  if(pw&&pw.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return;}
+  if(pw&&pw!==pw2){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  var team=getTeam();
+  for(var i=0;i<team.length;i++){
+    if(team[i].id===uid){
+      team[i].name=first+' '+last;
+      team[i].initials=(first[0]+last[0]).toUpperCase();
+      team[i].email=email;
+      team[i].role=document.getElementById('te_role').value;
+      team[i].status=document.getElementById('te_status').value;
+      if(pw) team[i].password=pw;
+      break;
+    }
+  }
+  saveTeam(team);
+  ADMIN_USERS=getTeam();
+  closeM('mteamedit');
+  renderTeamTable();
+  toast('User updated.');
+}
+
+function toggleTeamStatus(uid, newStatus) {
+  var team=getTeam();
+  for(var i=0;i<team.length;i++){if(team[i].id===uid){team[i].status=newStatus;break;}}
+  saveTeam(team);
+  ADMIN_USERS=getTeam();
+  renderTeamTable();
+  toast(newStatus==='active'?'Account reactivated.':'Account suspended.');
+}
+
+function deleteTeamUser() {
+  var uid=document.getElementById('te_id').value;
+  var name=document.getElementById('te_first').value+' '+document.getElementById('te_last').value;
+  var team=getTeam();
+  if(team.length<=1){toast('Cannot delete the last admin user.');return;}
+  if(!confirm('Permanently delete '+name.trim()+'? This cannot be undone.'))return;
+  team=team.filter(function(u){return u.id!==uid;});
+  saveTeam(team);
+  ADMIN_USERS=getTeam();
+  closeM('mteamedit');
+  renderTeamTable();
+  toast('User deleted.');
+}
+
+function applyRoleRestrictions(role) {
+  // Portal Users nav item: superadmin only
+  var teamNavItems = document.querySelectorAll('[onclick*="ateam"]');
+  teamNavItems.forEach(function(el) {
+    el.style.display = (role === 'superadmin') ? '' : 'none';
+  });
+  // Settings nav item: superadmin only
+  var setNavItems = document.querySelectorAll('[onclick*="aset"]');
+  setNavItems.forEach(function(el) {
+    el.style.display = (role === 'superadmin') ? '' : 'none';
+  });
+  // Staff: hide Client Logins and Properties edit controls
+  if (role === 'staff') {
+    var addBtns = document.querySelectorAll('#ausers .bs.gd, #aprops .bs.gd');
+    addBtns.forEach(function(b){b.style.display='none';});
+  }
+}
+
+// ── END PORTAL USER MANAGEMENT ──
 
 // ── USER MANAGEMENT ──
 function renderUserTable() {
