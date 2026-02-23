@@ -490,6 +490,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
       <div class="ni" onclick="anav('aord',this)"><span class="ic">&#9783;</span> All Orders <span class="nb">4</span></div>
       <div class="nlabel">Management</div>
       <div class="ni" onclick="anav('aprops',this)"><span class="ic">&#127968;</span> Properties</div>
+      <div class="ni" onclick="anav('afloorplans',this)"><span class="ic">&#9635;</span> Floor Plans</div>
       <div class="ni" onclick="anav('ausers',this)"><span class="ic">&#128101;</span> Client Logins</div>
       <div class="ni" onclick="anav('ateam',this)"><span class="ic">&#128274;</span> Portal Users</div>
       <div class="nlabel">Settings</div>
@@ -729,6 +730,28 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
       <!-- ADMIN SETTINGS -->
       <div class="panel" id="aset">
+      <!-- FLOOR PLANS ADMIN PANEL -->
+      <div class="panel" id="afloorplans">
+        <div class="shd">
+          <h2>Floor Plans</h2>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <select id="afp_propsel" onchange="renderAdminFpTable()" style="padding:8px 12px;border:1px solid var(--border);border-radius:3px;font-size:13px;font-family:inherit;">
+              <option value="cherry-creek-apartments">Cherry Creek Apartments</option>
+              <option value="riverside-apartments">Riverside Apartments</option>
+              <option value="arbor-ridge-nashville">Arbor Ridge Nashville</option>
+            </select>
+            <button class="bs gd" onclick="openAddFloorPlan()">+ Add Floor Plan</button>
+          </div>
+        </div>
+        <p style="color:var(--gray);font-size:13px;margin-bottom:20px;">
+          Floor plans defined here populate the client portal. Changes take effect immediately for all users assigned to that property.
+        </p>
+        <div class="tw"><table>
+          <thead><tr><th>Plan Name</th><th>Type</th><th>Sq Ft</th><th>Beds</th><th>Baths</th><th>Rooms</th><th></th></tr></thead>
+          <tbody id="afpTbody"><!-- rendered by renderAdminFpTable() --></tbody>
+        </table></div>
+      </div>
+
       <!-- PORTAL USERS PANEL -->
       <div class="panel" id="ateam">
         <div class="shd">
@@ -913,6 +936,35 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 </div>
 
 
+<div class="mb" id="mfpadd">
+  <div class="modal">
+    <div class="mh"><h3 id="mfpadd_title">Add Floor Plan</h3><button class="mx" onclick="closeM('mfpadd')">&#10005;</button></div>
+    <div class="mbody">
+      <input type="hidden" id="fpa_prop">
+      <input type="hidden" id="fpa_id_orig">
+      <div class="fg"><label>Plan Name *</label><input type="text" id="fpa_name" placeholder="e.g. Addison Renovated"></div>
+      <div class="form-row">
+        <div class="fg"><label>Sq Ft *</label><input type="text" id="fpa_sqft" placeholder="e.g. 735"></div>
+        <div class="fg"><label>Bedrooms *</label>
+          <select id="fpa_beds"><option value="0">Studio</option><option value="1">1 Bed</option><option value="2">2 Bed</option><option value="3">3 Bed</option><option value="4">4 Bed</option></select>
+        </div>
+        <div class="fg"><label>Bathrooms *</label>
+          <select id="fpa_baths"><option value="1">1 Bath</option><option value="1.5">1.5 Bath</option><option value="2">2 Bath</option><option value="2.5">2.5 Bath</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>Rooms (one per line)</label>
+        <textarea id="fpa_rooms" rows="6" placeholder="Living Room&#10;Bedroom&#10;Kitchen&#10;Bathroom&#10;Walk-in Closet&#10;Patio/Balcony"></textarea>
+      </div>
+      <div id="fpa_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
+    </div>
+    <div class="mf">
+      <button class="bl dn" id="fpa_delbtn" style="display:none;margin-right:auto;padding:10px 20px;font-size:12px;" onclick="deleteFloorPlan()">&#128465; Delete</button>
+      <button class="bl ol" onclick="closeM('mfpadd')">Cancel</button>
+      <button class="bl gd" onclick="saveFloorPlan()">Save Floor Plan</button>
+    </div>
+  </div>
+</div>
+
 <div class="mb" id="mteam">
   <div class="modal">
     <div class="mh"><h3>Add Portal User</h3><button class="mx" onclick="closeM('mteam')">&#10005;</button></div>
@@ -1057,7 +1109,7 @@ function getUsers() { return loadUsers(); }
 
 // Legacy alias so existing code still works
 var users = loadUsers();
-var fpByProp = {"riverside":[{id:"RV-1BR",name:"1 Bed / 1 Bath",sqft:"650"}, {id:"RV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"850"}, {id:"RV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,050"}, {id:"RV-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,280"}],"parkview":[{id:"PV-1BR",name:"1 Bed / 1 Bath",sqft:"620"}, {id:"PV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"820"}, {id:"PV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"980"}],"columns":[{id:"COL-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,100"}, {id:"COL-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,380"}],"magnolia":[{id:"MAG-1BR",name:"1 Bed / 1 Bath",sqft:"680"}, {id:"MAG-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,020"}],"cherrycreek":[{id:"CC-1BR",name:"1 Bed / 1 Bath",sqft:"720"}, {id:"CC-2BR1BA",name:"2 Bed / 1 Bath",sqft:"920"}, {id:"CC-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,080"}, {id:"CC-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,350"}],"arborridge":[{id:"AR-STU",name:"Studio",sqft:"450"}, {id:"AR-1BR",name:"1 Bed / 1 Bath",sqft:"700"}, {id:"AR-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,080"}, {id:"AR-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,350"}],"hermitage":[{id:"RS-1BR",name:"1 Bed / 1 Bath",sqft:"660"}, {id:"RS-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,040"}],};
+var fpByProp = {"riverside":[{id:"RV-1BR",name:"1 Bed / 1 Bath",sqft:"650"}, {id:"RV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"850"}, {id:"RV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,050"}, {id:"RV-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,280"}],"parkview":[{id:"PV-1BR",name:"1 Bed / 1 Bath",sqft:"620"}, {id:"PV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"820"}, {id:"PV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"980"}],"columns":[{id:"COL-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,100"}, {id:"COL-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,380"}],"magnolia":[{id:"MAG-1BR",name:"1 Bed / 1 Bath",sqft:"680"}, {id:"MAG-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,020"}],"cherry-creek-apartments":[{id:"CC-ASHFORD",name:"Ashford — 1 Bed / 1 Bath",sqft:"600"}, {id:"CC-ASHFORD-R",name:"Ashford Renovated — 1 Bed / 1 Bath",sqft:"600"}, {id:"CC-ADDISON",name:"Addison — 1 Bed / 1 Bath",sqft:"735"}, {id:"CC-ADDISON-R",name:"Addison Renovated — 1 Bed / 1 Bath",sqft:"735"}, {id:"CC-ASHLEY",name:"Ashley — 1 Bed / 1 Bath",sqft:"920"}, {id:"CC-ASHLEY-R",name:"Ashley Renovated — 1 Bed / 1 Bath",sqft:"920"}, {id:"CC-BRITTANY",name:"Brittany — 2 Bed / 1 Bath",sqft:"800"}, {id:"CC-BRITTANY-R",name:"Brittany Renovated — 2 Bed / 1 Bath",sqft:"800"}, {id:"CC-BERKLEY",name:"Berkley — 2 Bed / 1 Bath",sqft:"971"}, {id:"CC-BERKLEY-R",name:"Berkley Renovated — 2 Bed / 1 Bath",sqft:"971"}, {id:"CC-CHARLESTON",name:"Charleston — 2 Bed / 2 Bath",sqft:"1,073"}, {id:"CC-CHARLESTON-R",name:"Charleston Renovated — 2 Bed / 2 Bath",sqft:"1,073"}, {id:"CC-CAMERON",name:"Cameron — 2 Bed / 2 Bath",sqft:"1,100"}, {id:"CC-CAMERON-R",name:"Cameron Renovated — 2 Bed / 2 Bath",sqft:"1,100"}, {id:"CC-CARLTON",name:"Carlton — 2 Bed / 2 Bath",sqft:"1,289"}, {id:"CC-CARLTON-R",name:"Carlton Renovated — 2 Bed / 2 Bath",sqft:"1,289"}, {id:"CC-DEVONSHIRE",name:"Devonshire — 3 Bed / 2 Bath",sqft:"1,402"}, {id:"CC-DEVONSHIRE-R",name:"Devonshire Renovated — 3 Bed / 2 Bath",sqft:"1,402"}],"arborridge":[{id:"AR-STU",name:"Studio",sqft:"450"}, {id:"AR-1BR",name:"1 Bed / 1 Bath",sqft:"700"}, {id:"AR-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,080"}, {id:"AR-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,350"}],"hermitage":[{id:"RS-1BR",name:"1 Bed / 1 Bath",sqft:"660"}, {id:"RS-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,040"}],};
 var planPresets = {
   'CC-1BR':[
     {name:'Carpet Throughout',rooms:['Living Room','Bedroom','Hallway'],svc:'Carpet Installation'},
@@ -1115,10 +1167,24 @@ var fpStore = {};
 
 // Property floor plan details for card display
 var fpDetails = {
-  'CC-1BR':{name:'1 Bed / 1 Bath',sqft:'720 sq ft',rooms:['Living Room','Bedroom','Kitchen','Bathroom 1','Hallway']},
-  'CC-2BR1BA':{name:'2 Bed / 1 Bath',sqft:'920 sq ft',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom 1','Hallway']},
-  'CC-2BR2BA':{name:'2 Bed / 2 Bath',sqft:'1,080 sq ft',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Hallway']},
-  'CC-3BR2BA':{name:'3 Bed / 2 Bath',sqft:'1,350 sq ft',rooms:['Living Room','Bed 1','Bed 2','Bed 3','Kitchen','Bath 1','Bath 2','Dining Area','Hallway','Laundry Room']},
+  'CC-ASHFORD':{name:'Ashford',sqft:'600 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Patio/Balcony']},
+  'CC-ASHFORD-R':{name:'Ashford Renovated',sqft:'600 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Patio/Balcony'],renovated:true},
+  'CC-ADDISON':{name:'Addison',sqft:'735 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Patio/Balcony']},
+  'CC-ADDISON-R':{name:'Addison Renovated',sqft:'735 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Patio/Balcony'],renovated:true},
+  'CC-ASHLEY':{name:'Ashley',sqft:'920 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony']},
+  'CC-ASHLEY-R':{name:'Ashley Renovated',sqft:'920 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony'],renovated:true},
+  'CC-BRITTANY':{name:'Brittany',sqft:'800 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Patio/Balcony']},
+  'CC-BRITTANY-R':{name:'Brittany Renovated',sqft:'800 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Patio/Balcony'],renovated:true},
+  'CC-BERKLEY':{name:'Berkley',sqft:'971 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony']},
+  'CC-BERKLEY-R':{name:'Berkley Renovated',sqft:'971 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony'],renovated:true},
+  'CC-CHARLESTON':{name:'Charleston',sqft:'1,073 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','Patio/Balcony']},
+  'CC-CHARLESTON-R':{name:'Charleston Renovated',sqft:'1,073 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','Patio/Balcony'],renovated:true},
+  'CC-CAMERON':{name:'Cameron',sqft:'1,100 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Patio/Balcony']},
+  'CC-CAMERON-R':{name:'Cameron Renovated',sqft:'1,100 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Patio/Balcony'],renovated:true},
+  'CC-CARLTON':{name:'Carlton',sqft:'1,289 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony']},
+  'CC-CARLTON-R':{name:'Carlton Renovated',sqft:'1,289 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony'],renovated:true},
+  'CC-DEVONSHIRE':{name:'Devonshire',sqft:'1,402 sq ft',beds:3,baths:2,rooms:['Living Room','Bed 1','Bed 2','Bed 3','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony']},
+  'CC-DEVONSHIRE-R':{name:'Devonshire Renovated',sqft:'1,402 sq ft',beds:3,baths:2,rooms:['Living Room','Bed 1','Bed 2','Bed 3','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony'],renovated:true},
   'RV-1BR':{name:'1 Bed / 1 Bath',sqft:'650 sq ft',rooms:['Living Room','Bedroom','Kitchen','Bathroom 1','Hallway']},
   'RV-2BR1BA':{name:'2 Bed / 1 Bath',sqft:'850 sq ft',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom 1','Hallway']},
   'RV-2BR2BA':{name:'2 Bed / 2 Bath',sqft:'1,050 sq ft',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area']},
@@ -1230,16 +1296,29 @@ function buildFloorPlansPage(user) {
   grid.innerHTML = '';
   user.props.forEach(function(pname) {
     var pid = pname.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-    var fps = fpByProp[pid] || [];
+    var fps = (typeof getFpData === 'function') ? getFpData(pid) : (fpByProp[pid] || []);
     fps.forEach(function(fp) {
+      // Support both rich objects (from getFpData) and legacy fpDetails lookup
       var det = fpDetails[fp.id] || {};
-      var rooms = (det.rooms || []).map(function(r){ return '<span class="chip">'+r+'</span>'; }).join('');
+      var roomList = fp.rooms || det.rooms || [];
+      var beds = fp.beds !== undefined ? fp.beds : det.beds;
+      var baths = fp.baths !== undefined ? fp.baths : det.baths;
+      var sqftDisplay = fp.sqft ? fp.sqft + ' sq ft' : (det.sqft || '');
+      var typeLabel = '';
+      if (beds === 0) typeLabel = 'Studio';
+      else if (beds) typeLabel = beds + ' Bed / ' + baths + ' Bath';
+      var renovBadge = (fp.renovated || det.renovated) ? '<span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;margin-left:8px;vertical-align:middle;">RENOVATED</span>' : '';
+      var rooms = roomList.map(function(r){ return '<span class="chip">'+r+'</span>'; }).join('');
       var hasImg = !!fpStore[fp.id];
       var card = document.createElement('div');
       card.className = 'fc';
       card.style.marginBottom = '0';
       var btnCls = 'fit' + (hasImg ? ' hi' : '');
-      card.innerHTML = '<h3 style="font-size:17px;">'+fp.name+'</h3><p style="font-size:12px;color:var(--gray);margin-bottom:10px;">'+fp.sqft+' sq ft • '+pname+'</p><div style="margin-bottom:10px;">'+rooms+'</div><button class="'+btnCls+'" onclick="openFpImg(\''+fp.id+'\')">&#128506; '+(hasImg ? 'View Floor Plan' : 'No Image Yet')+'</button>';
+      card.innerHTML =
+        '<h3 style="font-size:17px;">'+fp.name+renovBadge+'</h3>' +
+        '<p style="font-size:12px;color:var(--gray);margin-bottom:6px;">' + (typeLabel ? typeLabel+' &bull; ' : '') + sqftDisplay + ' &bull; '+pname+'</p>' +
+        '<div style="margin-bottom:10px;">'+rooms+'</div>' +
+        '<button class="'+btnCls+'" onclick="openFpImg(\''+fp.id+'\')">&#128506; '+(hasImg ? 'View Floor Plan Image' : 'Upload Floor Plan Image')+'</button>';
       grid.appendChild(card);
     });
   });
@@ -1305,6 +1384,7 @@ function anav(pid, el) {
   var titles = {adash:'Admin Dashboard',aord:'All Orders',aprops:'Properties',ausers:'Client Logins',aset:'Portal Settings'};
   if (pid === 'ausers') renderUserTable();
   if (pid === 'ateam') renderTeamTable();
+  if (pid === 'afloorplans') renderAdminFpTable();
   document.getElementById('atitle').textContent = titles[pid] || pid;
 }
 
@@ -1530,6 +1610,152 @@ function saveFp() {
 }
 
 
+
+
+// ── FLOOR PLAN ADMIN MANAGEMENT ──
+
+// Returns prop-keyed floor plan data from localStorage (falls back to built-in fpByProp/fpDetails)
+function getFpData(propKey) {
+  try {
+    var stored = localStorage.getItem('pf_fp_' + propKey);
+    if (stored) return JSON.parse(stored);
+  } catch(e) {}
+  // Build from built-in data
+  var list = fpByProp[propKey] || [];
+  return list.map(function(fp) {
+    var det = fpDetails[fp.id] || {};
+    return {
+      id: fp.id,
+      name: fp.name,
+      sqft: fp.sqft,
+      beds: det.beds || 0,
+      baths: det.baths || 1,
+      rooms: det.rooms || [],
+      renovated: det.renovated || false
+    };
+  });
+}
+
+function saveFpData(propKey, arr) {
+  try { localStorage.setItem('pf_fp_' + propKey, JSON.stringify(arr)); } catch(e) {}
+  // Also refresh the in-memory fpByProp and fpDetails so client portal sees it immediately
+  fpByProp[propKey] = arr.map(function(fp) {
+    return {id: fp.id, name: fp.name, sqft: fp.sqft};
+  });
+  arr.forEach(function(fp) {
+    fpDetails[fp.id] = {name: fp.name, sqft: fp.sqft + ' sq ft', beds: fp.beds, baths: fp.baths, rooms: fp.rooms, renovated: fp.renovated};
+  });
+}
+
+function renderAdminFpTable() {
+  var propKey = document.getElementById('afp_propsel').value;
+  var fps = getFpData(propKey);
+  var tb = document.getElementById('afpTbody');
+  if (!tb) return;
+  if (!fps.length) {
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:32px;">No floor plans found for this property.</td></tr>';
+    return;
+  }
+  tb.innerHTML = fps.map(function(fp, i) {
+    var bedLabel = fp.beds === 0 ? 'Studio' : fp.beds + ' Bed';
+    var renovBadge = fp.renovated ? ' <span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;">RENOV</span>' : '';
+    return '<tr>'
+      + '<td><strong>' + fp.name + '</strong>' + renovBadge + '</td>'
+      + '<td>' + bedLabel + ' / ' + fp.baths + ' Bath</td>'
+      + '<td>' + fp.sqft + ' sq ft</td>'
+      + '<td>' + (fp.beds === 0 ? '—' : fp.beds) + '</td>'
+      + '<td>' + fp.baths + '</td>'
+      + '<td style="font-size:11px;color:var(--gray);">' + (fp.rooms || []).slice(0,4).join(', ') + (fp.rooms.length > 4 ? '…' : '') + '</td>'
+      + '<td><button class="bs ol" onclick="openEditFloorPlan(' + i + ')">Edit</button></td>'
+      + '</tr>';
+  }).join('');
+}
+
+function openAddFloorPlan() {
+  var propKey = document.getElementById('afp_propsel').value;
+  document.getElementById('mfpadd_title').textContent = 'Add Floor Plan';
+  document.getElementById('fpa_prop').value = propKey;
+  document.getElementById('fpa_id_orig').value = '';
+  document.getElementById('fpa_name').value = '';
+  document.getElementById('fpa_sqft').value = '';
+  document.getElementById('fpa_beds').value = '1';
+  document.getElementById('fpa_baths').value = '1';
+  document.getElementById('fpa_rooms').value = '';
+  document.getElementById('fpa_delbtn').style.display = 'none';
+  document.getElementById('fpa_err').style.display = 'none';
+  openM('mfpadd');
+}
+
+function openEditFloorPlan(idx) {
+  var propKey = document.getElementById('afp_propsel').value;
+  var fps = getFpData(propKey);
+  var fp = fps[idx];
+  if (!fp) return;
+  document.getElementById('mfpadd_title').textContent = 'Edit Floor Plan';
+  document.getElementById('fpa_prop').value = propKey;
+  document.getElementById('fpa_id_orig').value = fp.id;
+  document.getElementById('fpa_name').value = fp.name;
+  document.getElementById('fpa_sqft').value = fp.sqft;
+  document.getElementById('fpa_beds').value = String(fp.beds);
+  document.getElementById('fpa_baths').value = String(fp.baths);
+  document.getElementById('fpa_rooms').value = (fp.rooms || []).join('\n');
+  document.getElementById('fpa_delbtn').style.display = 'inline-flex';
+  document.getElementById('fpa_err').style.display = 'none';
+  openM('mfpadd');
+}
+
+function saveFloorPlan() {
+  var propKey = document.getElementById('fpa_prop').value;
+  var origId  = document.getElementById('fpa_id_orig').value;
+  var name    = document.getElementById('fpa_name').value.trim();
+  var sqft    = document.getElementById('fpa_sqft').value.trim();
+  var beds    = parseInt(document.getElementById('fpa_beds').value);
+  var baths   = parseFloat(document.getElementById('fpa_baths').value);
+  var roomsRaw = document.getElementById('fpa_rooms').value;
+  var err     = document.getElementById('fpa_err');
+  err.style.display = 'none';
+  if (!name) { err.textContent = 'Plan name is required.'; err.style.display = 'block'; return; }
+  if (!sqft) { err.textContent = 'Square footage is required.'; err.style.display = 'block'; return; }
+  var rooms = roomsRaw.split('\n').map(function(r){return r.trim();}).filter(Boolean);
+  var renovated = /renovat/i.test(name);
+  // Generate ID from prop key + sanitized name
+  var newId = propKey.toUpperCase().replace(/-/g,'_').substring(0,4) + '_' + name.toUpperCase().replace(/[^A-Z0-9]/g,'_').substring(0,12);
+  var fps = getFpData(propKey);
+  if (origId) {
+    // Edit existing
+    for (var i = 0; i < fps.length; i++) {
+      if (fps[i].id === origId) {
+        fps[i] = {id: origId, name: name, sqft: sqft, beds: beds, baths: baths, rooms: rooms, renovated: renovated};
+        break;
+      }
+    }
+  } else {
+    // Check duplicate name
+    for (var j = 0; j < fps.length; j++) {
+      if (fps[j].name.toLowerCase() === name.toLowerCase()) {
+        err.textContent = 'A floor plan with that name already exists.'; err.style.display = 'block'; return;
+      }
+    }
+    fps.push({id: newId, name: name, sqft: sqft, beds: beds, baths: baths, rooms: rooms, renovated: renovated});
+  }
+  saveFpData(propKey, fps);
+  closeM('mfpadd');
+  renderAdminFpTable();
+  toast('Floor plan saved: ' + name);
+}
+
+function deleteFloorPlan() {
+  var propKey = document.getElementById('fpa_prop').value;
+  var origId  = document.getElementById('fpa_id_orig').value;
+  var name    = document.getElementById('fpa_name').value;
+  if (!confirm('Delete floor plan "' + name + '"? This cannot be undone.')) return;
+  var fps = getFpData(propKey).filter(function(fp){ return fp.id !== origId; });
+  saveFpData(propKey, fps);
+  closeM('mfpadd');
+  renderAdminFpTable();
+  toast('Floor plan deleted.');
+}
+// ── END FLOOR PLAN ADMIN MANAGEMENT ──
 
 // ── PORTAL USER (TEAM) MANAGEMENT ──
 function roleLabel(role) {
