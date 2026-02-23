@@ -282,6 +282,26 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
   .ppbar{display:none!important;}
   .wofoot,.wost,.woh{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
+
+/* ── CHOOSER SCREEN ── */
+.sc-choice {
+  display:flex;align-items:center;gap:18px;
+  width:100%;padding:20px 24px;
+  background:var(--cream);border:2px solid var(--border);
+  border-radius:var(--r);cursor:pointer;
+  font-family:var(--font);transition:all .2s;
+  text-align:left;
+}
+.sc-choice:hover{border-color:var(--gold);background:#fffbf0;transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,149,42,.12);}
+.sc-choice.sc-admin{background:var(--navy);border-color:var(--navy);}
+.sc-choice.sc-admin:hover{background:#071480;border-color:#071480;}
+.sc-icon{font-size:24px;width:48px;height:48px;border-radius:var(--r);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sc-choice:not(.sc-admin) .sc-icon{background:rgba(2,10,91,.08);}
+.sc-title{font-size:15px;font-weight:700;color:var(--navy);letter-spacing:.3px;margin-bottom:3px;}
+.sc-choice.sc-admin .sc-title{color:var(--gold);}
+.sc-sub{font-size:12px;color:var(--gray);font-weight:400;line-height:1.4;}
+.sc-choice.sc-admin .sc-sub{color:rgba(255,255,255,.55);}
+
 </style>
 </head>
 <body>
@@ -298,12 +318,36 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
     <div class="fg"><label>Email Address</label><input type="email" id="lemail" value="manager@cherrycreek.com"></div>
     <div class="fg"><label>Password</label><input type="password" id="lpw" value="Cherry2025!"></div>
     <button class="btn-pri" onclick="doLogin()" style="margin-top:6px;">Sign In</button>
-    <p style="text-align:center;font-size:11px;color:var(--gray);margin-top:14px;letter-spacing:.5px;">&#8212; Quick Demo Access &#8212;</p>
-    <div class="demo-row">
-      <button class="dbtn cl" onclick="demoLogin('cl')">&#128101; Client Portal</button>
-      <button class="dbtn ad" onclick="demoLogin('ad')">&#128274; Admin Panel</button>
+    <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray);">Need access? <a href="#" style="color:var(--gold);font-weight:600;" onclick="toast('Contact info@protectiveflooring.com to request an account.')">Contact us</a></div>
+  </div>
+</div>
+
+<!-- CHOOSER SCREEN: shown to admin/staff users after login -->
+<div class="scr" id="sc">
+  <div class="lglow"></div>
+  <div class="lbox" style="max-width:460px;">
+    <div class="gl"></div>
+    <h1 style="margin-bottom:6px;">Welcome Back</h1>
+    <p class="sub" id="sc_greeting">Where would you like to go?</p>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:28px;">
+      <button class="sc-choice" onclick="goClientPortalFromChooser()">
+        <div class="sc-icon">&#128101;</div>
+        <div style="text-align:left;">
+          <div class="sc-title">Client Portal</div>
+          <div class="sc-sub">View and submit flooring orders for your properties</div>
+        </div>
+      </button>
+      <button class="sc-choice sc-admin" onclick="go('ad');applyRoleRestrictions(window.currentTeamUser?window.currentTeamUser.role:'admin');">
+        <div class="sc-icon">&#128274;</div>
+        <div style="text-align:left;">
+          <div class="sc-title">Admin Panel</div>
+          <div class="sc-sub">Manage orders, properties, users, and floor plans</div>
+        </div>
+      </button>
     </div>
-    <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray);">Need access? <a href="#" style="color:var(--gold);font-weight:600;" onclick="toast('Contact info@protectiveflooring.com to request an account.')">Contact us</a></div>
+    <div style="text-align:center;margin-top:28px;">
+      <button onclick="doLogout()" style="background:none;border:none;font-size:12px;color:var(--gray);cursor:pointer;font-family:inherit;text-decoration:underline;">&#8592; Sign out</button>
+    </div>
   </div>
 </div>
 
@@ -736,9 +780,6 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
           <h2>Floor Plans</h2>
           <div style="display:flex;gap:10px;align-items:center;">
             <select id="afp_propsel" onchange="renderAdminFpTable()" style="padding:8px 12px;border:1px solid var(--border);border-radius:3px;font-size:13px;font-family:inherit;">
-              <option value="cherry-creek-apartments">Cherry Creek Apartments</option>
-              <option value="riverside-apartments">Riverside Apartments</option>
-              <option value="arbor-ridge-nashville">Arbor Ridge Nashville</option>
             </select>
             <button class="bs gd" onclick="openAddFloorPlan()">+ Add Floor Plan</button>
           </div>
@@ -781,7 +822,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
         <div class="fc"><h3>Email Notifications</h3>
           <div class="fg"><label>Order Request Notification Email</label><input type="email" value="info@protectiveflooring.com"></div>
-          <div class="fg"><label>Scheduling Confirmation</label><select><option>Client + info@protectiveflooring.com</option><option>Client Only</option></select></div>
+          <div class="fg"><label>Scheduling Confirmation</label><select><option>Client + <template class="__cf_email__" data-cfemail="573e39313817272538233234233e2132313b3838253e39307934383a">[email&#160;protected]</template></option><option>Client Only</option></select></div>
           <div class="fa"><button class="bl gd" onclick="toast('Settings saved.')">Save Settings</button></div>
         </div>
       </div>
@@ -1075,7 +1116,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
 <div class="toast" id="toastEl"><span>&#10003;</span><span id="toastmsg"></span></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── DATA ──
 // ── USER STORE (persisted in localStorage) ──
 var DEFAULT_TEAM = [
@@ -1195,6 +1236,25 @@ var fpDetails = {
   'AR-3BR2BA':{name:'3 Bed / 2 Bath',sqft:'1,350 sq ft',rooms:['Living Room','Bed 1-3','Bath 1-2','Kitchen','Dining Area','Laundry Room']}
 };
 
+// ── SEED localStorage with built-in floor plan data on first load ──
+// This ensures admin panel and client portal always read from the same store
+(function seedFloorPlans() {
+  Object.keys(fpByProp).forEach(function(propKey) {
+    var lsKey = 'pf_fp_' + propKey;
+    try {
+      if (!localStorage.getItem(lsKey)) {
+        var arr = fpByProp[propKey].map(function(fp) {
+          var det = fpDetails[fp.id] || {};
+          return {id:fp.id, name:fp.name, sqft:fp.sqft,
+            beds:det.beds||0, baths:det.baths||1,
+            rooms:det.rooms||[], renovated:det.renovated||false};
+        });
+        localStorage.setItem(lsKey, JSON.stringify(arr));
+      }
+    } catch(e) {}
+  });
+})();
+
 // ── AUTH ──
 var currentUser = null;
 function doLogin() {
@@ -1214,8 +1274,10 @@ function doLogin() {
       }
       // Store logged-in team user info for permission checks
       window.currentTeamUser = tu;
-      go('ad');
-      applyRoleRestrictions(tu.role);
+      // Show greeting on chooser screen
+      var greet = document.getElementById('sc_greeting');
+      if (greet) greet.textContent = 'Hi ' + (tu.name || tu.email) + ' — where would you like to go?';
+      go('sc');
       return;
     }
   }
@@ -1242,17 +1304,25 @@ function doLogin() {
   loadClientPortal(user);
   go('cl');
 }
-function demoLogin(target) {
-  if (target === 'cl') {
-    var user = users[0]; // Cherry Creek default
-    loadClientPortal(user);
-    go('cl');
-  } else {
-    go('ad');
+// demoLogin removed - login screen has no demo buttons
+function goClientPortalFromChooser() {
+  // Admin/team users going to client portal view - use first client account or a generic view
+  var clients = getUsers();
+  if (clients.length > 0) {
+    loadClientPortal(clients[0]);
+  } else if (window.currentTeamUser) {
+    // Build a synthetic user object for the team member
+    loadClientPortal({name: window.currentTeamUser.name, props: Object.keys(fpByProp).map(function(k){
+      // Convert key back to title-case name
+      return k.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+    }), email: window.currentTeamUser.email});
   }
+  go('cl');
 }
+
 function doLogout() {
   currentUser = null;
+  window.currentTeamUser = null;
   document.getElementById('lemail').value = 'manager@cherrycreek.com';
   document.getElementById('lpw').value = 'Cherry2025!';
   document.getElementById('lerr').style.display = 'none';
@@ -1384,7 +1454,7 @@ function anav(pid, el) {
   var titles = {adash:'Admin Dashboard',aord:'All Orders',aprops:'Properties',ausers:'Client Logins',aset:'Portal Settings'};
   if (pid === 'ausers') renderUserTable();
   if (pid === 'ateam') renderTeamTable();
-  if (pid === 'afloorplans') renderAdminFpTable();
+  if (pid === 'afloorplans') { renderAdminFpPropSelector(); renderAdminFpTable(); }
   document.getElementById('atitle').textContent = titles[pid] || pid;
 }
 
@@ -1647,7 +1717,29 @@ function saveFpData(propKey, arr) {
   });
 }
 
+function renderAdminFpPropSelector() {
+  var sel = document.getElementById('afp_propsel');
+  if (!sel) return;
+  // Build options from all known properties (fpByProp keys + any in localStorage)
+  var keys = Object.keys(fpByProp);
+  // Also add any extra props from client users
+  try {
+    var clients = getUsers();
+    clients.forEach(function(u) {
+      (u.props||[]).forEach(function(pname) {
+        var pid = pname.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+        if (keys.indexOf(pid) < 0) keys.push(pid);
+      });
+    });
+  } catch(e) {}
+  sel.innerHTML = keys.map(function(k) {
+    var label = k.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+    return '<option value="'+k+'">'+label+'</option>';
+  }).join('');
+}
+
 function renderAdminFpTable() {
+  renderAdminFpPropSelector();
   var propKey = document.getElementById('afp_propsel').value;
   var fps = getFpData(propKey);
   var tb = document.getElementById('afpTbody');
@@ -2096,10 +2188,6 @@ function toast(msg) {
   clearTimeout(tt);
   tt=setTimeout(function(){el.classList.remove('on');},4500);
 }
-
-// ── INIT: auto-login Cherry Creek demo user ──
-loadClientPortal(users[0]);
-renderUserTable();
 </script>
 </body>
 </html>
