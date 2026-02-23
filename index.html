@@ -467,6 +467,49 @@ footer{
 .reveal-delay-2{transition-delay:.2s;}
 .reveal-delay-3{transition-delay:.3s;}
 .reveal-delay-4{transition-delay:.4s;}
+
+/* ── Fullscreen Hero Slideshow ── */
+.hero{position:relative;height:100vh;min-height:640px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.hero-slides{position:absolute;inset:0;z-index:0;}
+.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.4s ease-in-out;}
+.hero-slide.active{opacity:1;}
+.hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(1,5,53,0.82) 0%,rgba(1,5,53,0.60) 50%,rgba(1,5,53,0.40) 100%);}
+.hero-content{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:0 60px;text-align:center;width:100%;animation:fadeUp 1s ease both;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:32px;height:1px;background:var(--gold);}
+.slide-dots{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:12px;}
+.slide-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.5);cursor:pointer;transition:all .3s;}
+.slide-dot.active{background:var(--gold);border-color:var(--gold);transform:scale(1.25);}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.hero-stats{display:flex;gap:48px;margin-top:56px;padding-top:40px;border-top:1px solid rgba(255,255,255,.12);justify-content:center;}
+
+/* ── WHAT WE DO ── */
+.services-section{background:var(--white);padding:100px 60px;}
+.services-inner{max-width:1200px;margin:0 auto;}
+.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:64px;}
+.svc-card{background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:36px 28px;transition:transform .25s,box-shadow .25s;}
+.svc-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(2,10,91,.08);}
+.svc-card-icon{font-size:32px;margin-bottom:18px;width:60px;height:60px;border-radius:3px;background:var(--navy);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(2,10,91,.2);}
+.svc-card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:12px;line-height:1.2;}
+.svc-card-text{font-size:14px;color:var(--gray);line-height:1.7;font-weight:300;margin-bottom:16px;}
+.svc-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;}
+.svc-list li{font-size:13px;color:var(--text);padding-left:18px;position:relative;line-height:1.4;}
+.svc-list li::before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--gold);}
+
+/* ── WHY PROTECTIVE FLOORING ── */
+.why-section{background:var(--navy-dk);padding:100px 60px;position:relative;overflow:hidden;}
+.why-section::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(200,149,42,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,149,42,.03) 1px,transparent 1px);background-size:60px 60px;}
+.why-inner{position:relative;z-index:1;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+.why-pillar{display:flex;gap:20px;align-items:flex-start;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:28px;margin-bottom:16px;transition:border-color .25s;}
+.why-pillar:last-child{margin-bottom:0;}
+.why-pillar:hover{border-color:rgba(200,149,42,.3);}
+.why-icon{width:48px;height:48px;border-radius:3px;flex-shrink:0;background:rgba(200,149,42,.12);border:1px solid rgba(200,149,42,.25);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.why-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.why-text{font-size:14px;color:rgba(255,255,255,.5);line-height:1.7;font-weight:300;}
+
+@media(max-width:1000px){.svc-grid{grid-template-columns:1fr 1fr;}.why-inner{grid-template-columns:1fr;}}
+@media(max-width:600px){.svc-grid{grid-template-columns:1fr;}.services-section,.why-section{padding:60px 24px;}}
+
 </style>
 </head>
 <body>
@@ -535,6 +578,104 @@ footer{
     <span class="marquee-item">48hr Turnaround <span class="marquee-dot"></span></span>
   </div>
 </div>
+
+
+<!-- WHAT WE DO -->
+<section class="services-section" id="services">
+  <div class="services-inner">
+    <div class="section-eyebrow reveal">What We Do</div>
+    <h2 class="section-h2 reveal reveal-delay-1">Flooring Installs Built<br>for Multifamily.</h2>
+    <p class="section-sub reveal reveal-delay-2">From a single turnover to a full property renovation, Protective Flooring delivers consistent, professional results &mdash; on schedule, every time.</p>
+    <div class="svc-grid">
+      <div class="svc-card reveal reveal-delay-1">
+        <div class="svc-card-icon">&#129528;</div>
+        <h3 class="svc-card-title">Carpet Installation</h3>
+        <p class="svc-card-text">Turnover-grade and upgrade carpet installed fast. We work with all major product lines and match existing specs across an entire property.</p>
+        <ul class="svc-list">
+          <li>Full room and whole-property installs</li>
+          <li>Pad replacement and stretch repairs</li>
+          <li>Pet seal treatment before install</li>
+          <li>Same-week scheduling available</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal reveal-delay-2">
+        <div class="svc-card-icon">&#11036;</div>
+        <h3 class="svc-card-title">Luxury Vinyl Plank &amp; Tile</h3>
+        <p class="svc-card-text">Waterproof, durable, and resident-approved. LVP and LVT for living areas, kitchens, bathrooms, and high-traffic corridors.</p>
+        <ul class="svc-list">
+          <li>Floating and glue-down applications</li>
+          <li>Stair nosing and transitions included</li>
+          <li>Wide range of styles and price points</li>
+          <li>Subfloor prep and leveling</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal reveal-delay-3">
+        <div class="svc-card-icon">&#127959;</div>
+        <h3 class="svc-card-title">Sheet Vinyl &amp; Tile</h3>
+        <p class="svc-card-text">The workhorse of multifamily flooring. Sheet vinyl and VCT for kitchens, bathrooms, laundry rooms, and utility spaces.</p>
+        <ul class="svc-list">
+          <li>Full sheet and seam installations</li>
+          <li>VCT stripping, waxing, and buffing</li>
+          <li>Ceramic and porcelain tile</li>
+          <li>Moisture barrier applications</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal reveal-delay-4">
+        <div class="svc-card-icon">&#128296;</div>
+        <h3 class="svc-card-title">Subfloor Repair &amp; Prep</h3>
+        <p class="svc-card-text">We fix it before we floor it. Damaged, soft, or uneven subfloors are repaired by our own crew &mdash; no subcontractors, no delays.</p>
+        <ul class="svc-list">
+          <li>Plywood and OSB replacement</li>
+          <li>Self-leveling compound applications</li>
+          <li>Water and mold damage remediation</li>
+          <li>Full documentation for your records</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY PROTECTIVE FLOORING -->
+<section class="why-section">
+  <div class="why-inner">
+    <div class="why-left reveal">
+      <div class="section-eyebrow" style="color:var(--gold);">Why Protective Flooring</div>
+      <h2 class="section-h2" style="color:var(--white);">Nearly 50 Years of Doing<br>One Thing Well.</h2>
+      <p style="font-size:17px;font-weight:300;line-height:1.75;color:rgba(255,255,255,.65);margin-bottom:40px;max-width:500px;">Since 1976, we&rsquo;ve focused exclusively on multifamily properties across the Mid-South and Middle Tennessee. That focus means faster scheduling, fewer surprises, and crews who understand what property managers actually need.</p>
+      <a href="#contact" class="btn-gold">Talk to Our Team</a>
+    </div>
+    <div class="why-right">
+      <div class="why-pillar reveal reveal-delay-1">
+        <div class="why-icon">&#9201;</div>
+        <div>
+          <div class="why-title">Responsive Scheduling</div>
+          <div class="why-text">We confirm your date fast and show up on time. Our crews are staffed specifically for multifamily volume &mdash; not residential side work.</div>
+        </div>
+      </div>
+      <div class="why-pillar reveal reveal-delay-2">
+        <div class="why-icon">&#128172;</div>
+        <div>
+          <div class="why-title">Clear Communication</div>
+          <div class="why-text">You know what&rsquo;s happening at every step. Work orders are updated in real time and you&rsquo;ll never have to chase us down for a status update.</div>
+        </div>
+      </div>
+      <div class="why-pillar reveal reveal-delay-3">
+        <div class="why-icon">&#127942;</div>
+        <div>
+          <div class="why-title">Consistent Quality</div>
+          <div class="why-text">Same installation standards across every unit, every property, every time. Our crews are trained in-house and held to our own quality checklist.</div>
+        </div>
+      </div>
+      <div class="why-pillar reveal reveal-delay-4">
+        <div class="why-icon">&#128200;</div>
+        <div>
+          <div class="why-title">Built for Volume</div>
+          <div class="why-text">From a single turnover to a 200-unit renovation, we scale with your needs. Our Memphis and Nashville hubs handle 500+ units per month.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- MARKETS -->
 <section class="hubs" id="markets">
@@ -829,5 +970,27 @@ function toast(msg) {
   tt = setTimeout(function() { el.classList.remove('on'); }, 5000);
 }
 </script>
+
+<script>
+(function(){
+  var cur=0,slides,dots;
+  function init(){
+    slides=document.querySelectorAll('.hero-slide');
+    dots=document.querySelectorAll('.slide-dot');
+    if(!slides.length)return;
+    setInterval(function(){window.goSlide((cur+1)%slides.length);},5000);
+  }
+  window.goSlide=function(n){
+    if(!slides)return;
+    slides[cur].classList.remove('active');
+    dots[cur].classList.remove('active');
+    cur=n;
+    slides[cur].classList.add('active');
+    dots[cur].classList.add('active');
+  };
+  document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
+
 </body>
 </html>
