@@ -721,9 +721,9 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
         <div class="tw"><table>
           <thead><tr><th>Name</th><th>Email</th><th>Properties</th><th>Hub</th><th>Role</th><th>Status</th><th></th></tr></thead>
           <tbody>
-            <tr><td><strong>Jessica Lane</strong></td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2a474b444b4d4f586a49424f58585349584f4f4104494547">[email&#160;protected]</a></td><td>Cherry Creek Apartments</td><td><span class="b nv">Nashville</span></td><td>Property Manager</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="toast('Edit user.')">Edit</button></td></tr>
-            <tr><td><strong>Rachel Moore</strong></td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="28454946494f4d5a685a415e4d5a5b414c4d064b4745">[email&#160;protected]</a></td><td>Riverside Apartments</td><td><span class="b mp">Memphis</span></td><td>Property Manager</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="toast('Edit user.')">Edit</button></td></tr>
-            <tr><td><strong>Keisha Davis</strong></td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9bf6faf5fafcfee9dbfae9f9f4e9e9f2fffcfeb5f8f4f6">[email&#160;protected]</a></td><td>Arbor Ridge Nashville</td><td><span class="b nv">Nashville</span></td><td>Property Manager</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="toast('Edit user.')">Edit</button></td></tr>
+            <tr><td><strong>Jessica Lane</strong></td><td>manager@cherrycreek.com</td><td>Cherry Creek Apartments</td><td><span class="b nv">Nashville</span></td><td>Property Manager</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="toast('Edit user.')">Edit</button></td></tr>
+            <tr><td><strong>Rachel Moore</strong></td><td>manager@riverside.com</td><td>Riverside Apartments</td><td><span class="b mp">Memphis</span></td><td>Property Manager</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="toast('Edit user.')">Edit</button></td></tr>
+            <tr><td><strong>Keisha Davis</strong></td><td>manager@arborridge.com</td><td>Arbor Ridge Nashville</td><td><span class="b nv">Nashville</span></td><td>Property Manager</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="toast('Edit user.')">Edit</button></td></tr>
           </tbody>
         </table></div>
       </div>
@@ -732,7 +732,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
       <div class="panel" id="aset">
         <div class="fc"><h3>Email Notifications</h3>
           <div class="fg"><label>Order Request Notification Email</label><input type="email" value="info@protectiveflooring.com"></div>
-          <div class="fg"><label>Scheduling Confirmation</label><select><option>Client + <template class="__cf_email__" data-cfemail="f69f989099b6868499829395829f8093909a9999849f9891d895999b">[email&#160;protected]</template></option><option>Client Only</option></select></div>
+          <div class="fg"><label>Scheduling Confirmation</label><select><option>Client + info@protectiveflooring.com</option><option>Client Only</option></select></div>
           <div class="fa"><button class="bl gd" onclick="toast('Settings saved.')">Save Settings</button></div>
         </div>
       </div>
@@ -883,7 +883,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
 <div class="toast" id="toastEl"><span>&#10003;</span><span id="toastmsg"></span></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ── DATA ──
 var users = [{email:"manager@cherrycreek.com",password:"Cherry2025!",name:"Jessica Lane",initials:"JL",props:["Cherry Creek Apartments"],role:"Property Manager",hub:"nashville"},{email:"manager@riverside.com",password:"12345678",name:"Rachel Moore",initials:"RM",props:["Riverside Apartments"],role:"Property Manager",hub:"memphis"},{email:"manager@arborridge.com",password:"12345678",name:"Keisha Davis",initials:"KD",props:["Arbor Ridge Nashville"],role:"Property Manager",hub:"nashville"},];
 var fpByProp = {"riverside":[{id:"RV-1BR",name:"1 Bed / 1 Bath",sqft:"650"}, {id:"RV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"850"}, {id:"RV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,050"}, {id:"RV-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,280"}],"parkview":[{id:"PV-1BR",name:"1 Bed / 1 Bath",sqft:"620"}, {id:"PV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"820"}, {id:"PV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"980"}],"columns":[{id:"COL-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,100"}, {id:"COL-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,380"}],"magnolia":[{id:"MAG-1BR",name:"1 Bed / 1 Bath",sqft:"680"}, {id:"MAG-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,020"}],"cherrycreek":[{id:"CC-1BR",name:"1 Bed / 1 Bath",sqft:"720"}, {id:"CC-2BR1BA",name:"2 Bed / 1 Bath",sqft:"920"}, {id:"CC-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,080"}, {id:"CC-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,350"}],"arborridge":[{id:"AR-STU",name:"Studio",sqft:"450"}, {id:"AR-1BR",name:"1 Bed / 1 Bath",sqft:"700"}, {id:"AR-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,080"}, {id:"AR-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,350"}],"hermitage":[{id:"RS-1BR",name:"1 Bed / 1 Bath",sqft:"660"}, {id:"RS-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,040"}],};
@@ -1038,7 +1038,7 @@ function buildFloorPlansPage(user) {
       card.className = 'fc';
       card.style.marginBottom = '0';
       var btnCls = 'fit' + (hasImg ? ' hi' : '');
-      card.innerHTML = '<h3 style="font-size:17px;">'+fp.name+'</h3><p style="font-size:12px;color:var(--gray);margin-bottom:10px;">'+fp.sqft+' sq ft • '+pname+'</p><div style="margin-bottom:10px;">'+rooms+'</div><button class="'+btnCls+'" onclick="openFpImg(\''+fp.id+'\')">🗺 '+(hasImg ? 'View Floor Plan' : 'No Image Yet')+'</button>';
+      card.innerHTML = '<h3 style="font-size:17px;">'+fp.name+'</h3><p style="font-size:12px;color:var(--gray);margin-bottom:10px;">'+fp.sqft+' sq ft • '+pname+'</p><div style="margin-bottom:10px;">'+rooms+'</div><button class="'+btnCls+'" onclick="openFpImg(\''+fp.id+'\')">&#128506; '+(hasImg ? 'View Floor Plan' : 'No Image Yet')+'</button>';
       grid.appendChild(card);
     });
   });
@@ -1267,7 +1267,7 @@ function applyPreset(btn,p) {
 }
 function addProw() {
   var rooms=['Living Room','Master Bedroom','Bedroom 2','Bedroom 3','Bedroom 4','Kitchen','Bathroom 1','Bathroom 2','Hallway','Dining Area','Laundry Room','Entry','Entryway','Stairs'];
-  var tags=rooms.map(function(r){return '<span class="prt" onclick="this.classList.toggle(\'on\')">'+r+'</span>';}).join('');
+  var tags=rooms.map(function(r){return '<span class="prt" onclick="this.classList.toggle(\'on\')">"+r+"</span>';}).join('');
   var row=document.createElement('div');row.className='prow';
   row.innerHTML='<div class="form-row" style="margin-bottom:10px;"><div class="fg" style="margin-bottom:0;"><label>Preset Name *</label><input type="text" placeholder="e.g. Vinyl Wet+Dining"></div><div class="fg" style="margin-bottom:0;"><label>Default Service</label><select><option value="">-- Any --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select></div></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+tags+'</div><div style="margin-top:12px;text-align:right;"><button class="bs dn" onclick="this.closest(\'.prow\').remove()">Remove</button></div>';
   document.getElementById('prowcont').appendChild(row);
@@ -1320,4 +1320,24 @@ function submitOrder() {
 }
 function saveFp() {
   var n=document.getElementById('fpname');
-  if(n&&!n.value.trim()){toast('Pleas
+  if(n&&!n.value.trim()){toast('Please enter a floor plan name.');return;}
+  var inp=document.getElementById('fupinput');
+  if(inp&&inp._src&&n) fpStore[n.value.toLowerCase().replace(/\s+/g,'-')]=inp._src;
+  closeM('mfpe');toast('Floor plan saved.');
+}
+
+// ── TOAST ──
+var tt;
+function toast(msg) {
+  var el=document.getElementById('toastEl');
+  document.getElementById('toastmsg').textContent=msg;
+  el.classList.add('on');
+  clearTimeout(tt);
+  tt=setTimeout(function(){el.classList.remove('on');},4500);
+}
+
+// ── INIT: auto-login Cherry Creek demo user ──
+loadClientPortal(users[0]);
+</script>
+</body>
+</html>
