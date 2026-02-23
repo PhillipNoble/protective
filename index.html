@@ -26,7 +26,7 @@ a{text-decoration:none;color:inherit;}
 
 /* ── NAV ── */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
+  position:fixed;top:38px;left:0;right:0;z-index:200;
   padding:0 60px;height:80px;
   display:flex;align-items:center;justify-content:space-between;
   background:rgba(255,255,255,0.98);
@@ -468,7 +468,27 @@ footer{
 .reveal-delay-3{transition-delay:.3s;}
 .reveal-delay-4{transition-delay:.4s;}
 
-/* ── Fullscreen Hero Slideshow ── */
+/* ── TOP CONTACT BAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:201;
+  background:var(--navy);height:38px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 60px;
+}
+.topbar-inner{
+  display:flex;align-items:center;gap:24px;
+  font-size:11px;font-weight:500;letter-spacing:.3px;
+  color:rgba(255,255,255,.7);
+  white-space:nowrap;
+}
+.topbar-item{display:flex;align-items:center;gap:6px;}
+.topbar-item a{color:rgba(255,255,255,.7);transition:color .2s;}
+.topbar-item a:hover{color:var(--gold);}
+.topbar-div{width:1px;height:13px;background:rgba(255,255,255,.2);flex-shrink:0;}
+.topbar-emerg{color:var(--gold);font-weight:700;letter-spacing:.5px;}
+@media(max-width:900px){.topbar{display:none;}}
+
+/* ── HERO ── */
 .hero{position:relative;height:100vh;min-height:640px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .hero-slides{position:absolute;inset:0;z-index:0;}
 .hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.4s ease-in-out;}
@@ -513,6 +533,32 @@ footer{
 </style>
 </head>
 <body>
+
+<!-- TOP CONTACT BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-item">
+      <span>&#9990;</span>
+      <a href="tel:9017944101">Memphis: (901) 794-4101</a>
+    </div>
+    <div class="topbar-div"></div>
+    <div class="topbar-item">
+      <span>&#9990;</span>
+      <a href="tel:6154151331">Nashville: (615) 415-1331</a>
+    </div>
+    <div class="topbar-div"></div>
+    <div class="topbar-item">
+      <span>&#9993;</span>
+      <a href="mailto:info@protectiveflooring.com">info@protectiveflooring.com</a>
+    </div>
+    <div class="topbar-div"></div>
+    <div class="topbar-item">
+      <span>Mon&ndash;Fri &nbsp;7:00 AM &ndash; 5:00 PM</span>
+      <span class="topbar-div"></span>
+      <span class="topbar-emerg">&#9881; Emergency Line 24/7</span>
+    </div>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav id="mainnav">
@@ -972,24 +1018,60 @@ function toast(msg) {
 </script>
 
 <script>
-(function(){
-  var cur=0,slides,dots;
-  function init(){
-    slides=document.querySelectorAll('.hero-slide');
-    dots=document.querySelectorAll('.slide-dot');
-    if(!slides.length)return;
-    setInterval(function(){window.goSlide((cur+1)%slides.length);},5000);
+// Scroll reveal
+var revealEls = document.querySelectorAll('.reveal');
+var io = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); }
+  });
+}, {threshold:0.12});
+revealEls.forEach(function(el){ io.observe(el); });
+
+// Nav scroll effect
+var nav = document.getElementById('mainnav');
+window.addEventListener('scroll', function() {
+  if (window.scrollY > 10) {
+    nav.style.boxShadow = '0 4px 24px rgba(2,10,91,.08)';
+    nav.style.height = '64px';
+  } else {
+    nav.style.boxShadow = '';
+    nav.style.height = '80px';
   }
-  window.goSlide=function(n){
-    if(!slides)return;
+});
+
+// Hero slideshow
+(function(){
+  var cur = 0, slides, dots;
+  function init() {
+    slides = document.querySelectorAll('.hero-slide');
+    dots   = document.querySelectorAll('.slide-dot');
+    if (!slides.length) return;
+    setInterval(function(){ goSlide((cur + 1) % slides.length); }, 5000);
+  }
+  window.goSlide = function(n) {
+    if (!slides) return;
     slides[cur].classList.remove('active');
     dots[cur].classList.remove('active');
-    cur=n;
+    cur = n;
     slides[cur].classList.add('active');
     dots[cur].classList.add('active');
   };
-  document.addEventListener('DOMContentLoaded',init);
+  document.addEventListener('DOMContentLoaded', init);
 })();
+
+// Contact form
+var cfbtn = document.getElementById('cfsubmit');
+if (cfbtn) {
+  cfbtn.addEventListener('click', function() {
+    var name = document.getElementById('cf-name').value.trim();
+    var email = document.getElementById('cf-email').value.trim();
+    var msg = document.getElementById('cf-msg').value.trim();
+    if (!name || !email || !msg) { alert('Please fill in all required fields.'); return; }
+    cfbtn.textContent = '✓ Message Sent!';
+    cfbtn.style.background = '#16a34a';
+    cfbtn.disabled = true;
+  });
+}
 </script>
 
 </body>
