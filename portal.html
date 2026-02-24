@@ -451,6 +451,10 @@ table.fpt tr:hover td{background:var(--cream);}
 
 .bs.dn{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
 .bs.dn:hover{background:#fee2e2;}
+
+.tab-toggle{background:var(--white);border:none;padding:6px 14px;font-size:12px;font-weight:600;color:var(--gray);cursor:pointer;font-family:inherit;transition:all .15s;}
+.tab-toggle.on{background:var(--navy);color:#fff;}
+.tab-toggle:hover:not(.on){background:var(--cream);}
 </style>
 </head>
 <body>
@@ -545,11 +549,7 @@ table.fpt tr:hover td{background:var(--cream);}
         <div class="shd"><h2>Recent Orders</h2><button class="bs gd" onclick="cnav('co',document.querySelectorAll('#cl .ni')[1])">+ New Order</button></div>
         <div class="tw"><table>
           <thead><tr><th>Work Order</th><th>Unit</th><th>Service</th><th>Requested</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            <tr onclick="oworder('CC-001')"><td><strong>#WO-CC-001</strong></td><td>Unit 214</td><td>Carpet Installation</td><td>Feb 20, 2025</td><td><span class="b sc">Scheduled</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-001')">View / Print</button></td></tr>
-            <tr onclick="oworder('CC-002')"><td><strong>#WO-CC-002</strong></td><td>Unit 108</td><td>Sheet Vinyl</td><td>Feb 18, 2025</td><td><span class="b rq">Requested</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-002')">View / Print</button></td></tr>
-            <tr onclick="oworder('CC-003')"><td><strong>#WO-CC-003</strong></td><td>Unit 301</td><td>LVP Full Unit</td><td>Feb 10, 2025</td><td><span class="b cp">Completed</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-003')">View / Print</button></td></tr>
-          </tbody>
+          <tbody id="cd_tbody"></tbody>
         </table></div>
       </div>
 
@@ -652,11 +652,7 @@ table.fpt tr:hover td{background:var(--cream);}
         </div>
         <div class="tw"><table>
           <thead><tr><th>Work Order</th><th>Unit</th><th>Floor Plan</th><th>Service</th><th>Requested</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            <tr onclick="oworder('CC-001')"><td><strong>#WO-CC-001</strong></td><td>214</td><td>2 Bed / 2 Bath</td><td>Carpet Installation</td><td>Feb 20</td><td><span class="b sc">Scheduled</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-001')">View / Print</button></td></tr>
-            <tr onclick="oworder('CC-002')"><td><strong>#WO-CC-002</strong></td><td>108</td><td>1 Bed / 1 Bath</td><td>Sheet Vinyl</td><td>Feb 18</td><td><span class="b rq">Requested</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-002')">View / Print</button></td></tr>
-            <tr onclick="oworder('CC-003')"><td><strong>#WO-CC-003</strong></td><td>301</td><td>3 Bed / 2 Bath</td><td>LVP Full Unit</td><td>Feb 10</td><td><span class="b cp">Completed</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-003')">View / Print</button></td></tr>
-          </tbody>
+          <tbody id="ch_tbody"></tbody>
         </table></div>
       </div>
 
@@ -717,18 +713,23 @@ table.fpt tr:hover td{background:var(--cream);}
           <div class="sc"><div class="si n">&#127968;</div><div><div class="snum">8</div><div class="slbl">Active Properties</div></div></div>
           <div class="sc"><div class="si gr">&#128101;</div><div><div class="snum">36</div><div class="slbl">Client Logins</div></div></div>
         </div>
-        <div class="shd" style="margin-bottom:16px;">
-          <h2>New Orders — Action Required</h2>
-          <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*="co"]'));},150);">&#128221; Place New Order</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+          <h2 style="margin:0;" id="adash_table_title">New Orders — Action Required</h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
+              <button id="tab_recent" class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
+              <button id="tab_today"  class="tab-toggle"    onclick="switchDashTab('today')">Today's Installs</button>
+            </div>
+            <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*=&quot;co&quot;]'));},150);">&#128221; Place New Order</button>
+          </div>
         </div>
-        <div class="tw" style="margin-bottom:28px;"><table>
+        <div class="tw" style="margin-bottom:28px;" id="adash_recent_wrap"><table>
           <thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Requested</th><th>Occupancy</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr onclick="oworder('CC-002')"><td><strong>#WO-CC-002</strong></td><td>Cherry Creek Apts</td><td>108</td><td>Sheet Vinyl</td><td>Feb 18</td><td>Vacant</td><td><span class="b rq">Requested</span></td><td><div style="display:flex;gap:6px;"><button class="bs ol" onclick="event.stopPropagation();oworder('CC-002')">View</button><button class="bs gd" onclick="event.stopPropagation();openConfirm('CC-002')">Confirm</button></div></td></tr>
-            <tr onclick="oworder('2414')"><td><strong>#WO-2414</strong></td><td>Parkview Commons</td><td>08B</td><td>Carpet+Pet Seal</td><td>Mar 3</td><td>Vacant</td><td><span class="b rq">Requested</span></td><td><div style="display:flex;gap:6px;"><button class="bs ol" onclick="event.stopPropagation();oworder('2414')">View</button><button class="bs gd" onclick="event.stopPropagation();openConfirm('2414')">Confirm</button></div></td></tr>
-            <tr onclick="oworder('2413')"><td><strong>#WO-2413</strong></td><td>Riverside Apts</td><td>118</td><td>Carpet</td><td>Feb 26</td><td>Vacant</td><td><span class="b rq">Requested</span></td><td><div style="display:flex;gap:6px;"><button class="bs ol" onclick="event.stopPropagation();oworder('2413')">View</button><button class="bs gd" onclick="event.stopPropagation();openConfirm('2413')">Confirm</button></div></td></tr>
-            <tr onclick="oworder('2410')"><td><strong>#WO-2410</strong></td><td>Arbor Ridge Nashville</td><td>15C</td><td>Sheet Vinyl</td><td>Feb 24</td><td>Vacant</td><td><span class="b rq">Requested</span></td><td><div style="display:flex;gap:6px;"><button class="bs ol" onclick="event.stopPropagation();oworder('2410')">View</button><button class="bs gd" onclick="event.stopPropagation();openConfirm('2410')">Confirm</button></div></td></tr>
-          </tbody>
+          <tbody id="adash_recent_tbody"></tbody>
+        </table></div>
+        <div class="tw" style="margin-bottom:28px;display:none;" id="adash_today_wrap"><table>
+          <thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Requested Install</th><th>Occupancy</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="adash_today_tbody"></tbody>
         </table></div>
       </div>
 
@@ -1421,7 +1422,15 @@ table.fpt tr:hover td{background:var(--cream);}
 
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>// ── DATA ──
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+document.addEventListener('DOMContentLoaded', function() {
+  // Pre-render order tables so they're ready when panels open
+  renderAdashRecent();
+  renderClientDash();
+  renderClientHistory();
+});
+
+</script><script>// ── DATA ──
 // ── TEAM STORE ──
 var DEFAULT_TEAM = [
   {id:"t1", email:"admin@protectiveflooring.com",  password:"PF-Admin-2025!", name:"PF Admin",     initials:"PA", role:"superadmin", status:"active", created:"Jan 1, 2025"},
@@ -1590,7 +1599,7 @@ function filterProps() {
   var sf = (document.getElementById('pstatus')||{value:''}).value;
   var all=0, mem=0, nash=0;
   document.querySelectorAll('#proplist .pr-card').forEach(function(card) {
-    var hub=card.dataset.hub||'', nameCity=(card.dataset.name||'')+(card.dataset.city||'');
+    var hub=card.dataset.hub||'', nameCity=(card.dataset.name||'')+' '+(card.dataset.city||'')+' '+(card.dataset.zip||'');
     var status=card.dataset.status||'';
     var matchHub = curHub==='all'||hub===curHub;
     var matchQ = !q || nameCity.indexOf(q)>=0;
@@ -1612,7 +1621,7 @@ function togProp(card) {
 function renderPropList() {
   var list = document.getElementById('proplist');
   if (!list) return;
-  var props = getActiveProps();
+  var props = getProps().filter(function(pr){ return !pr.deletedAt; });
   list.innerHTML = '';
   props.forEach(function(prop) {
     var fps = loadFpForProp(prop.id);
@@ -1673,7 +1682,8 @@ function renderPropList() {
     card.dataset.hub = prop.hub;
     card.dataset.name = prop.name.toLowerCase();
     card.dataset.city = (prop.city||'').toLowerCase();
-    card.dataset.status = prop.status;
+    card.dataset.zip  = (prop.zip||'').toLowerCase();
+    card.dataset.status = prop.status || 'active';
     card.innerHTML =
       '<div class="pr-header" onclick="openEditProp(\''+prop.id+'\');event.stopPropagation();" style="cursor:pointer;">'
         +'<div class="pr-avatar">'+initials+'</div>'
@@ -2597,8 +2607,7 @@ function confirmVoidOrder() {
   closeM('mvoid');
   closeM('mwo');
   toast('Work order #' + o.num + ' has been voided.');
-  // Re-render admin orders table if visible
-  if (document.querySelector('#aord.on')) renderAdminOrders();
+  refreshAllOrderViews();
 }
 
 function renderAdminOrders() {
@@ -2630,6 +2639,161 @@ function renderAdminOrders() {
       + '</tr>';
   });
   tbody.innerHTML = rows || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:32px;">No orders found.</td></tr>';
+}
+
+
+// ── DASHBOARD & ORDER HISTORY RENDER FUNCTIONS ──
+
+var _dashTab = 'recent'; // default tab
+
+function switchDashTab(tab) {
+  _dashTab = tab;
+  document.getElementById('tab_recent').classList.toggle('on', tab === 'recent');
+  document.getElementById('tab_today').classList.toggle('on',  tab === 'today');
+  document.getElementById('adash_recent_wrap').style.display = tab === 'recent' ? '' : 'none';
+  document.getElementById('adash_today_wrap').style.display  = tab === 'today'  ? '' : 'none';
+  var title = tab === 'today' ? "Today's Installs" : 'New Orders — Action Required';
+  document.getElementById('adash_table_title').textContent = title;
+  if (tab === 'today') renderAdashToday();
+  else                 renderAdashRecent();
+}
+
+function todayStr() {
+  return new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  // e.g. "February 20, 2025" → "Feb 20"
+  var parts = d.replace(',','').split(' ');
+  if (parts.length >= 2) return parts[0].slice(0,3) + ' ' + parts[1];
+  return d;
+}
+
+function orderActionBtns(id, o) {
+  var view = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
+  var conf = o.status==='requested'
+    ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">Confirm</button>' : '';
+  var vd   = (o.status!=='vd' && o.status!=='completed')
+    ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
+  return '<div style="display:flex;gap:5px;">'+view+conf+vd+'</div>';
+}
+
+function statusBadge(status) {
+  return '<span class="b '+status+'">'+(slab[status]||status)+'</span>';
+}
+
+function renderAdashRecent() {
+  var tbody = document.getElementById('adash_recent_tbody');
+  if (!tbody) return;
+  var rows = Object.keys(orders)
+    .sort(function(a,b){
+      var oa=orders[a], ob=orders[b];
+      // requested first, then by submission date desc
+      if (oa.status==='requested' && ob.status!=='requested') return -1;
+      if (ob.status==='requested' && oa.status!=='requested') return 1;
+      return 0;
+    })
+    .slice(0, 10); // most recent 10
+  var html = '';
+  rows.forEach(function(id) {
+    var o = orders[id];
+    var hub = o.hub==='Nashville'
+      ? '<span class="b nv">Nashville</span>'
+      : '<span class="b mp">Memphis</span>';
+    html += '<tr onclick="oworder(\''+id+'\')">'
+      +'<td><strong>#'+o.num+'</strong></td>'
+      +'<td>'+o.property+'</td>'
+      +'<td>'+hub+'</td>'
+      +'<td>'+o.unit+'</td>'
+      +'<td>'+o.service+'</td>'
+      +'<td>'+fmtDate(o.reqDate)+'</td>'
+      +'<td>'+o.occ+'</td>'
+      +'<td>'+statusBadge(o.status)+'</td>'
+      +'<td>'+orderActionBtns(id,o)+'</td>'
+      +'</tr>';
+  });
+  tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:24px;">No orders yet.</td></tr>';
+}
+
+function renderAdashToday() {
+  var tbody = document.getElementById('adash_today_tbody');
+  if (!tbody) return;
+  var today = todayStr();
+  var html = '';
+  Object.keys(orders).forEach(function(id) {
+    var o = orders[id];
+    if (o.reqDate !== today) return;
+    var hub = o.hub==='Nashville'
+      ? '<span class="b nv">Nashville</span>'
+      : '<span class="b mp">Memphis</span>';
+    html += '<tr onclick="oworder(\''+id+'\')">'
+      +'<td><strong>#'+o.num+'</strong></td>'
+      +'<td>'+o.property+'</td>'
+      +'<td>'+hub+'</td>'
+      +'<td>'+o.unit+'</td>'
+      +'<td>'+o.service+'</td>'
+      +'<td>'+o.reqDate+'</td>'
+      +'<td>'+o.occ+'</td>'
+      +'<td>'+statusBadge(o.status)+'</td>'
+      +'<td>'+orderActionBtns(id,o)+'</td>'
+      +'</tr>';
+  });
+  tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:24px;">No installs scheduled for today.</td></tr>';
+}
+
+function renderClientDash() {
+  var tbody = document.getElementById('cd_tbody');
+  if (!tbody || !currentUser) return;
+  var userProps = currentUser.props || [];
+  var html = '';
+  var shown = 0;
+  // Sort: requested first, then by date
+  var ids = Object.keys(orders).filter(function(id){
+    var o = orders[id];
+    return userProps.indexOf(o.property) !== -1 || userProps.length === 0;
+  });
+  ids.slice(0,8).forEach(function(id) {
+    var o = orders[id];
+    shown++;
+    html += '<tr onclick="oworder(\''+id+'\')">'
+      +'<td><strong>#'+o.num+'</strong></td>'
+      +'<td>Unit '+o.unit+'</td>'
+      +'<td>'+o.service+'</td>'
+      +'<td>'+fmtDate(o.reqDate)+'</td>'
+      +'<td>'+statusBadge(o.status)+'</td>'
+      +'<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'
+      +'</tr>';
+  });
+  tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">No orders yet. <a href="#" onclick="cnav(\'co\',document.querySelector(\'#cl .ni[onclick*=&quot;co&quot;]\'))">Submit your first order.</a></td></tr>';
+}
+
+function renderClientHistory() {
+  var tbody = document.getElementById('ch_tbody');
+  if (!tbody || !currentUser) return;
+  var userProps = currentUser.props || [];
+  var html = '';
+  Object.keys(orders).forEach(function(id) {
+    var o = orders[id];
+    if (userProps.length > 0 && userProps.indexOf(o.property) === -1) return;
+    html += '<tr onclick="oworder(\''+id+'\')">'
+      +'<td><strong>#'+o.num+'</strong></td>'
+      +'<td>'+o.unit+'</td>'
+      +'<td>'+o.plan+'</td>'
+      +'<td>'+o.service+'</td>'
+      +'<td>'+fmtDate(o.reqDate)+'</td>'
+      +'<td>'+statusBadge(o.status)+'</td>'
+      +'<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'
+      +'</tr>';
+  });
+  tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px;">No orders found.</td></tr>';
+}
+
+function refreshAllOrderViews() {
+  renderClientDash();
+  renderClientHistory();
+  renderAdashRecent();
+  if (_dashTab === 'today') renderAdashToday();
 }
 
 // ── AUTH ──
@@ -2969,6 +3133,8 @@ function go(id) {
   if (el) el.classList.add('on');
 }
 function cnav(pid, el) {
+  if (pid==='cd') renderClientDash();
+  if (pid==='ch') renderClientHistory();
   document.querySelectorAll('#cl .ni').forEach(function(n){ n.classList.remove('on'); });
   if (el) el.classList.add('on');
   document.querySelectorAll('#cl .panel').forEach(function(p){ p.classList.remove('on'); });
@@ -2978,6 +3144,7 @@ function cnav(pid, el) {
   document.getElementById('ctitle').textContent = titles[pid] || pid;
 }
 function anav(pid, el) {
+  if (pid==='adash') renderAdashRecent();
   if (pid==='aprops') renderPropList();
   if (pid==='aset') renderScopeAdmin();
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
@@ -3293,6 +3460,8 @@ function submitOrder() {
   var prev = document.getElementById('fppreview');
   if (prev) prev.style.display = 'none';
 
+  refreshAllOrderViews();
+  refreshAllOrderViews();
   setTimeout(function(){ cnav('ch', document.querySelector('#cl .ni[onclick*=\"ch\"]')); }, 1400);
 }
 
