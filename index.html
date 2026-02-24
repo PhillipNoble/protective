@@ -530,6 +530,11 @@ footer{
 @media(max-width:1000px){.svc-grid{grid-template-columns:1fr 1fr;}.why-inner{grid-template-columns:1fr;}}
 @media(max-width:600px){.svc-grid{grid-template-columns:1fr;}.services-section,.why-section{padding:60px 24px;}}
 
+
+/* ── Hero text fade on slide change ── */
+.hero-content.fading{opacity:0;transform:translateY(12px);}
+.hero-content{transition:opacity .5s ease, transform .5s ease;}
+
 </style>
 </head>
 <body>
@@ -581,9 +586,9 @@ footer{
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <div class="hero-eyebrow">Memphis &amp; Nashville &mdash; Since 1976</div>
-    <h1 class="hero-h1">Flooring Done Right.<br><em>Every Unit. Every Time.</em></h1>
-    <p class="hero-sub">Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.</p>
+    <div class="hero-eyebrow" id="heroEyebrow">Memphis &amp; Nashville &mdash; Since 1976</div>
+    <h1 class="hero-h1" id="heroH1">Flooring Done Right.<br><em>Every Unit. Every Time.</em></h1>
+    <p class="hero-sub" id="heroSub">Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.</p>
     <div class="hero-btns">
       <a href="#contact" class="btn-gold">&#128222; Get a Quote</a>
       <a href="portal.html" target="_blank" class="btn-outline">Client Portal &#8599;</a>
@@ -963,21 +968,51 @@ revealEls.forEach(function(el) { io.observe(el); });
 
 // ── Hero Slideshow ──
 (function() {
+  var SLIDES = [
+    {
+      eyebrow: 'Memphis &amp; Nashville &mdash; Since 1976',
+      h1: 'Flooring Done Right.<br><em>Every Unit. Every Time.</em>',
+      sub: 'Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.'
+    },
+    {
+      eyebrow: 'Fast Turnovers &mdash; Memphis &amp; Nashville',
+      h1: 'Same-Week Scheduling.<br><em>Zero Surprises.</em>',
+      sub: 'We understand that every vacant day costs you money. Our dedicated crews deliver consistent, professional installations &mdash; coordinated directly with your maintenance team so your units are rent-ready on time, every time.'
+    },
+    {
+      eyebrow: 'Carpet &bull; LVP &bull; Sheet Vinyl &bull; Subfloor',
+      h1: 'One Contractor.<br><em>Every Flooring Need.</em>',
+      sub: 'From carpet and luxury vinyl plank to sheet vinyl, tile, and subfloor repair &mdash; Protective Flooring handles it all under one roof. One call, one relationship, one company that shows up ready to work.'
+    }
+  ];
   var cur = 0;
-  var slides, dots;
+  var slides, dots, eyebrow, h1el, subel, content;
   function init() {
-    slides = document.querySelectorAll('.hero-slide');
-    dots   = document.querySelectorAll('.slide-dot');
+    slides  = document.querySelectorAll('.hero-slide');
+    dots    = document.querySelectorAll('.slide-dot');
+    eyebrow = document.getElementById('heroEyebrow');
+    h1el    = document.getElementById('heroH1');
+    subel   = document.getElementById('heroSub');
+    content = document.querySelector('.hero-content');
     if (!slides.length) return;
-    setInterval(function() { window.goSlide((cur + 1) % slides.length); }, 5000);
+    setInterval(function() { window.goSlide((cur + 1) % slides.length); }, 5500);
   }
   window.goSlide = function(n) {
     if (!slides) return;
+    // Fade content out
+    if (content) content.classList.add('fading');
     slides[cur].classList.remove('active');
     dots[cur].classList.remove('active');
     cur = n;
     slides[cur].classList.add('active');
     dots[cur].classList.add('active');
+    // Swap text, then fade back in
+    setTimeout(function() {
+      if (eyebrow) eyebrow.innerHTML = SLIDES[cur].eyebrow;
+      if (h1el)    h1el.innerHTML    = SLIDES[cur].h1;
+      if (subel)   subel.textContent = SLIDES[cur].sub;
+      if (content) content.classList.remove('fading');
+    }, 350);
   };
   document.addEventListener('DOMContentLoaded', init);
 })();
@@ -1039,25 +1074,7 @@ window.addEventListener('scroll', function() {
   }
 });
 
-// Hero slideshow
-(function(){
-  var cur = 0, slides, dots;
-  function init() {
-    slides = document.querySelectorAll('.hero-slide');
-    dots   = document.querySelectorAll('.slide-dot');
-    if (!slides.length) return;
-    setInterval(function(){ goSlide((cur + 1) % slides.length); }, 5000);
-  }
-  window.goSlide = function(n) {
-    if (!slides) return;
-    slides[cur].classList.remove('active');
-    dots[cur].classList.remove('active');
-    cur = n;
-    slides[cur].classList.add('active');
-    dots[cur].classList.add('active');
-  };
-  document.addEventListener('DOMContentLoaded', init);
-})();
+// (slideshow handled above)
 
 // Contact form
 var cfbtn = document.getElementById('cfsubmit');
