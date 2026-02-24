@@ -646,12 +646,50 @@ table.fpt tr:hover td{background:var(--cream);}
 
       <!-- ORDER HISTORY -->
       <div class="panel" id="ch">
-        <div class="fb">
-          <div class="sw"><span class="si2">&#128269;</span><input type="text" placeholder="Search orders..."></div>
-          <select class="fs"><option>All Statuses</option><option>Requested</option><option>Scheduled</option><option>In Progress</option><option>Completed</option></select>
+        <div class="shd" style="margin-bottom:16px;">
+          <h2>Order History</h2>
+          <span id="ch_count" style="font-size:13px;color:var(--gray);font-weight:400;margin-left:8px;"></span>
+        </div>
+        <div class="fb" style="flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <div class="sw" style="min-width:200px;flex:1;">
+            <span class="si2">&#128269;</span>
+            <input type="text" id="ch_search" placeholder="Search orders, units, services..." oninput="renderClientHistory()">
+          </div>
+          <select class="fs" id="ch_status_filter" onchange="renderClientHistory()">
+            <option value="">All Statuses</option>
+            <option value="requested">Requested</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="vd">Void</option>
+          </select>
+          <select class="fs" id="ch_prop_filter" onchange="renderClientHistory()">
+            <option value="">All Properties</option>
+          </select>
+          <select class="fs" id="ch_hub_filter" onchange="renderClientHistory()">
+            <option value="">All Hubs</option>
+            <option value="memphis">Memphis</option>
+            <option value="nashville">Nashville</option>
+          </select>
+          <select class="fs" id="ch_sort" onchange="renderClientHistory()">
+            <option value="newest">Newest First</option>
+            <option value="date">By Install Date</option>
+            <option value="property">By Property</option>
+            <option value="status">By Status</option>
+            <option value="service">By Service</option>
+          </select>
         </div>
         <div class="tw"><table>
-          <thead><tr><th>Work Order</th><th>Unit</th><th>Floor Plan</th><th>Service</th><th>Requested</th><th>Status</th><th></th></tr></thead>
+          <thead><tr>
+            <th>Work Order</th>
+            <th>Property</th>
+            <th>Unit</th>
+            <th>Service</th>
+            <th>Requested</th>
+            <th>Hub</th>
+            <th>Status</th>
+            <th></th>
+          </tr></thead>
           <tbody id="ch_tbody"></tbody>
         </table></div>
       </div>
@@ -1424,10 +1462,8 @@ table.fpt tr:hover td{background:var(--cream);}
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
 document.addEventListener('DOMContentLoaded', function() {
-  // Pre-render order tables so they're ready when panels open
-  renderAdashRecent();
-  renderClientDash();
-  renderClientHistory();
+  // Tables render when user navigates to panels (via cnav/anav hooks)
+  // and after submitOrder via refreshAllOrderViews()
 });
 
 </script><script>// ── DATA ──
@@ -2749,11 +2785,18 @@ function renderClientDash() {
   var html = '';
   var shown = 0;
   // Sort: requested first, then by date
+  var allPNames = getActiveProps().map(function(pr){ return pr.name; });
+  var isAdminView = userProps.length >= allPNames.length - 1;
   var ids = Object.keys(orders).filter(function(id){
     var o = orders[id];
-    return userProps.indexOf(o.property) !== -1 || userProps.length === 0;
+    return isAdminView || userProps.indexOf(o.property) !== -1;
   });
-  ids.slice(0,8).forEach(function(id) {
+  ids.sort(function(a,b){
+    var aTs = a.indexOf("WO-")===0, bTs = b.indexOf("WO-")===0;
+    if (aTs && !bTs) return -1; if (!aTs && bTs) return 1;
+    return b > a ? 1 : -1;
+  });
+  ids.slice(0,10).forEach(function(id) {
     var o = orders[id];
     shown++;
     html += '<tr onclick="oworder(\''+id+'\')">'
@@ -2772,21 +2815,70 @@ function renderClientHistory() {
   var tbody = document.getElementById('ch_tbody');
   if (!tbody || !currentUser) return;
   var userProps = currentUser.props || [];
-  var html = '';
-  Object.keys(orders).forEach(function(id) {
+  var allPN = getActiveProps().map(function(pr){ return pr.name; });
+  var isAdm = userProps.length === 0 || userProps.length >= allPN.length - 1;
+
+  // Filters
+  var chQ   = (document.getElementById('ch_search')||{value:''}).value.trim().toLowerCase();
+  var chSt  = (document.getElementById('ch_status_filter')||{value:''}).value;
+  var chPr  = (document.getElementById('ch_prop_filter')||{value:''}).value;
+  var chHub = (document.getElementById('ch_hub_filter')||{value:''}).value;
+  var chSrt = (document.getElementById('ch_sort')||{value:'newest'}).value;
+
+  var ids = Object.keys(orders).filter(function(id){
     var o = orders[id];
-    if (userProps.length > 0 && userProps.indexOf(o.property) === -1) return;
-    html += '<tr onclick="oworder(\''+id+'\')">'
-      +'<td><strong>#'+o.num+'</strong></td>'
-      +'<td>'+o.unit+'</td>'
-      +'<td>'+o.plan+'</td>'
-      +'<td>'+o.service+'</td>'
-      +'<td>'+fmtDate(o.reqDate)+'</td>'
-      +'<td>'+statusBadge(o.status)+'</td>'
-      +'<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'
-      +'</tr>';
+    if (!isAdm && userProps.indexOf(o.property) === -1) return false;
+    if (chSt  && o.status !== chSt) return false;
+    if (chPr  && o.property !== chPr) return false;
+    if (chHub && (o.hub||'').toLowerCase() !== chHub) return false;
+    if (chQ) {
+      var hay = (o.num+' '+o.property+' '+o.unit+' '+o.service+' '+(o.plan||'')).toLowerCase();
+      if (hay.indexOf(chQ) === -1) return false;
+    }
+    return true;
   });
-  tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px;">No orders found.</td></tr>';
+
+  ids.sort(function(a,b){
+    var oa=orders[a], ob=orders[b];
+    if (chSrt==='property') return (oa.property||'').localeCompare(ob.property||'');
+    if (chSrt==='status')   return (oa.status||'').localeCompare(ob.status||'');
+    if (chSrt==='service')  return (oa.service||'').localeCompare(ob.service||'');
+    if (chSrt==='date')     return (oa.reqDate||'').localeCompare(ob.reqDate||'');
+    // newest first (timestamp keys first)
+    var aTs=a.indexOf('WO-')===0, bTs=b.indexOf('WO-')===0;
+    if (aTs && !bTs) return -1; if (!aTs && bTs) return 1;
+    return b > a ? 1 : -1;
+  });
+
+  // Populate property dropdown dynamically
+  var propSel = document.getElementById('ch_prop_filter');
+  if (propSel && propSel.options.length <= 1) {
+    var seen = {};
+    Object.keys(orders).forEach(function(id){ seen[orders[id].property] = 1; });
+    Object.keys(seen).sort().forEach(function(pn){
+      var opt = document.createElement('option');
+      opt.value = pn; opt.textContent = pn;
+      propSel.appendChild(opt);
+    });
+  }
+
+  var html = '';
+  ids.forEach(function(id) {
+    var o = orders[id];
+    html += '<tr onclick="oworder(\''+id+'\')">'+
+      '<td><strong>#'+o.num+'</strong></td>'+
+      '<td>'+o.property+'</td>'+
+      '<td>'+o.unit+'</td>'+
+      '<td>'+o.service+'</td>'+
+      '<td>'+fmtDate(o.reqDate)+'</td>'+
+      '<td>'+(o.hub ? '<span class="b '+(o.hub==='Nashville'?'nv':'mp')+'">'+o.hub+'</span>' : '—')+'</td>'+
+      '<td>'+statusBadge(o.status)+'</td>'+
+      '<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'+
+      '</tr>';
+  });
+  var countEl = document.getElementById('ch_count');
+  if (countEl) countEl.textContent = ids.length + ' order' + (ids.length===1?'':'s');
+  tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px;">No orders found.</td></tr>';
 }
 
 function refreshAllOrderViews() {
@@ -2797,7 +2889,6 @@ function refreshAllOrderViews() {
 }
 
 // ── AUTH ──
-var currentUser = null;
 function doLogin() {
   var email = document.getElementById('lemail').value.trim().toLowerCase();
   var pw = document.getElementById('lpw').value;
