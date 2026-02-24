@@ -455,6 +455,18 @@ table.fpt tr:hover td{background:var(--cream);}
 .tab-toggle{background:var(--white);border:none;padding:6px 14px;font-size:12px;font-weight:600;color:var(--gray);cursor:pointer;font-family:inherit;transition:all .15s;}
 .tab-toggle.on{background:var(--navy);color:#fff;}
 .tab-toggle:hover:not(.on){background:var(--cream);}
+
+/* ── Work order change log ── */
+.wo-log-sec{background:var(--cream);border:1px solid var(--border);}
+.wo-log-entry{padding:10px 0;border-bottom:1px solid var(--border);}
+.wo-log-entry:last-child{border-bottom:none;}
+.wo-log-hd{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.wo-log-hd span{font-weight:400;font-size:11px;color:var(--gray);}
+.wo-log-meta{font-size:12px;color:var(--gray);margin-bottom:6px;}
+.wo-log-change{font-size:12px;padding:3px 0;display:flex;gap:8px;flex-wrap:wrap;}
+.wo-log-field{font-weight:600;color:var(--navy);min-width:140px;}
+.wo-log-arrow{color:var(--gray);}
+
 </style>
 </head>
 <body>
@@ -984,6 +996,8 @@ table.fpt tr:hover td{background:var(--cream);}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="bs gn" onclick="window.print()">&#128424; Print / Save PDF</button>
         <button class="bs ol" id="phbtn" onclick="togPhotos()">Include Photos</button>
+        <button class="bs nv" id="editwobtn" onclick="openWoEdit(_currentWoId)" style="display:none;">&#9998; Edit Order</button>
+        <button class="bs ol" id="logbtn" onclick="exportWoLog(_currentWoId)" style="display:none;">&#128220; Export Log</button>
         <button class="bs dn" id="voidbtn" onclick="openVoidOrder(_currentWoId)" style="display:none;">&#128683; Cancel / Void</button>
         <button class="mx" onclick="closeM('mwo')">&#10005;</button>
       </div>
@@ -1448,6 +1462,90 @@ table.fpt tr:hover td{background:var(--cream);}
 </div>
 
 <div class="toast" id="toastEl"><span>&#10003;</span><span id="toastmsg"></span>
+<!-- EDIT WORK ORDER MODAL -->
+<div class="mb" id="mwoedit">
+  <div class="modal" style="max-width:700px;width:700px;">
+    <div class="mh">
+      <div>
+        <h3 id="woedit_title">Edit Work Order</h3>
+        <div id="woedit_num" style="font-size:12px;color:var(--gray);margin-top:2px;"></div>
+      </div>
+      <button class="mx" onclick="closeM('mwoedit')">&#10005;</button>
+    </div>
+    <div class="mbody">
+      <div class="ms"><div class="mst">Property &amp; Unit</div>
+        <div class="form-row">
+          <div class="fg" style="flex:2;"><label>Property</label>
+            <select id="woedit_prop" onchange="woeditPropChange()"></select></div>
+          <div class="fg"><label>Unit Number</label>
+            <input type="text" id="woedit_unit" placeholder="e.g. 214"></div>
+        </div>
+        <div class="form-row" style="margin-top:8px;">
+          <div class="fg"><label>Floor Plan</label>
+            <select id="woedit_plan"><option value="">-- Select --</option></select></div>
+          <div class="fg"><label>Occupancy</label>
+            <select id="woedit_occ"><option value="Vacant">Vacant</option><option value="Occupied">Occupied</option></select></div>
+          <div class="fg"><label>Hub</label>
+            <select id="woedit_hub"><option value="Memphis">Memphis</option><option value="Nashville">Nashville</option></select></div>
+          <div class="fg"><label>Status</label>
+            <select id="woedit_status">
+              <option value="requested">Requested</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select></div>
+        </div>
+      </div>
+      <div class="ms"><div class="mst">Service &amp; Scope</div>
+        <div class="form-row">
+          <div class="fg" style="flex:2;"><label>Flooring Service</label>
+            <select id="woedit_service">
+              <option value="">-- Select Service --</option>
+              <option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option>
+              <option>Sheet Vinyl</option><option>Tile Installation</option>
+              <option>Pet Seal Treatment</option><option>Subfloor Repair</option>
+              <option>Repair</option><option>Call Back</option>
+            </select></div>
+        </div>
+        <div class="fg" style="margin-top:10px;"><label>Scope of Work <span style="font-size:11px;font-weight:400;color:var(--gray);">(one item per line)</span></label>
+          <textarea id="woedit_scope" rows="4" placeholder="Living Room&#10;Bedroom 1&#10;Hallway" style="resize:vertical;"></textarea></div>
+      </div>
+      <div class="ms"><div class="mst">Scheduling</div>
+        <div class="form-row">
+          <div class="fg"><label>Requested Install Date</label><input type="date" id="woedit_reqdate"></div>
+          <div class="fg"><label>Confirmed Date <span style="font-size:11px;font-weight:400;color:var(--gray);">(leave blank if pending)</span></label><input type="date" id="woedit_confdate"></div>
+          <div class="fg"><label>Time Window</label>
+            <select id="woedit_timewindow">
+              <option value="To be confirmed">To be confirmed</option>
+              <option value="Morning (7 AM - 12 PM)">Morning (7 AM - 12 PM)</option>
+              <option value="Afternoon (12 PM - 5 PM)">Afternoon (12 PM - 5 PM)</option>
+              <option value="No Preference">No Preference</option>
+            </select></div>
+        </div>
+      </div>
+      <div class="ms"><div class="mst">Notes &amp; Instructions</div>
+        <div class="fg"><textarea id="woedit_notes" rows="3" placeholder="Special instructions, damage notes, access info..." style="resize:vertical;"></textarea></div>
+      </div>
+      <div class="ms" style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:14px 16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#b45309;margin-bottom:8px;">&#9998; Reason for Edit <span style="color:#b91c1c;">*</span></div>
+        <select id="woedit_reason_sel" onchange="toggleWoEditOther(this.value)" style="margin-bottom:8px;">
+          <option value="">-- Select reason --</option>
+          <option>Date change</option><option>Scope of work updated</option>
+          <option>Service type correction</option><option>Unit number correction</option>
+          <option>Property or address correction</option><option>Status update</option>
+          <option>Customer request</option><option value="Other">Other (specify)</option>
+        </select>
+        <textarea id="woedit_reason_other" placeholder="Describe the reason..." style="display:none;resize:vertical;min-height:60px;"></textarea>
+      </div>
+      <div id="woedit_err" style="display:none;color:#b91c1c;font-size:13px;margin-top:10px;padding:8px 12px;background:#fef2f2;border-radius:4px;"></div>
+    </div>
+    <div class="mf">
+      <button class="bs ol" onclick="closeM('mwoedit')">Cancel</button>
+      <button class="bl gd" onclick="saveWoEdit()">&#10003; Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- VOID / CANCEL WORK ORDER MODAL -->
 <div class="mb" id="mvoid">
   <div class="modal" style="max-width:480px;">
@@ -2655,6 +2753,216 @@ function openFpImgSrc(fpId, propId) {
 }
 
 
+// ── WORK ORDER EDIT ──
+
+function cstNow() {
+  // Returns CST timestamp string
+  var now = new Date();
+  return now.toLocaleString('en-US', {
+    timeZone: 'America/Chicago',
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit', second: '2-digit',
+    hour12: true
+  }) + ' CST';
+}
+
+function dateToDisplay(isoDate) {
+  // "2025-02-20" -> "February 20, 2025"
+  if (!isoDate) return 'Pending';
+  var d = new Date(isoDate + 'T12:00:00');
+  return d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+}
+
+function displayToIso(displayDate) {
+  // "February 20, 2025" -> "2025-02-20"
+  if (!displayDate || displayDate === 'Pending') return '';
+  try {
+    var d = new Date(displayDate);
+    if (isNaN(d)) return '';
+    var mm = String(d.getMonth()+1).padStart(2,'0');
+    var dd = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear() + '-' + mm + '-' + dd;
+  } catch(e) { return ''; }
+}
+
+function openWoEdit(id) {
+  var o = orders[id]; if (!o) return;
+
+  // Populate property dropdown
+  var propSel = document.getElementById('woedit_prop');
+  propSel.innerHTML = '';
+  getActiveProps().forEach(function(pr) {
+    var opt = document.createElement('option');
+    opt.value = pr.name; opt.textContent = pr.name;
+    propSel.appendChild(opt);
+  });
+  propSel.value = o.property;
+
+  // Populate floor plans for this property
+  woeditPopulatePlans(o.property, o.plan);
+
+  document.getElementById('woedit_title').textContent = 'Edit Work Order';
+  document.getElementById('woedit_num').textContent   = '#' + o.num + ' — Submitted ' + o.submittedDate;
+  document.getElementById('woedit_unit').value        = o.unit || '';
+  document.getElementById('woedit_occ').value         = o.occ  || 'Vacant';
+  document.getElementById('woedit_hub').value         = o.hub  || 'Memphis';
+  document.getElementById('woedit_status').value      = o.status || 'requested';
+  document.getElementById('woedit_service').value     = o.service || '';
+  document.getElementById('woedit_scope').value       = (o.scope||[]).join('\n');
+  document.getElementById('woedit_reqdate').value     = displayToIso(o.reqDate);
+  document.getElementById('woedit_confdate').value    = displayToIso(o.confDate);
+  document.getElementById('woedit_timewindow').value  = o.timeWindow || 'To be confirmed';
+  document.getElementById('woedit_notes').value       = o.notes !== 'No additional notes.' ? (o.notes||'') : '';
+  document.getElementById('woedit_reason_sel').value  = '';
+  document.getElementById('woedit_reason_other').style.display = 'none';
+  document.getElementById('woedit_reason_other').value = '';
+  document.getElementById('woedit_err').style.display = 'none';
+
+  // Store the id being edited
+  document.getElementById('mwoedit').dataset.editId = id;
+  openM('mwoedit');
+}
+
+function woeditPropChange() {
+  var propName = document.getElementById('woedit_prop').value;
+  woeditPopulatePlans(propName, '');
+}
+
+function woeditPopulatePlans(propName, currentPlan) {
+  var planSel = document.getElementById('woedit_plan');
+  planSel.innerHTML = '<option value="">-- Select Floor Plan --</option>';
+  var prop = null;
+  getActiveProps().forEach(function(pr) { if (pr.name === propName) prop = pr; });
+  if (!prop) return;
+  var fps = loadFpForProp(prop.id);
+  fps.forEach(function(fp) {
+    var opt = document.createElement('option');
+    var label = fp.name;
+    if (fp.beds === 0) label += ' (Studio)';
+    else if (fp.beds) label += ' (' + fp.beds + 'bd/' + fp.baths + 'ba)';
+    if (fp.sqft) label += ' — ' + fp.sqft + ' sqft';
+    if (fp.renovated) label += ' ★';
+    opt.value = fp.name; opt.textContent = label;
+    planSel.appendChild(opt);
+  });
+  // Match by name
+  for (var i = 0; i < planSel.options.length; i++) {
+    if (planSel.options[i].value === currentPlan ||
+        planSel.options[i].textContent.indexOf(currentPlan) === 0) {
+      planSel.selectedIndex = i; break;
+    }
+  }
+}
+
+function toggleWoEditOther(val) {
+  document.getElementById('woedit_reason_other').style.display =
+    val === 'Other' ? 'block' : 'none';
+}
+
+function saveWoEdit() {
+  var id = document.getElementById('mwoedit').dataset.editId;
+  var o  = orders[id]; if (!o) return;
+
+  var reason    = document.getElementById('woedit_reason_sel').value;
+  var otherTxt  = document.getElementById('woedit_reason_other').value.trim();
+  var errEl     = document.getElementById('woedit_err');
+
+  if (!reason) { errEl.textContent = 'Please select a reason for this edit.'; errEl.style.display='block'; return; }
+  if (reason === 'Other' && !otherTxt) { errEl.textContent = 'Please describe the reason.'; errEl.style.display='block'; return; }
+  errEl.style.display = 'none';
+
+  var finalReason = reason === 'Other' ? otherTxt : reason;
+  var editor      = (window.currentTeamUser && window.currentTeamUser.name) || 'Admin';
+  var ts          = cstNow();
+  var scopeRaw    = document.getElementById('woedit_scope').value;
+  var newScope    = scopeRaw.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  var newReqDate  = dateToDisplay(document.getElementById('woedit_reqdate').value);
+  var newConfRaw  = document.getElementById('woedit_confdate').value;
+  var newConf     = newConfRaw ? dateToDisplay(newConfRaw) : 'Pending';
+
+  // Build diff log
+  var FIELD_LABELS = {
+    property:'Property', unit:'Unit', plan:'Floor Plan', occ:'Occupancy',
+    hub:'Hub', status:'Status', service:'Service', scope:'Scope',
+    reqDate:'Requested Date', confDate:'Confirmed Date',
+    timeWindow:'Time Window', notes:'Notes'
+  };
+  var changes = [];
+  var newVals = {
+    property:   document.getElementById('woedit_prop').value,
+    unit:       document.getElementById('woedit_unit').value.trim(),
+    plan:       document.getElementById('woedit_plan').value,
+    occ:        document.getElementById('woedit_occ').value,
+    hub:        document.getElementById('woedit_hub').value,
+    status:     document.getElementById('woedit_status').value,
+    service:    document.getElementById('woedit_service').value,
+    scope:      newScope,
+    reqDate:    newReqDate,
+    confDate:   newConf,
+    timeWindow: document.getElementById('woedit_timewindow').value,
+    notes:      document.getElementById('woedit_notes').value.trim() || 'No additional notes.'
+  };
+
+  Object.keys(FIELD_LABELS).forEach(function(key) {
+    var oldVal = key === 'scope' ? (o[key]||[]).join(', ') : (o[key]||'');
+    var newVal = key === 'scope' ? newScope.join(', ') : newVals[key];
+    if (String(oldVal) !== String(newVal)) {
+      changes.push({ field: FIELD_LABELS[key], from: String(oldVal), to: String(newVal) });
+    }
+  });
+
+  // Apply changes
+  Object.keys(newVals).forEach(function(k){ o[k] = newVals[k]; });
+
+  // Write audit log entry
+  if (!o.log) o.log = [];
+  o.log.push({
+    ts:      ts,
+    by:      editor,
+    reason:  finalReason,
+    changes: changes.length ? changes : [{field:'No field changes', from:'—', to:'(saved with no detected differences)'}]
+  });
+
+  closeM('mwoedit');
+  // Re-open the work order view to show updated data
+  oworder(id);
+  refreshAllOrderViews();
+  toast('Work order #' + o.num + ' updated.');
+}
+
+function exportWoLog(id) {
+  var o = orders[id]; if (!o || !o.log || !o.log.length) { toast('No change log for this order.'); return; }
+  var lines = ['WORK ORDER CHANGE LOG'];
+  lines.push('Work Order: #' + o.num);
+  lines.push('Property: ' + o.property + ' — Unit ' + o.unit);
+  lines.push('Generated: ' + cstNow());
+  lines.push('');
+  o.log.forEach(function(entry, idx) {
+    lines.push('─────────────────────────────────────');
+    lines.push('Edit #' + (idx+1) + ' — ' + entry.ts);
+    lines.push('Edited by: ' + entry.by);
+    lines.push('Reason: ' + entry.reason);
+    if (entry.changes && entry.changes.length) {
+      lines.push('Changes:');
+      entry.changes.forEach(function(c) {
+        lines.push('  • ' + c.field + ':');
+        lines.push('      From: ' + c.from);
+        lines.push('      To:   ' + c.to);
+      });
+    }
+    lines.push('');
+  });
+  lines.push('─────────────────────────────────────');
+  lines.push('END OF LOG — Protective Services Company, Inc. dba Protective Flooring');
+  var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'WO-Log-' + o.num + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ── VOID / CANCEL ORDER ──
 var _voidTargetId = null;
 var _currentWoId = null;
@@ -3438,11 +3746,28 @@ function oworder(id) {
         '<div class="wof"><div class="wofl">Email</div><div class="wofv">'+o.email+'</div></div>'+
       '</div></div>'+
       '<div class="wosec"><div class="wosr"><div class="wosb">Protective Flooring Representative Signature and Date</div><div class="wosb">Customer / Property Manager Signature and Date</div></div></div>'+
+      (o.log && o.log.length ? '<div class="wosec wo-log-sec"><div class="wosect">&#128221; Change Log</div>'+
+        o.log.map(function(entry,i){
+          var chHtml = entry.changes.map(function(c){
+            return '<div class="wo-log-change"><span class="wo-log-field">'+c.field+'</span>'+
+              '<span class="wo-log-arrow">'+c.from+' &#8594; '+c.to+'</span></div>';
+          }).join('');
+          return '<div class="wo-log-entry">'+
+            '<div class="wo-log-hd"><strong>Edit #'+(i+1)+'</strong><span>'+entry.ts+'</span></div>'+
+            '<div class="wo-log-meta">By '+entry.by+' &mdash; Reason: '+entry.reason+'</div>'+
+            chHtml+'</div>';
+        }).join('')+
+      '</div>' : '')+
     '</div>'+
     '<div class="wofoot"><span>Protective Services Company, Inc. dba Protective Flooring</span><span>#'+o.num+' -- '+today+'</span><span>"We Stand on Our Word"</span></div>';
   _currentWoId = id;
+  var isAdminView = !!(window.currentTeamUser);
   var voidBtn = document.getElementById('voidbtn');
-  if (voidBtn) voidBtn.style.display = (o.status !== 'vd' && o.status !== 'completed') ? 'inline-flex' : 'none';
+  var editBtn = document.getElementById('editwobtn');
+  if (voidBtn) voidBtn.style.display = (isAdminView && o.status !== 'vd' && o.status !== 'completed') ? 'inline-flex' : 'none';
+  if (editBtn) editBtn.style.display  = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
+  var logBtn = document.getElementById('logbtn');
+  if (logBtn) logBtn.style.display = (isAdminView && o.log && o.log.length) ? 'inline-flex' : 'none';
   openM('mwo');
 }
 function togPhotos() {
