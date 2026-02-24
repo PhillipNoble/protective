@@ -279,9 +279,24 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 @media print{
   body *{visibility:hidden;}
   .parea,.parea *{visibility:visible;}
-  .parea{position:absolute;left:0;top:0;width:100%;}
+  /* Escape modal overflow clipping */
+  .mb,.modal,.mbody,.wopp{
+    overflow:visible!important;
+    max-height:none!important;
+    position:static!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    border:none!important;
+    padding:0!important;
+    margin:0!important;
+    width:auto!important;
+    animation:none!important;
+  }
+  .mh{display:none!important;}
+  .parea{position:fixed;left:0;top:0;width:100%;background:#fff!important;}
   .ppbar{display:none!important;}
   .wofoot,.wost,.woh{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{margin:0.5in;}
 }
 
 /* ── CHOOSER SCREEN ── */
@@ -996,9 +1011,9 @@ table.fpt tr:hover td{background:var(--cream);}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="bs gn" onclick="window.print()">&#128424; Print / Save PDF</button>
         <button class="bs ol" id="phbtn" onclick="togPhotos()">Include Photos</button>
-        <button class="bs nv" id="editwobtn" onclick="openWoEdit(_currentWoId)" style="display:none;">&#9998; Edit Order</button>
-        <button class="bs ol" id="logbtn" onclick="exportWoLog(_currentWoId)" style="display:none;">&#128220; Export Log</button>
-        <button class="bs dn" id="voidbtn" onclick="openVoidOrder(_currentWoId)" style="display:none;">&#128683; Cancel / Void</button>
+        <button class="bs nv" id="editwobtn" onclick="openWoEdit(this.dataset.woid)" style="display:none;">&#9998; Edit Order</button>
+        <button class="bs ol" id="logbtn" onclick="exportWoLog(this.dataset.woid)" style="display:none;">&#128220; Export Log</button>
+        <button class="bs dn" id="voidbtn" onclick="openVoidOrder(this.dataset.woid)" style="display:none;">&#128683; Cancel / Void</button>
         <button class="mx" onclick="closeM('mwo')">&#10005;</button>
       </div>
     </div>
@@ -3762,12 +3777,17 @@ function oworder(id) {
     '<div class="wofoot"><span>Protective Services Company, Inc. dba Protective Flooring</span><span>#'+o.num+' -- '+today+'</span><span>"We Stand on Our Word"</span></div>';
   _currentWoId = id;
   var isAdminView = !!(window.currentTeamUser);
+  // Stamp each button with the current WO id so onclick doesn't rely on the global
+  ['editwobtn','logbtn','voidbtn'].forEach(function(btnId){
+    var btn = document.getElementById(btnId);
+    if (btn) btn.dataset.woid = id;
+  });
   var voidBtn = document.getElementById('voidbtn');
   var editBtn = document.getElementById('editwobtn');
+  var logBtn  = document.getElementById('logbtn');
   if (voidBtn) voidBtn.style.display = (isAdminView && o.status !== 'vd' && o.status !== 'completed') ? 'inline-flex' : 'none';
   if (editBtn) editBtn.style.display  = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
-  var logBtn = document.getElementById('logbtn');
-  if (logBtn) logBtn.style.display = (isAdminView && o.log && o.log.length) ? 'inline-flex' : 'none';
+  if (logBtn)  logBtn.style.display   = (isAdminView && o.log && o.log.length) ? 'inline-flex' : 'none';
   openM('mwo');
 }
 function togPhotos() {
