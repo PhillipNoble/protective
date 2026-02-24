@@ -1009,7 +1009,7 @@ table.fpt tr:hover td{background:var(--cream);}
     <div class="mh">
       <h3 id="wotitle">Work Order</h3>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <button class="bs gn" onclick="window.print()">&#128424; Print / Save PDF</button>
+        <button class="bs gn" onclick="printWorkOrder()">&#128424; Print / Save PDF</button>
         <button class="bs ol" id="phbtn" onclick="togPhotos()">Include Photos</button>
         <button class="bs nv" id="editwobtn" onclick="openWoEdit(this.dataset.woid)" style="display:none;">&#9998; Edit Order</button>
         <button class="bs ol" id="logbtn" onclick="exportWoLog(this.dataset.woid)" style="display:none;">&#128220; Export Log</button>
@@ -1476,7 +1476,7 @@ table.fpt tr:hover td{background:var(--cream);}
   </div>
 </div>
 
-<div class="toast" id="toastEl"><span>&#10003;</span><span id="toastmsg"></span>
+<div class="toast" id="toastEl"><span>&#10003;</span><span id="toastmsg"></span></div>
 <!-- EDIT WORK ORDER MODAL -->
 <div class="mb" id="mwoedit">
   <div class="modal" style="max-width:700px;width:700px;">
@@ -2976,6 +2976,36 @@ function exportWoLog(id) {
   a.download = 'WO-Log-' + o.num + '.txt';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function printWorkOrder() {
+  var woHtml = document.getElementById('woprint');
+  if (!woHtml || !woHtml.innerHTML.trim()) { toast('No work order loaded.'); return; }
+  var win = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+  if (!win) { toast('Please allow popups to print.'); window.print(); return; }
+  var cssVars = '';
+  // Collect computed CSS variables
+  var style = getComputedStyle(document.documentElement);
+  var varNames = ['--navy','--gold','--white','--cream','--off','--gray','--border','--r','--lg','--green','--navy-lt','--gold-bg','--shl'];
+  varNames.forEach(function(v){ cssVars += v + ':' + style.getPropertyValue(v) + ';'; });
+
+  win.document.write(
+    '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>Work Order</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">' +
+    '<style>' +
+    ':root{' + cssVars + '}' +
+    'body{font-family:Inter,sans-serif;font-size:14px;color:#1a1a2e;margin:0;padding:24px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+    document.querySelector('style').textContent +
+    '.ppbar{display:none!important;}' +
+    '.wod{padding:32px 40px;}' +
+    '@page{margin:0.4in;}' +
+    '</style></head><body>' +
+    woHtml.outerHTML +
+    '<script>window.onload=function(){window.print();}<\/script>' +
+    '</body></html>'
+  );
+  win.document.close();
 }
 
 // ── VOID / CANCEL ORDER ──
