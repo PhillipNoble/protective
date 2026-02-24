@@ -2487,6 +2487,16 @@ function deleteFpInline(btn) {
   toast('Floor plan deleted.');
 }
 
+
+function openFpImgSrc(fpId, propId) {
+  var fps = loadFpForProp(propId);
+  var fp = fps.find(function(f){ return f.id===fpId; });
+  if (!fp || !fp.images || !fp.images.floorPlan) { toast('No floor plan image uploaded yet.'); return; }
+  var propName = '';
+  getActiveProps().forEach(function(pr){ if(pr.id===propId) propName=pr.name; });
+  openPrintPage(fp.images.floorPlan.src, 'Floor Plan', fp.name, propName);
+}
+
 // ── AUTH ──
 var currentUser = null;
 function doLogin() {
@@ -2653,9 +2663,9 @@ function buildFloorPlansPage(user) {
   user.props.forEach(function(pname) {
     var matchedProp = null;
     getActiveProps().forEach(function(pr){ if(pr.name===pname) matchedProp=pr; });
-    var fps = matchedProp ? loadFpForProp(matchedProp.id) : [];
+    var propId = matchedProp ? matchedProp.id : '';
+    var fps = matchedProp ? loadFpForProp(propId) : [];
     fps.forEach(function(fp) {
-      // Support both rich objects (from getFpData) and legacy fpDetails lookup
       var det = fpDetails[fp.id] || {};
       var roomList = fp.rooms || det.rooms || [];
       var beds = fp.beds !== undefined ? fp.beds : det.beds;
@@ -2664,18 +2674,41 @@ function buildFloorPlansPage(user) {
       var typeLabel = '';
       if (beds === 0) typeLabel = 'Studio';
       else if (beds) typeLabel = beds + ' Bed / ' + baths + ' Bath';
-      var renovBadge = (fp.renovated || det.renovated) ? '<span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;margin-left:8px;vertical-align:middle;">RENOVATED</span>' : '';
+      var renovBadge = (fp.renovated || det.renovated)
+        ? '<span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;margin-left:8px;vertical-align:middle;">RENOVATED</span>' : '';
       var rooms = roomList.map(function(r){ return '<span class="chip">'+r+'</span>'; }).join('');
-      var hasImg = !!fpStore[fp.id];
+      var fpImg = fp.images && fp.images.floorPlan && fp.images.floorPlan.src;
+      var scopes = fp.scopes || [];
+      var allScopes = loadScopes();
+      var scopeChips = scopes.length
+        ? '<div style="margin-bottom:8px;">'
+          + scopes.map(function(sid){
+              var sc = allScopes.find(function(s){ return s.id===sid; });
+              return sc ? '<span class="chip" style="background:rgba(2,10,91,.08);color:var(--navy);">'+sc.name+'</span>' : '';
+            }).join('')
+          + '</div>'
+        : '';
+
       var card = document.createElement('div');
       card.className = 'fc';
       card.style.marginBottom = '0';
-      var btnCls = 'fit' + (hasImg ? ' hi' : '');
-      card.innerHTML =
-        '<h3 style="font-size:17px;">'+fp.name+renovBadge+'</h3>' +
-        '<p style="font-size:12px;color:var(--gray);margin-bottom:6px;">' + (typeLabel ? typeLabel+' &bull; ' : '') + sqftDisplay + ' &bull; '+pname+'</p>' +
-        '<div style="margin-bottom:10px;">'+rooms+'</div>' +
-        '<button class="'+btnCls+'" onclick="openFpImg(\''+fp.id+'\')">&#128506; '+(hasImg ? 'View Floor Plan Image' : 'Upload Floor Plan Image')+'</button>';
+
+      var inner = '<h3 style="font-size:17px;">'+fp.name+renovBadge+'</h3>'
+        + '<p style="font-size:12px;color:var(--gray);margin-bottom:6px;">'
+          + (typeLabel ? typeLabel+' &bull; ' : '') + sqftDisplay + ' &bull; '+pname
+        + '</p>'
+        + '<div style="margin-bottom:10px;">'+rooms+'</div>'
+        + scopeChips;
+      card.innerHTML = inner;
+
+      if (fpImg && propId) {
+        var btn = document.createElement('button');
+        btn.className = 'fit hi';
+        btn.innerHTML = '&#128506; View Floor Plan';
+        (function(fid, pid){ btn.onclick = function(){ openFpImgSrc(fid, pid); }; })(fp.id, propId);
+        card.appendChild(btn);
+      }
+
       grid.appendChild(card);
     });
   });
@@ -2704,8 +2737,14 @@ function onPlanChange(fpId) {
     document.getElementById('fpcardname').textContent = det.name;
     document.getElementById('fpcardsqft').textContent = det.sqft;
     var img = document.getElementById('fpcardimg');
-    if (fpStore[fpId]) {
-      img.innerHTML = '<img src="'+fpStore[fpId]+'" style="width:100%;height:100%;object-fit:cover;">';
+    // get image from new store
+    var propSel = document.getElementById('cpropsel');
+    var propId2 = propSel ? propSel.value : '';
+    var fps2 = propId2 ? loadFpForProp(propId2) : [];
+    var fpObj = fps2.find(function(f){ return f.id===fpId; });
+    var imgSrc = fpObj && fpObj.images && fpObj.images.floorPlan && fpObj.images.floorPlan.src;
+    if (imgSrc) {
+      img.innerHTML = '<img src="'+imgSrc+'" style="width:100%;height:100%;object-fit:cover;">';
     } else {
       img.innerHTML = '🗺';
     }
@@ -2825,7 +2864,13 @@ function openFpImg(id) {
   document.getElementById('fpsub').textContent = id;
   var fp = fpDetails[id];
   document.getElementById('fptitle').textContent = fp ? fp.name : 'Floor Plan';
-  var img = fpStore[id];
+  // fpStore removed — find image from new per-property store
+  var img = null;
+  getActiveProps().forEach(function(pr){
+    loadFpForProp(pr.id).forEach(function(fp){
+      if(fp.id===id && fp.images && fp.images.floorPlan) img = fp.images.floorPlan.src;
+    });
+  });
   var d = document.getElementById('fpimg');
   var n = document.getElementById('fpnone');
   if (img) { d.src = img; d.style.display = 'block'; n.style.display = 'none'; }
@@ -2964,7 +3009,7 @@ function saveFp() {
   var n=document.getElementById('fpname');
   if(n&&!n.value.trim()){toast('Please enter a floor plan name.');return;}
   var inp=document.getElementById('fupinput');
-  if(inp&&inp._src&&n) fpStore[n.value.toLowerCase().replace(/\s+/g,'-')]=inp._src;
+  // fpStore removed — images saved via slot upload system in mfpe modal
   closeM('mfpe');toast('Floor plan saved.');
 }
 
