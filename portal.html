@@ -500,7 +500,7 @@ table.fpt tr:hover td{background:var(--cream);}
       <div class="ni" onclick="cnav('cx',this)"><span class="ic">&#128196;</span> Documents</div>
     </nav>
     <div class="sbot">
-    <button class="lo" style="background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;" onclick="goClientPortalFromChooser();go('cl');">&#128101; View Client Portal</button>
+    <button class="lo" style="background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');},100);">&#128101; View Client Portal</button>
     <button class="lo" style="background:rgba(255,255,255,.06);margin-bottom:8px;width:100%;justify-content:center;" onclick="goToChooser();">&#8592; Back to Hub</button>
     <button class="lo" onclick="doLogout()">&#8594; Sign Out</button>
   </div>
@@ -543,7 +543,6 @@ table.fpt tr:hover td{background:var(--cream);}
             <div class="fg"><label>Property</label>
               <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
                 <option value="">-- Select Property --</option>
-                <option value="riverside">Riverside Apartments</option><option value="parkview">Parkview Commons</option><option value="columns">The Columns at Bartlett</option><option value="magnolia">Magnolia Trace</option><option value="cherrycreek">Cherry Creek Apartments</option><option value="arborridge">Arbor Ridge Nashville</option><option value="hermitage">The Reserve at Hermitage</option>
               </select>
             </div>
             <div class="fg"><label>Unit Number *</label><input type="text" id="cunitinput" placeholder="e.g. 214"></div>
@@ -679,7 +678,7 @@ table.fpt tr:hover td{background:var(--cream);}
       <div class="ni" onclick="anav('aset',this)"><span class="ic">&#9881;</span> Portal Settings</div>
     </nav>
     <div class="sbot">
-    <button class="lo" style="background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;" onclick="goClientPortalFromChooser();go('cl');">&#128101; View Client Portal</button>
+    <button class="lo" style="background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');},100);">&#128101; View Client Portal</button>
     <button class="lo" style="background:rgba(255,255,255,.06);margin-bottom:8px;width:100%;justify-content:center;" onclick="goToChooser();">&#8592; Back to Hub</button>
     <button class="lo" onclick="doLogout()">&#8594; Sign Out</button>
   </div>
@@ -701,7 +700,7 @@ table.fpt tr:hover td{background:var(--cream);}
         </div>
         <div class="shd" style="margin-bottom:16px;">
           <h2>New Orders — Action Required</h2>
-          <button class="bs gd" onclick="goClientPortalFromChooser();go('cl');setTimeout(function(){cnav('co',document.querySelectorAll('#cl .ni')[1]);},200);">&#128221; Place New Order</button>
+          <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*="co"]'));},150);">&#128221; Place New Order</button>
         </div>
         <div class="tw" style="margin-bottom:28px;"><table>
           <thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Requested</th><th>Occupancy</th><th>Status</th><th>Action</th></tr></thead>
@@ -738,7 +737,7 @@ table.fpt tr:hover td{background:var(--cream);}
       <div class="panel" id="aprops">
         <div class="shd"><h2>Properties</h2>
           <div style="display:flex;gap:8px;">
-            <button class="bs ol" onclick="goClientPortalFromChooser();go('cl');setTimeout(function(){cnav('co',document.querySelectorAll('#cl .ni')[1]);},200);">&#128221; Place Order</button>
+            <button class="bs ol" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*="co"]'));},150);">&#128221; Place Order</button>
             <button class="bs gd" onclick="openM('madd')">+ Add Property</button>
           </div></div>
         <div class="fb" style="margin-bottom:16px;">
@@ -2628,8 +2627,9 @@ function loadClientPortal(user) {
   user.props.forEach(function(pname) {
     var opt = document.createElement('option');
     opt.textContent = pname;
-    // find prop id
-    var pid = pname.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    // find real prop.id from store
+    var pid = '';
+    getActiveProps().forEach(function(pr){ if(pr.name===pname) pid=pr.id; });
     opt.value = pid;
     sel.appendChild(opt);
   });
