@@ -558,7 +558,7 @@ table.fpt tr:hover td{background:var(--cream);}
         <div class="fc">
           <h3>&#127968; Property &amp; Unit</h3>
           <div class="form-row" style="margin-bottom:16px;">
-            <div class="fg"><label>Property</label>
+            <div class="fg"><label>Property *</label>
               <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
                 <option value="">-- Select Property --</option>
               </select>
@@ -603,10 +603,10 @@ table.fpt tr:hover td{background:var(--cream);}
         <div class="fc">
           <h3>&#129520; Service &amp; Scope</h3>
           <!-- presetzone merged into fppreview above -->
-          <div class="fg" style="margin-bottom:20px;"><label>Flooring Service *</label>
+          <div class="fg" style="margin-bottom:20px;"><label>Flooring Service <span style="font-size:11px;font-weight:400;color:var(--gray);">(required if no scope selected)</span></label>
             <select id="csvc"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select>
           </div>
-          <div class="fg"><label>Scope of Work *</label>
+          <div class="fg"><label>Scope of Work <span style="font-size:11px;font-weight:400;color:var(--gray);">(required if no service selected — or select presets above)</span></label>
             <div class="sg" style="margin-top:8px;" id="scopegrid">
               <div class="so" onclick="togScope(this)"><div class="ck"></div>Living Room</div>
               <div class="so" onclick="togScope(this)"><div class="ck"></div>Master Bedroom</div>
@@ -625,12 +625,12 @@ table.fpt tr:hover td{background:var(--cream);}
               <div class="so" onclick="togScope(this)"><div class="ck"></div>Entire Unit</div>
             </div>
           </div>
-          <div class="fg" style="margin-top:18px;"><label>Notes / Special Instructions</label><textarea placeholder="Describe damage, access instructions, or anything the crew should know..."></textarea></div>
+          <div class="fg" style="margin-top:18px;"><label>Notes / Special Instructions</label><textarea id="cnotes" placeholder="Describe damage, access instructions, or anything the crew should know..."></textarea></div>
         </div>
         <div class="fc">
           <h3>&#128197; Scheduling</h3>
           <div class="form-row">
-            <div class="fg"><label>Requested Install Date *</label><input type="date"></div>
+            <div class="fg"><label>Requested Install Date *</label><input type="date" id="cinstdate"></div>
             <div class="fg"><label>Preferred Time Window</label><select><option>No Preference</option><option>Morning (7 AM - 12 PM)</option><option>Afternoon (12 PM - 5 PM)</option></select></div>
           </div>
         </div>
@@ -3208,54 +3208,94 @@ document.querySelectorAll('.uprop-item').forEach(function(item) {
 
 // ── SUBMIT ──
 function submitOrder() {
-  var propSel  = document.getElementById('cpropsel');
-  var planSel  = document.getElementById('cplan');
-  var unitEl   = document.getElementById('cunitinput');
-  var svcEl    = document.getElementById('csvc');
-  if (!propSel.value) { toast('Please select a property.'); return; }
-  if (!planSel.value) { toast('Please select a floor plan.'); return; }
-  if (!unitEl.value.trim()) { toast('Please enter a unit number.'); return; }
-  if (!svcEl.value) { toast('Please select a flooring service.'); return; }
+  // ── Collect values ──
+  var propSel   = document.getElementById('cpropsel');
+  var planSel   = document.getElementById('cplan');
+  var unitEl    = document.getElementById('cunitinput');
+  var svcEl     = document.getElementById('csvc');
+  var dateEl    = document.getElementById('cinstdate');
+  var notesEl   = document.getElementById('cnotes');
 
-  // Collect selected scope chips
+  var propVal   = propSel ? propSel.value : '';
+  var planVal   = planSel ? planSel.value : '';
+  var unitVal   = unitEl  ? unitEl.value.trim() : '';
+  var svcVal    = svcEl   ? svcEl.value : '';
+  var dateVal   = dateEl  ? dateEl.value : '';
+  var notesVal  = notesEl ? notesEl.value.trim() : '';
+
+  // ── Collect scopes: preset chips (chosen) + scopegrid checkmarks ──
   var selectedScopes = [];
   document.querySelectorAll('#fpscopes-chips .scope-chip-sel.chosen').forEach(function(el){
     selectedScopes.push(el.getAttribute('data-scope'));
   });
+  document.querySelectorAll('#scopegrid .so.on').forEach(function(el){
+    var txt = el.textContent.trim();
+    if (txt && selectedScopes.indexOf(txt) === -1) selectedScopes.push(txt);
+  });
 
-  // Get property name
-  var propName = propSel.options[propSel.selectedIndex].text;
-  var planName = planSel.options[planSel.selectedIndex].text;
+  // ── Validation ──
+  var errors = [];
+  if (!propVal)  errors.push('Property is required.');
+  if (!unitVal)  errors.push('Unit number is required.');
+  if (!planVal)  errors.push('Floor Plan is required.');
+  if (!dateVal)  errors.push('Requested install date is required.');
+  // Service OR at least one scope is required
+  if (!svcVal && selectedScopes.length === 0)
+    errors.push('Select a Flooring Service and/or at least one Installation Scope.');
+
+  if (errors.length) {
+    toast(errors[0]);
+    return;
+  }
+
+  // ── Build work order ──
   var occEl    = document.querySelector('#co .ro.on .rl');
   var occ      = occEl ? occEl.textContent : 'Vacant';
-  var notesEl  = document.getElementById('cnotes');
-  var notes    = notesEl ? notesEl.value.trim() : '';
+  var propName = propSel.options[propSel.selectedIndex].text;
+  var planName = planSel.options[planSel.selectedIndex].text;
   var today    = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var reqDate  = dateVal ? new Date(dateVal + 'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : today;
 
-  // Build order key and object
   var woId  = 'WO-' + Date.now();
   var woNum = 'WO-' + Math.floor(Math.random()*9000+1000);
+
   orders[woId] = {
-    num: woNum, property: propName, hub: 'Memphis',
-    unit: unitEl.value.trim(), plan: planName, sqft: '',
-    occ: occ, service: svcEl.value,
-    scope: selectedScopes.length ? selectedScopes : ['See notes'],
-    reqDate: today, confDate: 'Pending', status: 'requested',
-    submittedBy: (currentUser && currentUser.name) || 'Portal User',
+    num:           woNum,
+    property:      propName,
+    hub:           'Memphis',
+    unit:          unitVal,
+    plan:          planName,
+    sqft:          '',
+    occ:           occ,
+    service:       svcVal || '(See scopes)',
+    scope:         selectedScopes.length ? selectedScopes : [svcVal],
+    reqDate:       reqDate,
+    confDate:      'Pending',
+    status:        'requested',
+    submittedBy:   (currentUser && currentUser.name) || 'Portal User',
     submittedDate: today,
-    email: (currentUser && currentUser.email) || '',
-    notes: notes || 'No additional notes.',
-    timeWindow: 'To be confirmed', photos: false
+    email:         (currentUser && currentUser.email) || '',
+    notes:         notesVal || 'No additional notes.',
+    timeWindow:    'To be confirmed',
+    photos:        false
   };
 
-  toast('Order submitted! Your request has been received.');
+  toast('\u2713 Order submitted! Your request has been received.');
+
   // Reset form
-  planSel.selectedIndex = 0;
-  unitEl.value = '';
+  if (planSel) planSel.selectedIndex = 0;
+  if (unitEl)  unitEl.value = '';
+  if (svcEl)   svcEl.selectedIndex = 0;
+  if (dateEl)  dateEl.value = '';
   if (notesEl) notesEl.value = '';
-  document.getElementById('fppreview').style.display = 'none';
-  setTimeout(function(){ cnav('ch', document.querySelector('#cl .ni[onclick*="ch"]')); }, 1400);
+  document.querySelectorAll('#fpscopes-chips .scope-chip-sel.chosen').forEach(function(el){ el.classList.remove('chosen'); });
+  document.querySelectorAll('#scopegrid .so.on').forEach(function(el){ el.classList.remove('on'); });
+  var prev = document.getElementById('fppreview');
+  if (prev) prev.style.display = 'none';
+
+  setTimeout(function(){ cnav('ch', document.querySelector('#cl .ni[onclick*=\"ch\"]')); }, 1400);
 }
+
 function saveFp() {
   var n=document.getElementById('fpname');
   if(n&&!n.value.trim()){toast('Please enter a floor plan name.');return;}
