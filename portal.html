@@ -2771,6 +2771,19 @@ function openFpImgSrc(fpId, propId) {
 }
 
 
+function svcDisplay(o) {
+  // If service is blank or placeholder, show scope list
+  var svc = o.service || '';
+  if (!svc || svc === '(See scopes)' || svc === 'See Work Order') {
+    return (o.scope && o.scope.length) ? o.scope.join(', ') : '—';
+  }
+  // If scopes exist and differ from service, append them
+  if (o.scope && o.scope.length && !(o.scope.length === 1 && o.scope[0] === svc)) {
+    return svc + '<br><span style="font-size:11px;color:var(--gray);">' + o.scope.join(', ') + '</span>';
+  }
+  return svc;
+}
+
 // ── WORK ORDER EDIT ──
 
 function cstNow() {
@@ -2792,15 +2805,15 @@ function dateToDisplay(isoDate) {
 }
 
 function displayToIso(displayDate) {
-  // "February 20, 2025" -> "2025-02-20"
+  // "February 20, 2025" -> "2025-02-20" (manual parse — avoids browser Date quirks)
   if (!displayDate || displayDate === 'Pending') return '';
-  try {
-    var d = new Date(displayDate);
-    if (isNaN(d)) return '';
-    var mm = String(d.getMonth()+1).padStart(2,'0');
-    var dd = String(d.getDate()).padStart(2,'0');
-    return d.getFullYear() + '-' + mm + '-' + dd;
-  } catch(e) { return ''; }
+  var MONTHS = {January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',
+    July:'07',August:'08',September:'09',October:'10',November:'11',December:'12'};
+  var m = displayDate.match(/^(\w+)\s+(\d{1,2}),?\s+(\d{4})$/);
+  if (!m) return '';
+  var mon = MONTHS[m[1]];
+  if (!mon) return '';
+  return m[3] + '-' + mon + '-' + String(m[2]).padStart(2,'0');
 }
 
 function openWoEdit(id) {
@@ -2885,8 +2898,18 @@ function saveWoEdit() {
   var otherTxt  = document.getElementById('woedit_reason_other').value.trim();
   var errEl     = document.getElementById('woedit_err');
 
-  if (!reason) { errEl.textContent = 'Please select a reason for this edit.'; errEl.style.display='block'; return; }
-  if (reason === 'Other' && !otherTxt) { errEl.textContent = 'Please describe the reason.'; errEl.style.display='block'; return; }
+  if (!reason) {
+    errEl.textContent = 'Please select a reason for this edit.';
+    errEl.style.display='block';
+    errEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+  if (reason === 'Other' && !otherTxt) {
+    errEl.textContent = 'Please describe the reason for this edit.';
+    errEl.style.display='block';
+    errEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
   errEl.style.display = 'none';
 
   var finalReason = reason === 'Other' ? otherTxt : reason;
@@ -2943,9 +2966,13 @@ function saveWoEdit() {
 
   saveOrders();
   closeM('mwoedit');
-  oworder(id);
   refreshAllOrderViews();
-  toast('Work order #' + o.num + ' updated.');
+  // If work order preview is still open, refresh it in place
+  var mwoEl = document.getElementById('mwo');
+  if (mwoEl && mwoEl.classList.contains('op')) {
+    oworder(id);
+  }
+  toast('\u2713 Work order #' + o.num + ' saved successfully.');
 }
 
 function exportWoLog(id) {
@@ -3084,7 +3111,7 @@ function renderAdminOrders() {
     if (st   && o.status   !== st)   return false;
     if (hub  && (o.hub||'') !== hub) return false;
     if (q) {
-      var hay = (o.num+' '+o.property+' '+o.unit+' '+o.service+' '+(o.plan||'')).toLowerCase();
+      var hay = (o.num+' '+o.property+' '+o.unit+' '+svcDisplay(o)+' '+(o.plan||'')).toLowerCase();
       if (hay.indexOf(q) === -1) return false;
     }
     return true;
@@ -3124,7 +3151,7 @@ function renderAdminOrders() {
       +'<td>'+o.property+'</td>'
       +'<td>'+hubBadge+'</td>'
       +'<td>'+o.unit+'</td>'
-      +'<td>'+o.service+'</td>'
+      +'<td>'+svcDisplay(o)+'</td>'
       +'<td>'+fmtDate(o.reqDate)+'</td>'
       +'<td>'+sb+'</td>'
       +'<td><div style="display:flex;gap:4px;">'+view+conf+vd+'</div></td>'
@@ -3179,38 +3206,48 @@ function renderAdashRecent() {
   var tbody = document.getElementById('adash_recent_tbody');
   if (!tbody) return;
   var adashHub = (document.getElementById('adash_hub')||{value:''}).value;
-  var rows = Object.keys(orders)
-    .sort(function(a,b){
-      var oa=orders[a], ob=orders[b];
-      // requested first, then by submission date desc
-      if (oa.status==='requested' && ob.status!=='requested') return -1;
-      if (ob.status==='requested' && oa.status!=='requested') return 1;
-      return 0;
-    })
-    .filter(function(id){
-      if (!adashHub) return true;
-      return (orders[id].hub||'')=== adashHub;
-    })
-    .slice(0, 10);
-  var html = '';
-  rows.forEach(function(id) {
+
+  // Show: all 'requested' orders first, then recent 'scheduled', exclude completed/void
+  var allIds = Object.keys(orders).filter(function(id){
     var o = orders[id];
-    var hub = o.hub==='Nashville'
+    if (o.status === 'vd' || o.status === 'completed') return false;
+    if (adashHub && (o.hub||'') !== adashHub) return false;
+    return true;
+  });
+
+  // Sort: requested first, then scheduled, then in-progress; newest within each group
+  allIds.sort(function(a, b) {
+    var sa = orders[a].status, sb = orders[b].status;
+    var rank = {requested:0,'in-progress':1,scheduled:2};
+    var ra = rank[sa] !== undefined ? rank[sa] : 3;
+    var rb = rank[sb] !== undefined ? rank[sb] : 3;
+    if (ra !== rb) return ra - rb;
+    // Within same status: newest first (timestamp keys first)
+    var aTs = a.indexOf('WO-')===0, bTs = b.indexOf('WO-')===0;
+    if (aTs && !bTs) return -1; if (!aTs && bTs) return 1;
+    return b > a ? 1 : -1;
+  });
+
+  var ids = allIds.slice(0, 10);
+  var html = '';
+  ids.forEach(function(id) {
+    var o = orders[id];
+    var hub = (o.hub||'')==='Nashville'
       ? '<span class="b nv">Nashville</span>'
       : '<span class="b mp">Memphis</span>';
-    html += '<tr onclick="oworder(\''+id+'\')">'
-      +'<td><strong>#'+o.num+'</strong></td>'
-      +'<td>'+o.property+'</td>'
-      +'<td>'+hub+'</td>'
-      +'<td>'+o.unit+'</td>'
-      +'<td>'+o.service+'</td>'
-      +'<td>'+fmtDate(o.reqDate)+'</td>'
-      +'<td>'+o.occ+'</td>'
-      +'<td>'+statusBadge(o.status)+'</td>'
-      +'<td>'+orderActionBtns(id,o)+'</td>'
-      +'</tr>';
+    html += '<tr onclick="oworder(\''+id+'\')">'+
+      '<td><strong>#'+o.num+'</strong></td>'+
+      '<td>'+o.property+'</td>'+
+      '<td>'+hub+'</td>'+
+      '<td>'+o.unit+'</td>'+
+      '<td>'+svcDisplay(o)+'</td>'+
+      '<td>'+fmtDate(o.reqDate)+'</td>'+
+      '<td>'+o.occ+'</td>'+
+      '<td>'+statusBadge(o.status)+'</td>'+
+      '<td>'+orderActionBtns(id,o)+'</td>'+
+      '</tr>';
   });
-  tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:24px;">No orders yet.</td></tr>';
+  tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:24px;">No pending orders.</td></tr>';
 }
 
 function renderAdashToday() {
@@ -3222,6 +3259,7 @@ function renderAdashToday() {
   Object.keys(orders).forEach(function(id) {
     var o = orders[id];
     if (o.reqDate !== today) return;
+    if (o.status === 'vd' || o.status === 'completed') return;
     if (adashHub && (o.hub||'') !== adashHub) return;
     var hub = (o.hub||'')==='Nashville'
       ? '<span class="b nv">Nashville</span>'
@@ -3231,7 +3269,7 @@ function renderAdashToday() {
       '<td>'+o.property+'</td>'+
       '<td>'+hub+'</td>'+
       '<td>'+o.unit+'</td>'+
-      '<td>'+o.service+'</td>'+
+      '<td>'+svcDisplay(o)+'</td>'+
       '<td>'+o.reqDate+'</td>'+
       '<td>'+o.occ+'</td>'+
       '<td>'+statusBadge(o.status)+'</td>'+
@@ -3265,7 +3303,7 @@ function renderClientDash() {
     html += '<tr onclick="oworder(\''+id+'\')">'
       +'<td><strong>#'+o.num+'</strong></td>'
       +'<td>Unit '+o.unit+'</td>'
-      +'<td>'+o.service+'</td>'
+      +'<td>'+svcDisplay(o)+'</td>'
       +'<td>'+fmtDate(o.reqDate)+'</td>'
       +'<td>'+statusBadge(o.status)+'</td>'
       +'<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'
@@ -3295,7 +3333,7 @@ function renderClientHistory() {
     if (chPr  && o.property !== chPr) return false;
     if (chHub && (o.hub||'').toLowerCase() !== chHub) return false;
     if (chQ) {
-      var hay = (o.num+' '+o.property+' '+o.unit+' '+o.service+' '+(o.plan||'')).toLowerCase();
+      var hay = (o.num+' '+o.property+' '+o.unit+' '+svcDisplay(o)+' '+(o.plan||'')).toLowerCase();
       if (hay.indexOf(chQ) === -1) return false;
     }
     return true;
@@ -3335,7 +3373,7 @@ function renderClientHistory() {
       '<td><strong>#'+o.num+'</strong></td>'+
       '<td>'+o.property+'</td>'+
       '<td>'+o.unit+'</td>'+
-      '<td>'+o.service+'</td>'+
+      '<td>'+svcDisplay(o)+'</td>'+
       '<td>'+fmtDate(o.reqDate)+'</td>'+
       '<td>'+(o.hub ? '<span class="b '+(o.hub==='Nashville'?'nv':'mp')+'">'+o.hub+'</span>' : '—')+'</td>'+
       '<td>'+statusBadge(o.status)+'</td>'+
@@ -4083,8 +4121,8 @@ function submitOrder() {
     plan:          planName,
     sqft:          '',
     occ:           occ,
-    service:       svcVal || '(See scopes)',
-    scope:         selectedScopes.length ? selectedScopes : [svcVal],
+    service:       svcVal || (selectedScopes.length ? selectedScopes.join(', ') : 'See Work Order'),
+    scope:         selectedScopes.length ? selectedScopes : (svcVal ? [svcVal] : []),
     reqDate:       reqDate,
     confDate:      'Pending',
     status:        'requested',
