@@ -535,6 +535,20 @@ footer{
 .hero-content.fading{opacity:0;transform:translateY(12px);}
 .hero-content{transition:opacity .5s ease, transform .5s ease;}
 
+
+/* ── Hero slide tagline (italic quote) ── */
+.hero-tagline {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 20px;
+  font-style: italic;
+  color: var(--gold);
+  letter-spacing: .5px;
+  margin-bottom: 10px;
+  min-height: 0;
+  transition: opacity .3s;
+}
+.hero-tagline:empty { display: none; }
+
 </style>
 </head>
 <body>
@@ -587,9 +601,10 @@ footer{
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <div class="hero-eyebrow" id="heroEyebrow">Memphis &amp; Nashville &mdash; Since 1976</div>
+    <div class="hero-tagline" id="heroTagline"></div>
     <h1 class="hero-h1" id="heroH1">Flooring Done Right.<br><em>Every Unit. Every Time.</em></h1>
     <p class="hero-sub" id="heroSub">Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.</p>
-    <div class="hero-btns">
+    <div class="hero-btns" id="heroBtns">
       <a href="#contact" class="btn-gold">&#128222; Get a Quote</a>
       <a href="portal.html" target="_blank" class="btn-outline">Client Portal &#8599;</a>
     </div>
@@ -971,28 +986,35 @@ revealEls.forEach(function(el) { io.observe(el); });
   var SLIDES = [
     {
       eyebrow: 'Memphis &amp; Nashville &mdash; Since 1976',
-      h1: 'Flooring Done Right.<br><em>Every Unit. Every Time.</em>',
-      sub: 'Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.'
+      h1: 'Flooring Done Right.<br><em>On Time. On Budget. Up to Standard.</em>',
+      sub: 'Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.',
+      btns: '<a href="#contact" class="btn-gold">&#128222; Get a Quote</a><a href="portal.html" target="_blank" class="btn-outline">Client Portal &#8599;</a>'
     },
     {
-      eyebrow: 'Fast Turnovers &mdash; Memphis &amp; Nashville',
-      h1: 'Same-Week Scheduling.<br><em>Zero Surprises.</em>',
-      sub: 'We understand that every vacant day costs you money. Our dedicated crews deliver consistent, professional installations &mdash; coordinated directly with your maintenance team so your units are rent-ready on time, every time.'
+      eyebrow: 'Same-Day Response Available',
+      h1: 'Vacancy Costs You<br><em>Every Single Day.</em>',
+      tagline: '&ldquo;We Stand on Our Word&rdquo;',
+      sub: 'Our same-day emergency crews and next-day guaranteed installation are built for exactly that reason. When a unit needs to be rent-ready, we move fast &mdash; without cutting corners on quality.',
+      btns: '<a href="#contact" class="btn-gold">&#9889; Get Emergency Help</a><a href="#services" class="btn-outline">All Services</a>'
     },
     {
-      eyebrow: 'Carpet &bull; LVP &bull; Sheet Vinyl &bull; Subfloor',
-      h1: 'One Contractor.<br><em>Every Flooring Need.</em>',
-      sub: 'From carpet and luxury vinyl plank to sheet vinyl, tile, and subfloor repair &mdash; Protective Flooring handles it all under one roof. One call, one relationship, one company that shows up ready to work.'
+      eyebrow: 'Family Owned Since 1976',
+      h1: 'A Partner You Can<br><em>Actually Rely On.</em>',
+      tagline: '&ldquo;We Stand on Our Word&rdquo;',
+      sub: 'No national chain. No revolving door of project managers. Protective Flooring is family owned and operated — and the owners are personally invested in every job we send our crews to do.',
+      btns: '<a href="#about" class="btn-gold">Our Story</a><a href="#contact" class="btn-outline">Contact Us</a>'
     }
   ];
   var cur = 0;
-  var slides, dots, eyebrow, h1el, subel, content;
+  var slides, dots, eyebrow, tagline, h1el, subel, btnsEl, content;
   function init() {
     slides  = document.querySelectorAll('.hero-slide');
     dots    = document.querySelectorAll('.slide-dot');
     eyebrow = document.getElementById('heroEyebrow');
+    tagline = document.getElementById('heroTagline');
     h1el    = document.getElementById('heroH1');
     subel   = document.getElementById('heroSub');
+    btnsEl  = document.getElementById('heroBtns');
     content = document.querySelector('.hero-content');
     if (!slides.length) return;
     setInterval(function() { window.goSlide((cur + 1) % slides.length); }, 5500);
@@ -1008,9 +1030,12 @@ revealEls.forEach(function(el) { io.observe(el); });
     dots[cur].classList.add('active');
     // Swap text, then fade back in
     setTimeout(function() {
-      if (eyebrow) eyebrow.innerHTML = SLIDES[cur].eyebrow;
-      if (h1el)    h1el.innerHTML    = SLIDES[cur].h1;
-      if (subel)   subel.textContent = SLIDES[cur].sub;
+      var s = SLIDES[cur];
+      if (eyebrow) eyebrow.innerHTML = s.eyebrow;
+      if (tagline) tagline.innerHTML = s.tagline || '';
+      if (h1el)    h1el.innerHTML    = s.h1;
+      if (subel)   subel.textContent = s.sub;
+      if (btnsEl)  btnsEl.innerHTML  = s.btns || '';
       if (content) content.classList.remove('fading');
     }, 350);
   };
