@@ -302,6 +302,91 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 .sc-sub{font-size:12px;color:var(--gray);font-weight:400;line-height:1.4;}
 .sc-choice.sc-admin .sc-sub{color:rgba(255,255,255,.55);}
 
+
+/* ── PROPERTY CARD (dynamic) ── */
+.pr-card{background:var(--white);border:1px solid var(--border);border-radius:4px;margin-bottom:12px;overflow:hidden;transition:box-shadow .2s;}
+.pr-card:hover{box-shadow:0 4px 20px rgba(2,10,91,.07);}
+.pr-card.inactive-prop .pr-name{color:var(--gray);}
+.pr-header{display:flex;align-items:center;gap:16px;padding:18px 20px;cursor:pointer;user-select:none;}
+.pr-avatar{width:44px;height:44px;border-radius:3px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;flex-shrink:0;}
+.pr-info{flex:1;min-width:0;}
+.pr-name{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pr-addr{font-size:12px;color:var(--gray);font-weight:300;}
+.pr-contact{font-size:11px;color:var(--gray);margin-top:2px;}
+.pr-contact a{color:var(--navy);opacity:.6;transition:opacity .15s;}
+.pr-contact a:hover{opacity:1;}
+.pr-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto;}
+.pr-actions{display:flex;gap:6px;flex-shrink:0;margin-left:8px;}
+.pr-chevron{font-size:10px;color:var(--gray);margin-left:8px;transition:transform .25s;flex-shrink:0;}
+.pr-card.open .pr-chevron{transform:rotate(180deg);}
+.pr-body{display:none;border-top:1px solid var(--border);padding:20px;}
+.pr-card.open .pr-body{display:block;}
+.pr-section-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.pr-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.pr-detail-item label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:3px;}
+.pr-detail-item span{font-size:13px;color:var(--text);}
+.pr-detail-item a{color:var(--navy);font-size:13px;}
+
+/* ── FLOOR PLAN TABLE (inside property card) ── */
+.fp-table-wrap{overflow-x:auto;margin-bottom:14px;}
+table.fpt{width:100%;border-collapse:collapse;font-size:13px;}
+table.fpt th{background:var(--cream);padding:8px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);border-bottom:2px solid var(--border);white-space:nowrap;}
+table.fpt td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+table.fpt tr:last-child td{border-bottom:none;}
+table.fpt tr:hover td{background:var(--cream);}
+.fp-img-btn{font-size:10px;padding:3px 7px;border-radius:2px;border:1px solid;cursor:pointer;font-weight:600;letter-spacing:.3px;white-space:nowrap;}
+.fp-img-btn.has-img{border-color:var(--navy);color:var(--navy);background:rgba(2,10,91,.05);}
+.fp-img-btn.no-img{border-color:var(--border);color:var(--gray);background:transparent;}
+.fp-img-btn:hover.has-img{background:var(--navy);color:var(--white);}
+
+/* ── ADD PROPERTY MODAL ── */
+.import-strip{display:flex;align-items:center;gap:10px;background:var(--cream);border:1px solid var(--border);border-radius:3px;padding:10px 14px;margin-bottom:16px;}
+.import-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--navy);white-space:nowrap;}
+
+/* ── IMAGE SLOTS ── */
+.img-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.img-slot{border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.img-slot-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--cream);border-bottom:1px solid var(--border);}
+.img-slot-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--navy);}
+.img-slot-drop{padding:28px 16px;text-align:center;cursor:pointer;transition:background .15s;}
+.img-slot-drop:hover{background:rgba(2,10,91,.04);}
+.img-slot-icon{font-size:28px;opacity:.25;margin-bottom:8px;}
+.img-slot-hint{font-size:12px;color:var(--gray);font-weight:300;}
+.img-slot-preview{padding:10px;}
+.img-slot-preview img{width:100%;height:140px;object-fit:contain;border-radius:2px;background:#f9f9f9;display:block;}
+.img-slot-fname{font-size:10px;color:var(--gray);margin-top:6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── SCOPE CHECKBOXES ── */
+.scope-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--border);border-radius:3px;margin-bottom:6px;transition:background .15s;}
+.scope-row:hover{background:var(--cream);}
+.scope-row label{display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;flex:1;}
+.scope-row .svc-tag{font-size:10px;color:var(--gray);background:var(--cream);border:1px solid var(--border);padding:1px 6px;border-radius:10px;margin-left:4px;}
+.scope-row .del-scope{font-size:11px;color:var(--gray);cursor:pointer;opacity:.5;padding:2px 6px;border-radius:2px;transition:all .15s;}
+.scope-row .del-scope:hover{opacity:1;background:#fef2f2;color:#b91c1c;}
+
+/* ── ROOM CHIPS ── */
+.room-chip{display:inline-flex;align-items:center;gap:4px;background:var(--cream);border:1px solid var(--border);padding:4px 8px;border-radius:20px;font-size:12px;}
+.room-chip button{background:none;border:none;cursor:pointer;color:var(--gray);padding:0;line-height:1;font-size:13px;}
+.room-chip button:hover{color:#b91c1c;}
+.room-quick{display:inline-block;font-size:11px;color:var(--navy);border:1px solid var(--border);padding:2px 7px;border-radius:10px;cursor:pointer;margin:2px;}
+.room-quick:hover{background:var(--navy);color:var(--white);}
+
+/* ── MODAL SIZES ── */
+.modal-lg{max-width:860px;}
+
+/* ── PRINT STYLES ── */
+@media print{
+  .topbar,.sidebar,.snav,.adm,.scr:not(.on),.mb,.toast-wrap{display:none!important;}
+  .print-page{display:block!important;}
+}
+.print-page{display:none;position:fixed;inset:0;background:var(--white);z-index:9999;padding:40px;overflow:auto;}
+.print-page-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--navy);}
+.print-page-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--navy);}
+.print-page-sub{font-size:13px;color:var(--gray);margin-top:4px;}
+.print-page img{max-width:100%;max-height:calc(100vh - 200px);object-fit:contain;display:block;margin:0 auto;}
+.print-page-actions{display:flex;gap:10px;margin-top:24px;justify-content:flex-end;}
+@media print{.print-page-actions{display:none!important;}}
+
 </style>
 </head>
 <body>
@@ -534,7 +619,6 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
       <div class="ni" onclick="anav('aord',this)"><span class="ic">&#9783;</span> All Orders <span class="nb">4</span></div>
       <div class="nlabel">Management</div>
       <div class="ni" onclick="anav('aprops',this)"><span class="ic">&#127968;</span> Properties</div>
-      <div class="ni" onclick="anav('afloorplans',this)"><span class="ic">&#9635;</span> Floor Plans</div>
       <div class="ni" onclick="anav('ausers',this)"><span class="ic">&#128101;</span> Client Logins</div>
       <div class="ni" onclick="anav('ateam',this)"><span class="ic">&#128274;</span> Portal Users</div>
       <div class="nlabel">Settings</div>
@@ -601,167 +685,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
           <div class="tab" onclick="switchHub('memphis',this)">&#128205; Memphis Hub <span class="tc" id="cmem">5</span></div>
           <div class="tab" onclick="switchHub('nashville',this)">&#128205; Nashville Hub <span class="tc" id="cnash">3</span></div>
         </div>
-        <div id="proplist">
-  <div class="pr" data-hub="memphis" data-name="riverside apartments" data-city="3846 delp street, memphis, tn 38118" data-status="active">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname">Riverside Apartments</div><div class="paddr">&#128205; 3846 Delp Street, Memphis, TN 38118</div></div>
-      <div class="pmeta"><span class="b mp">Memphis</span><span class="pp">100 Units</span><span class="b ac">Active</span><span class="pp">3 Logins</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()">
-        <button class="bs ol" onclick="toast('Edit property in live version.')">Edit</button>
-        <button class="bs nv" onclick="anav('aord',document.querySelector('#ad .ni:nth-child(4)'))">Orders</button>
-      </div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre">
-      <div class="fplbl">Floor Plans</div>
-      <div style="overflow-x:auto;">
-        <table class="fpt">
-          <thead><tr><th>Plan Name</th><th>Size</th><th>Image</th><th>Rooms Included</th><th>Preset Scopes</th><th>Units</th><th>Status</th><th></th></tr></thead>
-          <tbody><tr><td><strong>1 Bed / 1 Bath</strong></td><td>650 sqft</td><td><button class="fit hi" onclick="openFpImg('RV-1BR')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bedroom</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span><span class="chip">Hallway</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>24</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('RV-1BR')">Edit</button></td></tr><tr><td><strong>2 Bed / 1 Bath</strong></td><td>850 sqft</td><td><button class="fit hi" onclick="openFpImg('RV-2BR1BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span><span class="chip">Hallway</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Carpet Bedrooms</span><span class="chip gd">Vinyl Wet Areas</span></td><td>36</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('RV-2BR1BA')">Edit</button></td></tr><tr><td><strong>2 Bed / 2 Bath</strong></td><td>1,050 sqft</td><td><button class="fit hi" onclick="openFpImg('RV-2BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Kitchen</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span><span class="chip">Dining Area</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Vinyl Wet+Dining</span><span class="chip gd">Full Turnover</span></td><td>28</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('RV-2BR2BA')">Edit</button></td></tr><tr><td><strong>3 Bed / 2 Bath</strong></td><td>1,280 sqft</td><td><button class="fit hi" onclick="openFpImg('RV-3BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1-3</span><span class="chip">Kitchen</span><span class="chip">Bath 1-2</span><span class="chip">Dining Area</span><span class="chip">Laundry Room</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Carpet Bedrooms</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Full Turnover</span></td><td>12</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('RV-3BR2BA')">Edit</button></td></tr></tbody>
-        </table>
-      </div>
-      <div style="margin-top:14px;"><button class="bs gd" onclick="openAddFp()">+ Add Floor Plan</button></div>
-    </div>
-  </div>
-  <div class="pr" data-hub="memphis" data-name="parkview commons" data-city="4820 millbranch road, memphis, tn 38116" data-status="active">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname">Parkview Commons</div><div class="paddr">&#128205; 4820 Millbranch Road, Memphis, TN 38116</div></div>
-      <div class="pmeta"><span class="b mp">Memphis</span><span class="pp">148 Units</span><span class="b ac">Active</span><span class="pp">2 Logins</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()">
-        <button class="bs ol" onclick="toast('Edit property in live version.')">Edit</button>
-        <button class="bs nv" onclick="anav('aord',document.querySelector('#ad .ni:nth-child(4)'))">Orders</button>
-      </div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre">
-      <div class="fplbl">Floor Plans</div>
-      <div style="overflow-x:auto;">
-        <table class="fpt">
-          <thead><tr><th>Plan Name</th><th>Size</th><th>Image</th><th>Rooms Included</th><th>Preset Scopes</th><th>Units</th><th>Status</th><th></th></tr></thead>
-          <tbody><tr><td><strong>1 Bed / 1 Bath</strong></td><td>620 sqft</td><td><button class="fit hi" onclick="openFpImg('PV-1BR')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bedroom</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>48</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('PV-1BR')">Edit</button></td></tr><tr><td><strong>2 Bed / 1 Bath</strong></td><td>820 sqft</td><td><button class="fit hi" onclick="openFpImg('PV-2BR1BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Carpet Bedrooms</span><span class="chip gd">Vinyl Wet Areas</span></td><td>60</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('PV-2BR1BA')">Edit</button></td></tr><tr><td><strong>2 Bed / 2 Bath</strong></td><td>980 sqft</td><td><button class="fit hi" onclick="openFpImg('PV-2BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span><span class="chip">Kitchen</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Full Turnover</span></td><td>40</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('PV-2BR2BA')">Edit</button></td></tr></tbody>
-        </table>
-      </div>
-      <div style="margin-top:14px;"><button class="bs gd" onclick="openAddFp()">+ Add Floor Plan</button></div>
-    </div>
-  </div>
-  <div class="pr" data-hub="memphis" data-name="the columns at bartlett" data-city="7200 us-70, bartlett, tn 38134" data-status="active">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname">The Columns at Bartlett</div><div class="paddr">&#128205; 7200 US-70, Bartlett, TN 38134</div></div>
-      <div class="pmeta"><span class="b mp">Memphis</span><span class="pp">72 Units</span><span class="b ac">Active</span><span class="pp">2 Logins</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()">
-        <button class="bs ol" onclick="toast('Edit property in live version.')">Edit</button>
-        <button class="bs nv" onclick="anav('aord',document.querySelector('#ad .ni:nth-child(4)'))">Orders</button>
-      </div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre">
-      <div class="fplbl">Floor Plans</div>
-      <div style="overflow-x:auto;">
-        <table class="fpt">
-          <thead><tr><th>Plan Name</th><th>Size</th><th>Image</th><th>Rooms Included</th><th>Preset Scopes</th><th>Units</th><th>Status</th><th></th></tr></thead>
-          <tbody><tr><td><strong>2 Bed / 2 Bath</strong></td><td>1,100 sqft</td><td><button class="fit hi" onclick="openFpImg('COL-2BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span><span class="chip">Kitchen</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>40</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('COL-2BR2BA')">Edit</button></td></tr><tr><td><strong>3 Bed / 2 Bath</strong></td><td>1,380 sqft</td><td><button class="fit hi" onclick="openFpImg('COL-3BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1-3</span><span class="chip">Bath 1-2</span><span class="chip">Kitchen</span><span class="chip">Dining Area</span></td><td><span class="chip gd">Carpet Bedrooms</span><span class="chip gd">Full Turnover</span></td><td>32</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('COL-3BR2BA')">Edit</button></td></tr></tbody>
-        </table>
-      </div>
-      <div style="margin-top:14px;"><button class="bs gd" onclick="openAddFp()">+ Add Floor Plan</button></div>
-    </div>
-  </div>
-  <div class="pr" data-hub="memphis" data-name="magnolia trace" data-city="1480 goodman road, southaven, ms 38671" data-status="active">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname">Magnolia Trace</div><div class="paddr">&#128205; 1480 Goodman Road, Southaven, MS 38671</div></div>
-      <div class="pmeta"><span class="b mp">Memphis</span><span class="pp">90 Units</span><span class="b ac">Active</span><span class="pp">2 Logins</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()">
-        <button class="bs ol" onclick="toast('Edit property in live version.')">Edit</button>
-        <button class="bs nv" onclick="anav('aord',document.querySelector('#ad .ni:nth-child(4)'))">Orders</button>
-      </div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre">
-      <div class="fplbl">Floor Plans</div>
-      <div style="overflow-x:auto;">
-        <table class="fpt">
-          <thead><tr><th>Plan Name</th><th>Size</th><th>Image</th><th>Rooms Included</th><th>Preset Scopes</th><th>Units</th><th>Status</th><th></th></tr></thead>
-          <tbody><tr><td><strong>1 Bed / 1 Bath</strong></td><td>680 sqft</td><td><button class="fit hi" onclick="openFpImg('MAG-1BR')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bedroom</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>30</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('MAG-1BR')">Edit</button></td></tr><tr><td><strong>2 Bed / 2 Bath</strong></td><td>1,020 sqft</td><td><button class="fit hi" onclick="openFpImg('MAG-2BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>60</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('MAG-2BR2BA')">Edit</button></td></tr></tbody>
-        </table>
-      </div>
-      <div style="margin-top:14px;"><button class="bs gd" onclick="openAddFp()">+ Add Floor Plan</button></div>
-    </div>
-  </div>
-  <div class="pr" data-hub="memphis" data-name="whitehaven village" data-city="4100 elvis presley blvd, memphis, tn 38116" data-status="inactive">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname" style="color:var(--gray);">Whitehaven Village</div><div class="paddr">&#128205; 4100 Elvis Presley Blvd, Memphis, TN 38116</div></div>
-      <div class="pmeta"><span class="b mp">Memphis</span><span class="pp">55 Units</span><span class="b in">Inactive</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()"><button class="bs ol" onclick="toast('Reactivating...')">Reactivate</button></div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre"><p style="font-size:13px;color:var(--gray);padding:12px 0;">Inactive -- reactivate to manage floor plans.</p></div>
-  </div>
-  <div class="pr" data-hub="nashville" data-name="cherry creek apartments" data-city="5200 old hickory blvd, hermitage, tn 37076" data-status="active">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname">Cherry Creek Apartments</div><div class="paddr">&#128205; 5200 Old Hickory Blvd, Hermitage, TN 37076</div></div>
-      <div class="pmeta"><span class="b nv">Nashville</span><span class="pp">140 Units</span><span class="b ac">Active</span><span class="pp">2 Logins</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()">
-        <button class="bs ol" onclick="toast('Edit property in live version.')">Edit</button>
-        <button class="bs nv" onclick="anav('aord',document.querySelector('#ad .ni:nth-child(4)'))">Orders</button>
-      </div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre">
-      <div class="fplbl">Floor Plans</div>
-      <div style="overflow-x:auto;">
-        <table class="fpt">
-          <thead><tr><th>Plan Name</th><th>Size</th><th>Image</th><th>Rooms Included</th><th>Preset Scopes</th><th>Units</th><th>Status</th><th></th></tr></thead>
-          <tbody><tr><td><strong>1 Bed / 1 Bath</strong></td><td>720 sqft</td><td><button class="fit hi" onclick="openFpImg('CC-1BR')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bedroom</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span><span class="chip">Hallway</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>32</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('CC-1BR')">Edit</button></td></tr><tr><td><strong>2 Bed / 1 Bath</strong></td><td>920 sqft</td><td><button class="fit hi" onclick="openFpImg('CC-2BR1BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span><span class="chip">Hallway</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Carpet Bedrooms Only</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Full Turnover</span></td><td>40</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('CC-2BR1BA')">Edit</button></td></tr><tr><td><strong>2 Bed / 2 Bath</strong></td><td>1,080 sqft</td><td><button class="fit hi" onclick="openFpImg('CC-2BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Kitchen</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span><span class="chip">Dining Area</span><span class="chip">Hallway</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Carpet Bedrooms Only</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Vinyl Wet+Dining</span><span class="chip gd">Full Turnover</span></td><td>48</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('CC-2BR2BA')">Edit</button></td></tr><tr><td><strong>3 Bed / 2 Bath</strong></td><td>1,350 sqft</td><td><button class="fit hi" onclick="openFpImg('CC-3BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Bed 3</span><span class="chip">Kitchen</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span><span class="chip">Dining Area</span><span class="chip">Hallway</span><span class="chip">Laundry Room</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Carpet Bedrooms Only</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Vinyl Wet+Dining</span><span class="chip gd">Full Turnover</span></td><td>20</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('CC-3BR2BA')">Edit</button></td></tr></tbody>
-        </table>
-      </div>
-      <div style="margin-top:14px;"><button class="bs gd" onclick="openAddFp()">+ Add Floor Plan</button></div>
-    </div>
-  </div>
-  <div class="pr" data-hub="nashville" data-name="arbor ridge nashville" data-city="2940 brick church pike, nashville, tn 37207" data-status="active">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname">Arbor Ridge Nashville</div><div class="paddr">&#128205; 2940 Brick Church Pike, Nashville, TN 37207</div></div>
-      <div class="pmeta"><span class="b nv">Nashville</span><span class="pp">200 Units</span><span class="b ac">Active</span><span class="pp">4 Logins</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()">
-        <button class="bs ol" onclick="toast('Edit property in live version.')">Edit</button>
-        <button class="bs nv" onclick="anav('aord',document.querySelector('#ad .ni:nth-child(4)'))">Orders</button>
-      </div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre">
-      <div class="fplbl">Floor Plans</div>
-      <div style="overflow-x:auto;">
-        <table class="fpt">
-          <thead><tr><th>Plan Name</th><th>Size</th><th>Image</th><th>Rooms Included</th><th>Preset Scopes</th><th>Units</th><th>Status</th><th></th></tr></thead>
-          <tbody><tr><td><strong>Studio</strong></td><td>450 sqft</td><td><button class="fit hi" onclick="openFpImg('AR-STU')">&#127760; View</button></td><td><span class="chip">Main Area</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span></td><td><span class="chip gd">Vinyl Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>20</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('AR-STU')">Edit</button></td></tr><tr><td><strong>1 Bed / 1 Bath</strong></td><td>700 sqft</td><td><button class="fit hi" onclick="openFpImg('AR-1BR')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bedroom</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Vinyl Throughout</span></td><td>80</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('AR-1BR')">Edit</button></td></tr><tr><td><strong>2 Bed / 2 Bath</strong></td><td>1,080 sqft</td><td><button class="fit hi" onclick="openFpImg('AR-2BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span><span class="chip">Kitchen</span><span class="chip">Dining Area</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet+Dining</span><span class="chip gd">Full Turnover</span></td><td>60</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('AR-2BR2BA')">Edit</button></td></tr><tr><td><strong>3 Bed / 2 Bath</strong></td><td>1,350 sqft</td><td><button class="fit hi" onclick="openFpImg('AR-3BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1-3</span><span class="chip">Bath 1-2</span><span class="chip">Kitchen</span><span class="chip">Dining Area</span><span class="chip">Laundry Room</span></td><td><span class="chip gd">Carpet Bedrooms</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Full Turnover</span></td><td>40</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('AR-3BR2BA')">Edit</button></td></tr></tbody>
-        </table>
-      </div>
-      <div style="margin-top:14px;"><button class="bs gd" onclick="openAddFp()">+ Add Floor Plan</button></div>
-    </div>
-  </div>
-  <div class="pr" data-hub="nashville" data-name="the reserve at hermitage" data-city="600 hermitage ave, hermitage, tn 37076" data-status="active">
-    <div class="prh" onclick="togProp(this.parentElement)">
-      <div><div class="pname">The Reserve at Hermitage</div><div class="paddr">&#128205; 600 Hermitage Ave, Hermitage, TN 37076</div></div>
-      <div class="pmeta"><span class="b nv">Nashville</span><span class="pp">160 Units</span><span class="b ac">Active</span><span class="pp">3 Logins</span></div>
-      <div style="display:flex;gap:8px;margin-left:16px;" onclick="event.stopPropagation()">
-        <button class="bs ol" onclick="toast('Edit property in live version.')">Edit</button>
-        <button class="bs nv" onclick="anav('aord',document.querySelector('#ad .ni:nth-child(4)'))">Orders</button>
-      </div>
-      <span class="pra">&#9660;</span>
-    </div>
-    <div class="pre">
-      <div class="fplbl">Floor Plans</div>
-      <div style="overflow-x:auto;">
-        <table class="fpt">
-          <thead><tr><th>Plan Name</th><th>Size</th><th>Image</th><th>Rooms Included</th><th>Preset Scopes</th><th>Units</th><th>Status</th><th></th></tr></thead>
-          <tbody><tr><td><strong>1 Bed / 1 Bath</strong></td><td>660 sqft</td><td><button class="fit hi" onclick="openFpImg('RS-1BR')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bedroom</span><span class="chip">Kitchen</span><span class="chip">Bathroom 1</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Vinyl Wet Areas</span></td><td>60</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('RS-1BR')">Edit</button></td></tr><tr><td><strong>2 Bed / 2 Bath</strong></td><td>1,040 sqft</td><td><button class="fit hi" onclick="openFpImg('RS-2BR2BA')">&#127760; View</button></td><td><span class="chip">Living Room</span><span class="chip">Bed 1</span><span class="chip">Bed 2</span><span class="chip">Bath 1</span><span class="chip">Bath 2</span></td><td><span class="chip gd">Carpet Throughout</span><span class="chip gd">Carpet Bedrooms</span><span class="chip gd">Vinyl Wet Areas</span><span class="chip gd">Full Turnover</span></td><td>100</td><td><span class="b ac">Active</span></td><td><button class="bs ol" onclick="openEditFp('RS-2BR2BA')">Edit</button></td></tr></tbody>
-        </table>
-      </div>
-      <div style="margin-top:14px;"><button class="bs gd" onclick="openAddFp()">+ Add Floor Plan</button></div>
-    </div>
-  </div>
-        </div>
-      </div>
-
-      <!-- ADMIN USERS -->
+        <div id="proplist"></div>      <!-- ADMIN USERS -->
       <div class="panel" id="ausers">
         <div class="shd"><h2>Client Logins</h2><button class="bs gd" onclick="openM('muser')">+ Add Login</button></div>
         <div class="tw"><table>
@@ -774,24 +698,6 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
       <!-- ADMIN SETTINGS -->
       <div class="panel" id="aset">
-      <!-- FLOOR PLANS ADMIN PANEL -->
-      <div class="panel" id="afloorplans">
-        <div class="shd">
-          <h2>Floor Plans</h2>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <select id="afp_propsel" onchange="renderAdminFpTable()" style="padding:8px 12px;border:1px solid var(--border);border-radius:3px;font-size:13px;font-family:inherit;">
-            </select>
-            <button class="bs gd" onclick="openAddFloorPlan()">+ Add Floor Plan</button>
-          </div>
-        </div>
-        <p style="color:var(--gray);font-size:13px;margin-bottom:20px;">
-          Floor plans defined here populate the client portal. Changes take effect immediately for all users assigned to that property.
-        </p>
-        <div class="tw"><table>
-          <thead><tr><th>Plan Name</th><th>Type</th><th>Sq Ft</th><th>Beds</th><th>Baths</th><th>Rooms</th><th></th></tr></thead>
-          <tbody id="afpTbody"><!-- rendered by renderAdminFpTable() --></tbody>
-        </table></div>
-      </div>
 
       <!-- PORTAL USERS PANEL -->
       <div class="panel" id="ateam">
@@ -872,72 +778,264 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 </div>
 
 <div class="mb" id="madd">
-  <div class="modal">
-    <div class="mh"><h3>Add New Property</h3><button class="mx" onclick="closeM('madd')">&#10005;</button></div>
-    <div class="mbody">
-      <div class="fg"><label>Property Name *</label><input type="text" placeholder="e.g. Willow Creek Apartments"></div>
-      <div class="form-row"><div class="fg"><label>Street Address *</label><input type="text"></div><div class="fg"><label>City *</label><input type="text"></div></div>
-      <div class="form-row"><div class="fg"><label>State *</label><select><option>TN</option><option>MS</option><option>AR</option></select></div><div class="fg"><label>Zip *</label><input type="text"></div></div>
-      <div class="form-row"><div class="fg"><label>Total Units</label><input type="number"></div><div class="fg"><label>Hub *</label><select><option>Memphis Hub</option><option>Nashville Hub</option></select></div></div>
+  <div class="modal modal-lg">
+    <div class="mh">
+      <h3 id="madd_title">Add New Property</h3>
+      <button class="mx" onclick="closeM('madd')">&#10005;</button>
     </div>
-    <div class="mf"><button class="bl ol" onclick="closeM('madd')">Cancel</button><button class="bl gd" onclick="closeM('madd');toast('Property added.')">Save Property</button></div>
+    <div class="mbody">
+      <input type="hidden" id="madd_id">
+
+      <!-- URL IMPORT STRIP -->
+      <div class="import-strip">
+        <span class="import-label">&#127760; Quick Import</span>
+        <input type="url" id="madd_url" placeholder="Paste property website URL to auto-fill..." style="flex:1;">
+        <button class="bs nv" onclick="importFromUrl()">Import</button>
+      </div>
+
+      <!-- SECTION: Property Info -->
+      <div class="ms"><div class="mst">Property Information</div>
+        <div class="fg"><label>Property Name *</label>
+          <input type="text" id="madd_name" placeholder="e.g. Cherry Creek Apartments"></div>
+        <div class="form-row">
+          <div class="fg"><label>Management Company</label>
+            <input type="text" id="madd_mgmt" placeholder="e.g. Willow Bridge Property Co."></div>
+          <div class="fg"><label>Website</label>
+            <input type="url" id="madd_web" placeholder="https://"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: Address -->
+      <div class="ms"><div class="mst">Address</div>
+        <div class="fg"><label>Street Address *</label>
+          <input type="text" id="madd_addr" placeholder="e.g. 1100 Crystal Spring Lane"></div>
+        <div class="form-row">
+          <div class="fg"><label>City *</label>
+            <input type="text" id="madd_city" placeholder="e.g. Hermitage"></div>
+          <div class="fg" style="max-width:100px;"><label>State *</label>
+            <select id="madd_state">
+              <option value="TN">TN</option><option value="MS">MS</option>
+              <option value="AR">AR</option><option value="AL">AL</option>
+              <option value="KY">KY</option><option value="GA">GA</option>
+            </select></div>
+          <div class="fg" style="max-width:110px;"><label>Zip *</label>
+            <input type="text" id="madd_zip" placeholder="37076" maxlength="10"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: Contact -->
+      <div class="ms"><div class="mst">Contact Information</div>
+        <div class="form-row">
+          <div class="fg"><label>Property Phone</label>
+            <input type="tel" id="madd_phone" placeholder="(615) 229-8238"></div>
+          <div class="fg"><label>Property Email</label>
+            <input type="email" id="madd_email" placeholder="office@property.com"></div>
+        
+          <!-- GLOBAL SCOPES MANAGER -->
+          <div class="ms"><div class="mst">&#9883; Preset Installation Scopes</div>
+            <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">
+              Define the global scope library available across all properties. 
+              Individual floor plans can also add property-specific scopes.
+            </p>
+            <div id="scope_list_admin"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;">
+              <input type="text" id="scope_new_name" placeholder="Scope name (e.g. Carpet Bedrooms Only)" style="flex:1;">
+              <select id="scope_new_svc" style="min-width:180px;">
+                <option value="">No specific service</option>
+                <option value="Carpet Installation">Carpet Installation</option>
+                <option value="Sheet Vinyl">Sheet Vinyl</option>
+                <option value="Luxury Vinyl Plank">Luxury Vinyl Plank</option>
+                <option value="Tile Installation">Tile Installation</option>
+                <option value="Subfloor Repair">Subfloor Repair</option>
+                <option value="Full Turnover">Full Turnover Package</option>
+              </select>
+              <button class="bs gd" onclick="addGlobalScope()">+ Add</button>
+            </div>
+          </div>
+</div>
+      </div>
+
+      <!-- SECTION: Operations -->
+      <div class="ms"><div class="mst">Operations</div>
+        <div class="form-row">
+          <div class="fg"><label>Total Units</label>
+            <input type="number" id="madd_units" placeholder="e.g. 140" min="1"></div>
+          <div class="fg"><label>Hub *</label>
+            <select id="madd_hub">
+              <option value="memphis">Memphis Hub</option>
+              <option value="nashville">Nashville Hub</option>
+            </select></div>
+          <div class="fg"><label>Status</label>
+            <select id="madd_status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select></div>
+        </div>
+        <div class="fg"><label>Notes (internal only)</label>
+          <textarea id="madd_notes" rows="2" placeholder="Internal notes, access codes, special instructions..."></textarea></div>
+      </div>
+
+      <div id="madd_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:8px;"></div>
+    </div>
+    <div class="mf">
+      <button class="bl dn" id="madd_delbtn" style="display:none;margin-right:auto;" onclick="deleteProperty()">&#128465; Delete Property</button>
+      <button class="bl ol" onclick="closeM('madd')">Cancel</button>
+      <button class="bl gd" onclick="saveProperty()">Save Property</button>
+    </div>
   </div>
 </div>
 
+
 <div class="mb" id="mfpe">
-  <div class="modal w">
-    <div class="mh"><h3 id="fpetitle">Add Floor Plan</h3><button class="mx" onclick="closeM('mfpe')">&#10005;</button></div>
-    <div class="mbody">
-      <div class="ms"><div class="mst">Plan Details</div>
-        <div class="form-row"><div class="fg"><label>Plan Name *</label><input type="text" id="fpname" placeholder="e.g. 2 Bedroom / 2 Bath"></div><div class="fg"><label>Square Footage</label><input type="text" placeholder="e.g. 1,050 sq ft"></div></div>
-      </div>
-      <div class="ms"><div class="mst">&#127760; Floor Plan Image</div>
-        <div id="fupzone" class="uz" onclick="document.getElementById('fupinput').click()" style="padding:28px;">
-          <div style="font-size:36px;margin-bottom:10px;">&#127760;</div><div style="font-size:14px;color:var(--gray);font-weight:300;"><strong style="color:var(--navy);">Click to upload floor plan image</strong></div><div style="font-size:11px;color:var(--gray);margin-top:6px;">JPG, PNG, PDF -- Max 10MB</div>
-        </div>
-        <input type="file" id="fupinput" accept="image/*,.pdf" style="display:none;" onchange="handleFpUp(event)">
-        <div id="fupprev" style="display:none;margin-top:14px;">
-          <div style="display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--border);padding:12px 16px;border-radius:var(--r);">
-            <div id="fupthumb" style="width:64px;height:64px;background:var(--lg);border-radius:2px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px;">&#127760;</div>
-            <div style="flex:1;"><div id="fupname" style="font-size:13px;font-weight:600;color:var(--navy);"></div><div id="fupsize" style="font-size:11px;color:var(--gray);"></div></div>
-            <button class="bs dn" onclick="clearFpUp()">&#10005; Remove</button>
-          </div>
-        </div>
-      </div>
-      <div class="ms"><div class="mst">Rooms in This Plan</div>
-        <div class="sg">
-          <div class="so on" onclick="togScope(this)"><div class="ck">&#10003;</div>Living Room</div>
-          <div class="so on" onclick="togScope(this)"><div class="ck">&#10003;</div>Master Bedroom</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Bedroom 2</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Bedroom 3</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Bedroom 4</div>
-          <div class="so on" onclick="togScope(this)"><div class="ck">&#10003;</div>Kitchen</div>
-          <div class="so on" onclick="togScope(this)"><div class="ck">&#10003;</div>Bathroom 1</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Bathroom 2</div>
-          <div class="so on" onclick="togScope(this)"><div class="ck">&#10003;</div>Hallway</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Dining Area</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Laundry Room</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Entry</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Entryway</div>
-          <div class="so" onclick="togScope(this)"><div class="ck"></div>Stairs</div>
-        </div>
-      </div>
-      <div class="ms">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="mst" style="margin-bottom:0;">Preset Installation Scopes</div><button class="bs gd" onclick="addProw()">+ Add Preset</button></div>
-        <div id="prowcont">
-          <div class="prow">
-            <div class="form-row" style="margin-bottom:10px;">
-              <div class="fg" style="margin-bottom:0;"><label>Preset Name *</label><input type="text" value="Carpet Throughout"></div>
-              <div class="fg" style="margin-bottom:0;"><label>Default Service</label><select><option value="">-- Any --</option><option selected>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select></div>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
-              <span class="prt on" onclick="this.classList.toggle('on')">Living Room</span><span class="prt on" onclick="this.classList.toggle('on')">Master Bedroom</span><span class="prt on" onclick="this.classList.toggle('on')">Bedroom 2</span><span class="prt on" onclick="this.classList.toggle('on')">Bedroom 3</span><span class="prt on" onclick="this.classList.toggle('on')">Hallway</span><span class="prt" onclick="this.classList.toggle('on')">Kitchen</span><span class="prt" onclick="this.classList.toggle('on')">Bathroom 1</span><span class="prt" onclick="this.classList.toggle('on')">Bathroom 2</span><span class="prt" onclick="this.classList.toggle('on')">Dining Area</span><span class="prt" onclick="this.classList.toggle('on')">Laundry Room</span><span class="prt" onclick="this.classList.toggle('on')">Entry</span><span class="prt" onclick="this.classList.toggle('on')">Entryway</span><span class="prt" onclick="this.classList.toggle('on')">Stairs</span><span class="prt" onclick="this.classList.toggle('on')">Bedroom 4</span>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="modal modal-lg">
+    <div class="mh">
+      <h3 id="fpetitle">Add Floor Plan</h3>
+      <button class="mx" onclick="closeM('mfpe')">&#10005;</button>
     </div>
-    <div class="mf"><button class="bl ol" onclick="closeM('mfpe')">Cancel</button><button class="bl gd" onclick="saveFp()">Save Floor Plan</button></div>
+    <div class="mbody">
+      <input type="hidden" id="fpe_prop_id">
+      <input type="hidden" id="fpe_fp_id">
+
+      <!-- SECTION: Plan Details -->
+      <div class="ms"><div class="mst">Plan Details</div>
+        <div class="form-row">
+          <div class="fg" style="flex:2;"><label>Plan Name *</label>
+            <input type="text" id="fpe_name" placeholder="e.g. Ashford — 1 Bed / 1 Bath"></div>
+          <div class="fg"><label>Sq Ft</label>
+            <input type="text" id="fpe_sqft" placeholder="e.g. 735"></div>
+          <div class="fg"><label>Units in Property</label>
+            <input type="number" id="fpe_units" placeholder="e.g. 32" min="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Bedrooms</label>
+            <select id="fpe_beds">
+              <option value="0">Studio</option><option value="1">1 Bed</option>
+              <option value="2">2 Bed</option><option value="3">3 Bed</option>
+              <option value="4">4 Bed</option>
+            </select></div>
+          <div class="fg"><label>Bathrooms</label>
+            <select id="fpe_baths">
+              <option value="1">1 Bath</option><option value="1.5">1.5 Bath</option>
+              <option value="2">2 Bath</option><option value="2.5">2.5 Bath</option>
+            </select></div>
+          <div class="fg"><label>Renovated</label>
+            <select id="fpe_renov">
+              <option value="false">Standard</option>
+              <option value="true">Renovated</option>
+            </select></div>
+        </div>
+      </div>
+
+      <!-- SECTION: Rooms -->
+      <div class="ms"><div class="mst">Rooms in Plan</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;" id="fpe_room_chips"></div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="fpe_room_input" placeholder="Add room (e.g. Living Room)..." 
+            style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();addRoomChip();}">
+          <button class="bs nv" onclick="addRoomChip()">+ Add</button>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--gray);">
+          Quick add: 
+          <span class="room-quick" onclick="addRoomChipVal('Living Room')">Living Room</span>
+          <span class="room-quick" onclick="addRoomChipVal('Bedroom')">Bedroom</span>
+          <span class="room-quick" onclick="addRoomChipVal('Kitchen')">Kitchen</span>
+          <span class="room-quick" onclick="addRoomChipVal('Bathroom')">Bathroom</span>
+          <span class="room-quick" onclick="addRoomChipVal('Dining Area')">Dining Area</span>
+          <span class="room-quick" onclick="addRoomChipVal('Walk-in Closet')">Walk-in Closet</span>
+          <span class="room-quick" onclick="addRoomChipVal('Laundry Room')">Laundry Room</span>
+          <span class="room-quick" onclick="addRoomChipVal('Patio/Balcony')">Patio/Balcony</span>
+        </div>
+      </div>
+
+      <!-- SECTION: Installation Images (3 named slots) -->
+      <div class="ms"><div class="mst">Installation Documents</div>
+        <p style="font-size:12px;color:var(--gray);margin-bottom:16px;">
+          Each document can be printed individually for installers. Upload JPG, PNG, or PDF (max 10MB each).
+        </p>
+        <div class="img-slots">
+
+          <!-- Slot 1: Floor Plan -->
+          <div class="img-slot" id="slot_floorplan">
+            <div class="img-slot-hd">
+              <div class="img-slot-label">&#127760; Floor Plan</div>
+              <div style="display:flex;gap:6px;">
+                <button class="bs ol img-slot-print" onclick="printSlot('floorplan')" style="display:none;">&#128438; Print</button>
+                <button class="bs dn img-slot-clear" onclick="clearSlot('floorplan')" style="display:none;">&#10005; Remove</button>
+              </div>
+            </div>
+            <div class="img-slot-drop" id="drop_floorplan" onclick="triggerSlotUpload('floorplan')">
+              <div class="img-slot-icon">&#127760;</div>
+              <div class="img-slot-hint">Click to upload floor plan image</div>
+            </div>
+            <div class="img-slot-preview" id="prev_floorplan" style="display:none;">
+              <img id="img_floorplan" src="" alt="Floor Plan">
+              <div class="img-slot-fname" id="fname_floorplan"></div>
+            </div>
+            <input type="file" id="file_floorplan" accept="image/*,.pdf" style="display:none;" onchange="handleSlotUpload('floorplan',this)">
+          </div>
+
+          <!-- Slot 2: Seam Diagram -->
+          <div class="img-slot" id="slot_seam">
+            <div class="img-slot-hd">
+              <div class="img-slot-label">&#9999; Seam Diagram</div>
+              <div style="display:flex;gap:6px;">
+                <button class="bs ol img-slot-print" onclick="printSlot('seam')" style="display:none;">&#128438; Print</button>
+                <button class="bs dn img-slot-clear" onclick="clearSlot('seam')" style="display:none;">&#10005; Remove</button>
+              </div>
+            </div>
+            <div class="img-slot-drop" id="drop_seam" onclick="triggerSlotUpload('seam')">
+              <div class="img-slot-icon">&#9999;</div>
+              <div class="img-slot-hint">Click to upload seam diagram</div>
+            </div>
+            <div class="img-slot-preview" id="prev_seam" style="display:none;">
+              <img id="img_seam" src="" alt="Seam Diagram">
+              <div class="img-slot-fname" id="fname_seam"></div>
+            </div>
+            <input type="file" id="file_seam" accept="image/*,.pdf" style="display:none;" onchange="handleSlotUpload('seam',this)">
+          </div>
+
+          <!-- Slot 3: Cut Sheet -->
+          <div class="img-slot" id="slot_cutsheet">
+            <div class="img-slot-hd">
+              <div class="img-slot-label">&#9986; Cut Sheet</div>
+              <div style="display:flex;gap:6px;">
+                <button class="bs ol img-slot-print" onclick="printSlot('cutsheet')" style="display:none;">&#128438; Print</button>
+                <button class="bs dn img-slot-clear" onclick="clearSlot('cutsheet')" style="display:none;">&#10005; Remove</button>
+              </div>
+            </div>
+            <div class="img-slot-drop" id="drop_cutsheet" onclick="triggerSlotUpload('cutsheet')">
+              <div class="img-slot-icon">&#9986;</div>
+              <div class="img-slot-hint">Click to upload cut sheet</div>
+            </div>
+            <div class="img-slot-preview" id="prev_cutsheet" style="display:none;">
+              <img id="img_cutsheet" src="" alt="Cut Sheet">
+              <div class="img-slot-fname" id="fname_cutsheet"></div>
+            </div>
+            <input type="file" id="file_cutsheet" accept="image/*,.pdf" style="display:none;" onchange="handleSlotUpload('cutsheet',this)">
+          </div>
+
+        </div><!-- .img-slots -->
+      </div>
+
+      <!-- SECTION: Installation Scopes -->
+      <div class="ms"><div class="mst">Preset Installation Scopes</div>
+        <p style="font-size:12px;color:var(--gray);margin-bottom:14px;">
+          Check the scopes that apply to this floor plan. These appear as quick-select options when clients submit an order.
+        </p>
+        <div id="fpe_scopes_list"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <input type="text" id="fpe_custom_scope" placeholder="Add custom scope for this plan..." style="flex:1;">
+          <button class="bs nv" onclick="addCustomScope()">+ Add</button>
+        </div>
+      </div>
+
+      <div id="fpe_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:8px;"></div>
+    </div>
+    <div class="mf">
+      <button class="bl dn" id="fpe_delbtn" style="display:none;margin-right:auto;" onclick="deleteFpFromModal()">&#128465; Delete Plan</button>
+      <button class="bl ol" onclick="closeM('mfpe')">Cancel</button>
+      <button class="bl gd" onclick="saveFpFromModal()">Save Floor Plan</button>
+    </div>
   </div>
 </div>
 
@@ -1116,144 +1214,778 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
 <div class="toast" id="toastEl"><span>&#10003;</span><span id="toastmsg"></span></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ── DATA ──
-// ── USER STORE (persisted in localStorage) ──
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>// ── DATA ──
+// ── TEAM STORE ──
 var DEFAULT_TEAM = [
-  {id:"t1", email:"admin@protectiveflooring.com", password:"PF-Admin-2025!", name:"PF Admin",    initials:"PA", role:"superadmin", status:"active", created:"Jan 1, 2025"},
-  {id:"t2", email:"ops@protectiveflooring.com",   password:"PFOps2025!",     name:"Ops Manager", initials:"OM", role:"admin",      status:"active", created:"Jan 1, 2025"}
+  {id:"t1", email:"admin@protectiveflooring.com",  password:"PF-Admin-2025!", name:"PF Admin",     initials:"PA", role:"superadmin", status:"active", created:"Jan 1, 2025"},
+  {id:"t2", email:"sarah@protectiveflooring.com",   password:"PF-Sarah-25!",  name:"Sarah Williams",initials:"SW", role:"admin",      status:"active", created:"Jan 5, 2025"},
+  {id:"t3", email:"field@protectiveflooring.com",   password:"PF-Field-25!",  name:"Field Staff",   initials:"FS", role:"staff",       status:"active", created:"Feb 1, 2025"}
 ];
 function loadTeam() {
-  try { var s=localStorage.getItem('pf_team'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_TEAM)); } catch(e){return JSON.parse(JSON.stringify(DEFAULT_TEAM));}
+  try { var s=localStorage.getItem('pf_team'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_TEAM)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_TEAM)); }
 }
-function saveTeam(arr) { try{localStorage.setItem('pf_team',JSON.stringify(arr));}catch(e){} }
+function saveTeam(arr) { try { localStorage.setItem('pf_team',JSON.stringify(arr)); } catch(e) {} }
 function getTeam() { return loadTeam(); }
-// Keep ADMIN_USERS as alias used by doLogin
-var ADMIN_USERS = loadTeam();
 
+// ── CLIENT LOGIN STORE ──
 var DEFAULT_CLIENTS = [
-  {id:"u1", email:"manager@cherrycreek.com",  password:"Cherry2025!", name:"Jessica Lane",  initials:"JL", props:["Cherry Creek Apartments"],   role:"Property Manager", hub:"nashville", status:"active",  created:"Feb 20, 2025"},
-  {id:"u2", email:"manager@riverside.com",    password:"PF-River25!", name:"Rachel Moore",  initials:"RM", props:["Riverside Apartments"],       role:"Property Manager", hub:"memphis",   status:"active",  created:"Jan 10, 2025"},
-  {id:"u3", email:"manager@arborridge.com",   password:"Arbor2025!",  name:"Keisha Davis",  initials:"KD", props:["Arbor Ridge Nashville"],       role:"Property Manager", hub:"nashville", status:"active",  created:"Jan 15, 2025"}
+  {id:"u1",email:"manager@cherrycreek.com",  password:"Cherry2025!", name:"Jessica Lane",   initials:"JL",props:["Cherry Creek Apartments"],  role:"Property Manager",hub:"nashville",status:"active", created:"Feb 20, 2025"},
+  {id:"u2",email:"manager@riverside.com",    password:"PF-River25!", name:"Rachel Moore",   initials:"RM",props:["Riverside Apartments"],      role:"Property Manager",hub:"memphis",  status:"active", created:"Jan 10, 2025"},
+  {id:"u3",email:"manager@arborridge.com",   password:"Arbor2025!",  name:"Keisha Davis",   initials:"KD",props:["Arbor Ridge Nashville"],      role:"Property Manager",hub:"nashville",status:"active", created:"Jan 15, 2025"}
 ];
-
 function loadUsers() {
-  try {
-    var stored = localStorage.getItem('pf_users');
-    return stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_CLIENTS));
-  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_CLIENTS)); }
+  try { var s=localStorage.getItem('pf_users'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_CLIENTS)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_CLIENTS)); }
 }
-function saveUsers(arr) {
-  try { localStorage.setItem('pf_users', JSON.stringify(arr)); } catch(e) {}
-}
+function saveUsers(arr) { try { localStorage.setItem('pf_users',JSON.stringify(arr)); } catch(e) {} }
 function getUsers() { return loadUsers(); }
 
-// Legacy alias so existing code still works
-var users = loadUsers();
-var fpByProp = {"riverside":[{id:"RV-1BR",name:"1 Bed / 1 Bath",sqft:"650"}, {id:"RV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"850"}, {id:"RV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,050"}, {id:"RV-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,280"}],"parkview":[{id:"PV-1BR",name:"1 Bed / 1 Bath",sqft:"620"}, {id:"PV-2BR1BA",name:"2 Bed / 1 Bath",sqft:"820"}, {id:"PV-2BR2BA",name:"2 Bed / 2 Bath",sqft:"980"}],"columns":[{id:"COL-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,100"}, {id:"COL-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,380"}],"magnolia":[{id:"MAG-1BR",name:"1 Bed / 1 Bath",sqft:"680"}, {id:"MAG-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,020"}],"cherry-creek-apartments":[{id:"CC-ASHFORD",name:"Ashford — 1 Bed / 1 Bath",sqft:"600"}, {id:"CC-ASHFORD-R",name:"Ashford Renovated — 1 Bed / 1 Bath",sqft:"600"}, {id:"CC-ADDISON",name:"Addison — 1 Bed / 1 Bath",sqft:"735"}, {id:"CC-ADDISON-R",name:"Addison Renovated — 1 Bed / 1 Bath",sqft:"735"}, {id:"CC-ASHLEY",name:"Ashley — 1 Bed / 1 Bath",sqft:"920"}, {id:"CC-ASHLEY-R",name:"Ashley Renovated — 1 Bed / 1 Bath",sqft:"920"}, {id:"CC-BRITTANY",name:"Brittany — 2 Bed / 1 Bath",sqft:"800"}, {id:"CC-BRITTANY-R",name:"Brittany Renovated — 2 Bed / 1 Bath",sqft:"800"}, {id:"CC-BERKLEY",name:"Berkley — 2 Bed / 1 Bath",sqft:"971"}, {id:"CC-BERKLEY-R",name:"Berkley Renovated — 2 Bed / 1 Bath",sqft:"971"}, {id:"CC-CHARLESTON",name:"Charleston — 2 Bed / 2 Bath",sqft:"1,073"}, {id:"CC-CHARLESTON-R",name:"Charleston Renovated — 2 Bed / 2 Bath",sqft:"1,073"}, {id:"CC-CAMERON",name:"Cameron — 2 Bed / 2 Bath",sqft:"1,100"}, {id:"CC-CAMERON-R",name:"Cameron Renovated — 2 Bed / 2 Bath",sqft:"1,100"}, {id:"CC-CARLTON",name:"Carlton — 2 Bed / 2 Bath",sqft:"1,289"}, {id:"CC-CARLTON-R",name:"Carlton Renovated — 2 Bed / 2 Bath",sqft:"1,289"}, {id:"CC-DEVONSHIRE",name:"Devonshire — 3 Bed / 2 Bath",sqft:"1,402"}, {id:"CC-DEVONSHIRE-R",name:"Devonshire Renovated — 3 Bed / 2 Bath",sqft:"1,402"}],"arborridge":[{id:"AR-STU",name:"Studio",sqft:"450"}, {id:"AR-1BR",name:"1 Bed / 1 Bath",sqft:"700"}, {id:"AR-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,080"}, {id:"AR-3BR2BA",name:"3 Bed / 2 Bath",sqft:"1,350"}],"hermitage":[{id:"RS-1BR",name:"1 Bed / 1 Bath",sqft:"660"}, {id:"RS-2BR2BA",name:"2 Bed / 2 Bath",sqft:"1,040"}],};
-var planPresets = {
-  'CC-1BR':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bedroom','Hallway'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bathroom 1'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bedroom','Kitchen','Bathroom 1','Hallway'],svc:''}
+// ── PROPERTY STORE ──
+var DEFAULT_PROPS = [
+  {id:"prop-rv", name:"Riverside Apartments",      mgmt:"",                        addr:"3846 Delp Street",     city:"Memphis",   state:"TN",zip:"38118",phone:"(901) 362-7700",email:"office@riverside.com",   web:"",hub:"memphis",  units:100,status:"active", notes:"",created:"2024-01-10",deletedAt:null},
+  {id:"prop-pk", name:"Parkview Commons",           mgmt:"",                        addr:"4820 Millbranch Road", city:"Memphis",   state:"TN",zip:"38116",phone:"(901) 396-6644",email:"manager@parkview.com",   web:"",hub:"memphis",  units:148,status:"active", notes:"",created:"2024-01-15",deletedAt:null},
+  {id:"prop-co", name:"The Columns at Bartlett",    mgmt:"",                        addr:"7200 US-70",           city:"Bartlett",  state:"TN",zip:"38134",phone:"(901) 388-3300",email:"office@columns.com",     web:"",hub:"memphis",  units:72, status:"active", notes:"",created:"2024-03-01",deletedAt:null},
+  {id:"prop-mg", name:"Magnolia Trace",             mgmt:"",                        addr:"1480 Goodman Road",    city:"Southaven", state:"MS",zip:"38671",phone:"(662) 349-4400",email:"leasing@magnoliatrace.com",web:"",hub:"memphis",  units:90, status:"active", notes:"",created:"2024-04-01",deletedAt:null},
+  {id:"prop-wh", name:"Whitehaven Village",         mgmt:"",                        addr:"4100 Elvis Presley Blvd",city:"Memphis", state:"TN",zip:"38116",phone:"",              email:"",                       web:"",hub:"memphis",  units:55, status:"inactive",notes:"Inactive pending renovation",created:"2023-06-01",deletedAt:null},
+  {id:"prop-cc", name:"Cherry Creek Apartments",    mgmt:"Willow Bridge Property Co.",addr:"1100 Crystal Spring Lane",city:"Hermitage",state:"TN",zip:"37076",phone:"(615) 229-8238",email:"manager@cherrycreek.com",web:"https://www.willowbridgepc.com/properties/cherry-creek-apartments-hermitage-tn",hub:"nashville",units:627,status:"active",notes:"",created:"2024-02-01",deletedAt:null},
+  {id:"prop-ar", name:"Arbor Ridge Nashville",      mgmt:"",                        addr:"2940 Brick Church Pike",city:"Nashville",state:"TN",zip:"37207",phone:"(615) 228-5500",email:"leasing@arborridge.com", web:"",hub:"nashville",units:200,status:"active", notes:"",created:"2024-01-20",deletedAt:null},
+  {id:"prop-rh", name:"The Reserve at Hermitage",   mgmt:"",                        addr:"600 Hermitage Ave",    city:"Hermitage", state:"TN",zip:"37076",phone:"(615) 883-7700",email:"office@reservehermitage.com",web:"",hub:"nashville",units:160,status:"active", notes:"",created:"2024-05-01",deletedAt:null}
+];
+function loadProps() {
+  try { var s=localStorage.getItem('pf_props'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_PROPS)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_PROPS)); }
+}
+function saveProps(arr) { try { localStorage.setItem('pf_props',JSON.stringify(arr)); } catch(e) {} }
+function getProps() { return loadProps(); }
+// Return only visible (non-deleted, non-filtered) props
+function getActiveProps() { return getProps().filter(function(pr){ return pr.deletedAt===null||pr.deletedAt===undefined; }); }
+
+// ── GLOBAL SCOPE STORE ──
+var DEFAULT_SCOPES = [
+  {id:"sc1",name:"Carpet Throughout",    svc:"Carpet Installation"},
+  {id:"sc2",name:"Carpet Bedrooms Only", svc:"Carpet Installation"},
+  {id:"sc3",name:"Vinyl Wet Areas",      svc:"Sheet Vinyl"},
+  {id:"sc4",name:"Vinyl Wet + Dining",   svc:"Sheet Vinyl"},
+  {id:"sc5",name:"LVP Throughout",       svc:"Luxury Vinyl Plank"},
+  {id:"sc6",name:"Full Turnover",        svc:"Full Turnover Package"},
+  {id:"sc7",name:"Subfloor Repair Only", svc:"Subfloor Repair"}
+];
+function loadScopes() {
+  try { var s=localStorage.getItem('pf_scopes'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_SCOPES)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_SCOPES)); }
+}
+function saveScopes(arr) { try { localStorage.setItem('pf_scopes',JSON.stringify(arr)); } catch(e) {} }
+
+// ── FLOOR PLAN STORE ──
+// Each floor plan stored under key pf_fp_{propId}
+// Schema: {id, name, sqft, beds, baths, unitCount, renovated, rooms[], 
+//          images:{floorPlan:{src,name}, seam:{src,name}, cutSheet:{src,name}},
+//          scopes:["sc1","sc2",...], customScopes:[{name,svc}], status}
+var DEFAULT_FP = {
+  "prop-rv":[
+    {id:"RV-1BR",    name:"1 Bed / 1 Bath",     sqft:"650", beds:1,baths:1,  unitCount:24,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom","Hallway"],              images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"RV-2BR1BA", name:"2 Bed / 1 Bath",     sqft:"850", beds:2,baths:1,  unitCount:36,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Kitchen","Bathroom","Hallway"],        images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3"],customScopes:[],status:"active"},
+    {id:"RV-2BR2BA", name:"2 Bed / 2 Bath",     sqft:"1050",beds:2,baths:2,  unitCount:28,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Kitchen","Bath 1","Bath 2","Dining"],  images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3","sc4","sc6"],customScopes:[],status:"active"},
+    {id:"RV-3BR2BA", name:"3 Bed / 2 Bath",     sqft:"1280",beds:3,baths:2,  unitCount:12,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bed 3","Kitchen","Bath 1","Bath 2","Dining","Laundry"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc6"],customScopes:[],status:"active"}
   ],
-  'CC-2BR1BA':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bed 1','Bed 2','Hallway'],svc:'Carpet Installation'},
-    {name:'Carpet Bedrooms Only',rooms:['Bed 1','Bed 2'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bathroom 1'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom 1','Hallway'],svc:''}
+  "prop-pk":[
+    {id:"PV-1BR",    name:"1 Bed / 1 Bath",     sqft:"620", beds:1,baths:1,  unitCount:48,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom"],                        images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"PV-2BR1BA", name:"2 Bed / 1 Bath",     sqft:"820", beds:2,baths:1,  unitCount:60,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Kitchen","Bathroom"],                  images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3"],customScopes:[],status:"active"},
+    {id:"PV-2BR2BA", name:"2 Bed / 2 Bath",     sqft:"980", beds:2,baths:2,  unitCount:40,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen"],            images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3","sc6"],customScopes:[],status:"active"}
   ],
-  'CC-2BR2BA':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bed 1','Bed 2','Hallway'],svc:'Carpet Installation'},
-    {name:'Carpet Bedrooms Only',rooms:['Bed 1','Bed 2'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bath 1','Bath 2'],svc:'Sheet Vinyl'},
-    {name:'Vinyl Wet+Dining',rooms:['Kitchen','Bath 1','Bath 2','Dining Area'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Hallway'],svc:''}
+  "prop-co":[
+    {id:"CO-2BR2BA",name:"2 Bed / 2 Bath",      sqft:"1100",beds:2,baths:2,  unitCount:40,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen"],            images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"CO-3BR2BA",name:"3 Bed / 2 Bath",      sqft:"1380",beds:3,baths:2,  unitCount:32,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bed 3","Bath 1","Bath 2","Kitchen","Dining"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc2","sc6"],customScopes:[],status:"active"}
   ],
-  'CC-3BR2BA':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],svc:'Carpet Installation'},
-    {name:'Carpet Bedrooms Only',rooms:['Bed 1','Bed 2','Bed 3'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bath 1','Bath 2'],svc:'Sheet Vinyl'},
-    {name:'Vinyl Wet+Dining',rooms:['Kitchen','Bath 1','Bath 2','Dining Area'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bed 1','Bed 2','Bed 3','Kitchen','Bath 1','Bath 2','Dining Area','Hallway','Laundry Room'],svc:''}
+  "prop-mg":[
+    {id:"MG-1BR",   name:"1 Bed / 1 Bath",      sqft:"680", beds:1,baths:1,  unitCount:30,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom"],                        images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"MG-2BR2BA",name:"2 Bed / 2 Bath",      sqft:"1020",beds:2,baths:2,  unitCount:60,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2"],                    images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"}
   ],
-  'RV-1BR':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bedroom','Hallway'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bathroom 1'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bedroom','Kitchen','Bathroom 1','Hallway'],svc:''}
+  "prop-cc":[
+    {id:"CC-ASHFORD",    name:"Ashford",          sqft:"600", beds:1,baths:1,  unitCount:32,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom","Patio/Balcony"],        images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"CC-ASHFORD-R",  name:"Ashford",          sqft:"600", beds:1,baths:1,  unitCount:20,renovated:true, rooms:["Living Room","Bedroom","Kitchen","Bathroom","Patio/Balcony"],        images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"CC-ADDISON",    name:"Addison",          sqft:"735", beds:1,baths:1,  unitCount:28,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom","Dining Area","Patio/Balcony"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"CC-ADDISON-R",  name:"Addison",          sqft:"735", beds:1,baths:1,  unitCount:20,renovated:true, rooms:["Living Room","Bedroom","Kitchen","Bathroom","Dining Area","Patio/Balcony"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"CC-ASHLEY",     name:"Ashley",           sqft:"920", beds:1,baths:1,  unitCount:24,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom","Walk-in Closet","Patio/Balcony"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"CC-ASHLEY-R",   name:"Ashley",           sqft:"920", beds:1,baths:1,  unitCount:16,renovated:true, rooms:["Living Room","Bedroom","Kitchen","Bathroom","Walk-in Closet","Patio/Balcony"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"CC-BRITTANY",   name:"Brittany",         sqft:"800", beds:2,baths:1,  unitCount:30,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Kitchen","Bathroom","Patio/Balcony"],  images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3"],customScopes:[],status:"active"},
+    {id:"CC-BRITTANY-R", name:"Brittany",         sqft:"800", beds:2,baths:1,  unitCount:20,renovated:true, rooms:["Living Room","Bed 1","Bed 2","Kitchen","Bathroom","Patio/Balcony"],  images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3"],customScopes:[],status:"active"},
+    {id:"CC-BERKLEY",    name:"Berkley",          sqft:"971", beds:2,baths:1,  unitCount:32,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Kitchen","Bathroom","Dining Area"],     images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3"],customScopes:[],status:"active"},
+    {id:"CC-BERKLEY-R",  name:"Berkley",          sqft:"971", beds:2,baths:1,  unitCount:20,renovated:true, rooms:["Living Room","Bed 1","Bed 2","Kitchen","Bathroom","Dining Area"],     images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3"],customScopes:[],status:"active"},
+    {id:"CC-CHARLESTON", name:"Charleston",       sqft:"1073",beds:2,baths:2,  unitCount:40,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen","W/D Hookup"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc6"],customScopes:[],status:"active"},
+    {id:"CC-CHARLESTON-R",name:"Charleston",      sqft:"1073",beds:2,baths:2,  unitCount:24,renovated:true, rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen","W/D Hookup"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc6"],customScopes:[],status:"active"},
+    {id:"CC-CAMERON",    name:"Cameron",          sqft:"1100",beds:2,baths:2,  unitCount:36,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen","Dining Area"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc4","sc6"],customScopes:[],status:"active"},
+    {id:"CC-CAMERON-R",  name:"Cameron",          sqft:"1100",beds:2,baths:2,  unitCount:20,renovated:true, rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen","Dining Area"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc4","sc6"],customScopes:[],status:"active"},
+    {id:"CC-CARLTON",    name:"Carlton",          sqft:"1289",beds:2,baths:2,  unitCount:28,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen","Dining Area","W/D Hookup"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc4","sc6"],customScopes:[],status:"active"},
+    {id:"CC-CARLTON-R",  name:"Carlton",          sqft:"1289",beds:2,baths:2,  unitCount:16,renovated:true, rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen","Dining Area","W/D Hookup"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc4","sc6"],customScopes:[],status:"active"},
+    {id:"CC-DEVONSHIRE", name:"Devonshire",       sqft:"1402",beds:3,baths:2,  unitCount:20,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bed 3","Bath 1","Bath 2","Kitchen","Dining Area","W/D Hookup","Patio/Balcony"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc2","sc3","sc4","sc6"],customScopes:[],status:"active"},
+    {id:"CC-DEVONSHIRE-R",name:"Devonshire",      sqft:"1402",beds:3,baths:2,  unitCount:12,renovated:true, rooms:["Living Room","Bed 1","Bed 2","Bed 3","Bath 1","Bath 2","Kitchen","Dining Area","W/D Hookup","Patio/Balcony"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc2","sc3","sc4","sc6"],customScopes:[],status:"active"}
   ],
-  'RV-2BR1BA':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bed 1','Bed 2','Hallway'],svc:'Carpet Installation'},
-    {name:'Carpet Bedrooms',rooms:['Bed 1','Bed 2'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bathroom 1'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom 1','Hallway'],svc:''}
+  "prop-ar":[
+    {id:"AR-STU",   name:"Studio",               sqft:"450", beds:0,baths:1,  unitCount:20,renovated:false,rooms:["Main Area","Kitchen","Bathroom"],                                     images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc5","sc3"],customScopes:[],status:"active"},
+    {id:"AR-1BR",   name:"1 Bed / 1 Bath",        sqft:"700", beds:1,baths:1,  unitCount:80,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom"],                        images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3","sc5"],customScopes:[],status:"active"},
+    {id:"AR-2BR2BA",name:"2 Bed / 2 Bath",        sqft:"1080",beds:2,baths:2,  unitCount:60,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2","Kitchen","Dining Area"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc4","sc6"],customScopes:[],status:"active"},
+    {id:"AR-3BR2BA",name:"3 Bed / 2 Bath",        sqft:"1350",beds:3,baths:2,  unitCount:40,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bed 3","Bath 1","Bath 2","Kitchen","Dining Area","Laundry"],images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc2","sc3","sc6"],customScopes:[],status:"active"}
   ],
-  'RV-2BR2BA':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bed 1','Bed 2','Hallway','Dining Area'],svc:'Carpet Installation'},
-    {name:'Carpet Bedrooms Only',rooms:['Bed 1','Bed 2'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bath 1','Bath 2'],svc:'Sheet Vinyl'},
-    {name:'Vinyl Wet+Dining',rooms:['Kitchen','Bath 1','Bath 2','Dining Area'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Hallway','Dining Area'],svc:''}
-  ],
-  'RV-3BR2BA':[
-    {name:'Carpet Throughout',rooms:['Living Room','Bed 1-3','Hallway'],svc:'Carpet Installation'},
-    {name:'Carpet Bedrooms Only',rooms:['Bed 1-3'],svc:'Carpet Installation'},
-    {name:'Vinyl Wet Areas',rooms:['Kitchen','Bath 1-2'],svc:'Sheet Vinyl'},
-    {name:'Vinyl Wet+Dining',rooms:['Kitchen','Bath 1-2','Dining Area'],svc:'Sheet Vinyl'},
-    {name:'Full Turnover',rooms:['Living Room','Bed 1-3','Kitchen','Bath 1-2','Dining Area','Laundry Room'],svc:''}
+  "prop-rh":[
+    {id:"RH-1BR",   name:"1 Bed / 1 Bath",        sqft:"660", beds:1,baths:1,  unitCount:60,renovated:false,rooms:["Living Room","Bedroom","Kitchen","Bathroom"],                        images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc3"],customScopes:[],status:"active"},
+    {id:"RH-2BR2BA",name:"2 Bed / 2 Bath",        sqft:"1040",beds:2,baths:2,  unitCount:100,renovated:false,rooms:["Living Room","Bed 1","Bed 2","Bath 1","Bath 2"],                   images:{floorPlan:null,seam:null,cutSheet:null},scopes:["sc1","sc2","sc3","sc6"],customScopes:[],status:"active"}
   ]
 };
 
-var fpStore = {};
+function loadFpForProp(propId) {
+  try {
+    var s = localStorage.getItem('pf_fp_' + propId);
+    if (s) return JSON.parse(s);
+  } catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_FP[propId] || []));
+}
+function saveFpForProp(propId, arr) {
+  try { localStorage.setItem('pf_fp_' + propId, JSON.stringify(arr)); } catch(e) {}
+}
+// Seed localStorage with default data on first load
+(function seedAll() {
+  Object.keys(DEFAULT_FP).forEach(function(k) {
+    try { if (!localStorage.getItem('pf_fp_'+k)) saveFpForProp(k, JSON.parse(JSON.stringify(DEFAULT_FP[k]))); } catch(e){}
+  });
+  try { if (!localStorage.getItem('pf_scopes')) saveScopes(JSON.parse(JSON.stringify(DEFAULT_SCOPES))); } catch(e){}
+  try { if (!localStorage.getItem('pf_props')) saveProps(JSON.parse(JSON.stringify(DEFAULT_PROPS))); } catch(e){}
+})();
 
-// Property floor plan details for card display
-var fpDetails = {
-  'CC-ASHFORD':{name:'Ashford',sqft:'600 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Patio/Balcony']},
-  'CC-ASHFORD-R':{name:'Ashford Renovated',sqft:'600 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Patio/Balcony'],renovated:true},
-  'CC-ADDISON':{name:'Addison',sqft:'735 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Patio/Balcony']},
-  'CC-ADDISON-R':{name:'Addison Renovated',sqft:'735 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Patio/Balcony'],renovated:true},
-  'CC-ASHLEY':{name:'Ashley',sqft:'920 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony']},
-  'CC-ASHLEY-R':{name:'Ashley Renovated',sqft:'920 sq ft',beds:1,baths:1,rooms:['Living Room','Bedroom','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony'],renovated:true},
-  'CC-BRITTANY':{name:'Brittany',sqft:'800 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Patio/Balcony']},
-  'CC-BRITTANY-R':{name:'Brittany Renovated',sqft:'800 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Patio/Balcony'],renovated:true},
-  'CC-BERKLEY':{name:'Berkley',sqft:'971 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony']},
-  'CC-BERKLEY-R':{name:'Berkley Renovated',sqft:'971 sq ft',beds:2,baths:1,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom','Dining Area','Walk-in Closet','Patio/Balcony'],renovated:true},
-  'CC-CHARLESTON':{name:'Charleston',sqft:'1,073 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','Patio/Balcony']},
-  'CC-CHARLESTON-R':{name:'Charleston Renovated',sqft:'1,073 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','Patio/Balcony'],renovated:true},
-  'CC-CAMERON':{name:'Cameron',sqft:'1,100 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Patio/Balcony']},
-  'CC-CAMERON-R':{name:'Cameron Renovated',sqft:'1,100 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Patio/Balcony'],renovated:true},
-  'CC-CARLTON':{name:'Carlton',sqft:'1,289 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony']},
-  'CC-CARLTON-R':{name:'Carlton Renovated',sqft:'1,289 sq ft',beds:2,baths:2,rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony'],renovated:true},
-  'CC-DEVONSHIRE':{name:'Devonshire',sqft:'1,402 sq ft',beds:3,baths:2,rooms:['Living Room','Bed 1','Bed 2','Bed 3','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony']},
-  'CC-DEVONSHIRE-R':{name:'Devonshire Renovated',sqft:'1,402 sq ft',beds:3,baths:2,rooms:['Living Room','Bed 1','Bed 2','Bed 3','Kitchen','Bath 1','Bath 2','Dining Area','Walk-in Closet','W/D Hookup','Extra Storage','Patio/Balcony'],renovated:true},
-  'RV-1BR':{name:'1 Bed / 1 Bath',sqft:'650 sq ft',rooms:['Living Room','Bedroom','Kitchen','Bathroom 1','Hallway']},
-  'RV-2BR1BA':{name:'2 Bed / 1 Bath',sqft:'850 sq ft',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bathroom 1','Hallway']},
-  'RV-2BR2BA':{name:'2 Bed / 2 Bath',sqft:'1,050 sq ft',rooms:['Living Room','Bed 1','Bed 2','Kitchen','Bath 1','Bath 2','Dining Area']},
-  'RV-3BR2BA':{name:'3 Bed / 2 Bath',sqft:'1,280 sq ft',rooms:['Living Room','Bed 1-3','Kitchen','Bath 1-2','Dining Area','Laundry Room']},
-  'AR-STU':{name:'Studio',sqft:'450 sq ft',rooms:['Main Area','Kitchen','Bathroom 1']},
-  'AR-1BR':{name:'1 Bed / 1 Bath',sqft:'700 sq ft',rooms:['Living Room','Bedroom','Kitchen','Bathroom 1']},
-  'AR-2BR2BA':{name:'2 Bed / 2 Bath',sqft:'1,080 sq ft',rooms:['Living Room','Bed 1','Bed 2','Bath 1','Bath 2','Kitchen','Dining Area']},
-  'AR-3BR2BA':{name:'3 Bed / 2 Bath',sqft:'1,350 sq ft',rooms:['Living Room','Bed 1-3','Bath 1-2','Kitchen','Dining Area','Laundry Room']}
-};
-
-// ── SEED localStorage with built-in floor plan data on first load ──
-// This ensures admin panel and client portal always read from the same store
-(function seedFloorPlans() {
-  Object.keys(fpByProp).forEach(function(propKey) {
-    var lsKey = 'pf_fp_' + propKey;
-    try {
-      if (!localStorage.getItem(lsKey)) {
-        var arr = fpByProp[propKey].map(function(fp) {
-          var det = fpDetails[fp.id] || {};
-          return {id:fp.id, name:fp.name, sqft:fp.sqft,
-            beds:det.beds||0, baths:det.baths||1,
-            rooms:det.rooms||[], renovated:det.renovated||false};
-        });
-        localStorage.setItem(lsKey, JSON.stringify(arr));
-      }
-    } catch(e) {}
+// ── Legacy aliases so existing order form still works ──
+var fpByProp = {};
+var fpDetails = {};
+(function buildLegacy() {
+  getActiveProps().forEach(function(prop) {
+    var fps = loadFpForProp(prop.id);
+    var legacyKey = prop.name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    fpByProp[legacyKey] = fps.map(function(fp) {
+      var label = fp.renovated ? fp.name + ' (Renovated)' : fp.name;
+      return {id: fp.id, name: label, sqft: fp.sqft};
+    });
+    fps.forEach(function(fp) {
+      fpDetails[fp.id] = {name: fp.name, sqft: fp.sqft+' sq ft', beds: fp.beds, baths: fp.baths, rooms: fp.rooms, renovated: fp.renovated};
+    });
+    // Also index by propId directly
+    fpByProp[prop.id] = fpByProp[legacyKey];
   });
 })();
+
+
+
+// ── PROPERTY CARD RENDERING ──
+var curHub = 'all';
+function switchHub(hub, el) {
+  curHub = hub;
+  document.querySelectorAll('.tabs .tab').forEach(function(t){ t.classList.remove('on'); });
+  el.classList.add('on');
+  filterProps();
+}
+function filterProps() {
+  var q = (document.getElementById('psearch')||{value:''}).value.toLowerCase();
+  var sf = (document.getElementById('pstatus')||{value:''}).value;
+  var all=0, mem=0, nash=0;
+  document.querySelectorAll('#proplist .pr-card').forEach(function(card) {
+    var hub=card.dataset.hub||'', nameCity=(card.dataset.name||'')+(card.dataset.city||'');
+    var status=card.dataset.status||'';
+    var matchHub = curHub==='all'||hub===curHub;
+    var matchQ = !q || nameCity.indexOf(q)>=0;
+    var matchS = !sf || status===sf;
+    card.style.display = (matchHub&&matchQ&&matchS)?'':'none';
+    if (card.style.display!=='none') {
+      all++;
+      if(hub==='memphis') mem++;
+      if(hub==='nashville') nash++;
+    }
+  });
+  if(document.getElementById('call')) document.getElementById('call').textContent=all;
+  if(document.getElementById('cmem')) document.getElementById('cmem').textContent=mem;
+  if(document.getElementById('cnash')) document.getElementById('cnash').textContent=nash;
+}
+function togProp(card) {
+  card.classList.toggle('open');
+}
+function renderPropList() {
+  var list = document.getElementById('proplist');
+  if (!list) return;
+  var props = getActiveProps();
+  list.innerHTML = '';
+  props.forEach(function(prop) {
+    var fps = loadFpForProp(prop.id);
+    var initials = prop.name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+    var hubBadge = prop.hub==='memphis'
+      ? '<span class="b mp">Memphis</span>'
+      : '<span class="b nv">Nashville</span>';
+    var statusBadge = prop.status==='active'
+      ? '<span class="b ac">Active</span>'
+      : '<span class="b in">Inactive</span>';
+    var pid = prop.id;
+    var actionBtns = prop.status==='active'
+      ? '<button class="bs ol" onclick="openEditProp(\'' + pid + '\');event.stopPropagation();">Edit</button>'
+        +'<button class="bs dn" onclick="deactivateProp(\'' + pid + '\');event.stopPropagation();">Deactivate</button>'
+      : '<button class="bs gd" onclick="reactivateProp(\'' + pid + '\');event.stopPropagation();">Reactivate</button>'
+        +'<button class="bs ol" onclick="openEditProp(\'' + pid + '\');event.stopPropagation();">Edit</button>';
+    // Floor plan table rows
+    var fpRows = fps.map(function(fp) {
+      var renovBadge = fp.renovated ? '<span class="chip" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;font-size:9px;padding:1px 5px;">RENOV</span>' : '';
+      var bedsLabel = fp.beds===0 ? 'Studio' : fp.beds+'BR/'+fp.baths+'BA';
+      var roomsHtml = (fp.rooms||[]).map(function(r){ return '<span class="chip">'+r+'</span>'; }).join('');
+      var allScopes = getScopesForFp(fp);
+      var scopesHtml = allScopes.map(function(s){ return '<span class="chip gd">'+s.name+'</span>'; }).join('');
+      var imgBtns = (function() {
+        var SLOTS = ['floorPlan','seam','cutSheet'];
+        var ICONS = {floorPlan:'&#127760;',seam:'&#9999;',cutSheet:'&#9986;'};
+        var LABELS = {floorPlan:'Floor Plan',seam:'Seam',cutSheet:'Cut Sheet'};
+        return SLOTS.map(function(slot) {
+          var hasImg = fp.images && fp.images[slot] && fp.images[slot].src;
+          var cls = hasImg ? 'fp-img-btn has-img' : 'fp-img-btn no-img';
+          var onclick = 'openFpDoc(\'' + prop.id + '\',\'' + fp.id + '\',\'' + slot + '\');event.stopPropagation();';
+          return '<button class="' + cls + '" onclick="' + onclick + '" title="' + LABELS[slot] + '">' + ICONS[slot] + '</button>';
+        }).join(' ');
+      })();
+      return '<tr>'
+        +'<td><strong>'+fp.name+'</strong> '+renovBadge+'</td>'
+        +'<td style="white-space:nowrap;">'+bedsLabel+'</td>'
+        +'<td style="white-space:nowrap;">'+fp.sqft+' sqft</td>'
+        +'<td>'+imgBtns+'</td>'
+        +'<td>'+roomsHtml+'</td>'
+        +'<td>'+scopesHtml+'</td>'
+        +'<td><span class="b '+(fp.status==='active'?'ac':'in')+'">'+fp.status+'</span></td>'
+        +'<td><button class="bs ol" data-prop="'+prop.id+'" data-fp="'+fp.id+'" onclick="editFpClick(this)">Edit</button></td>'
+        +'</tr>';
+    }).join('');
+
+    var detailHtml = '';
+    if (prop.mgmt) detailHtml += '<div class="pr-detail-item"><label>Management Co.</label><span>'+prop.mgmt+'</span></div>';
+    if (prop.phone) detailHtml += '<div class="pr-detail-item"><label>Phone</label><span><a href="tel:'+prop.phone+'">'+prop.phone+'</a></span></div>';
+    if (prop.email) detailHtml += '<div class="pr-detail-item"><label>Email</label><span><a href="mailto:'+prop.email+'">'+prop.email+'</a></span></div>';
+    if (prop.web) detailHtml += '<div class="pr-detail-item"><label>Website</label><span><a href="'+prop.web+'" target="_blank" rel="noopener">View Site &#8599;</a></span></div>';
+    if (prop.notes) detailHtml += '<div class="pr-detail-item" style="grid-column:1/-1;"><label>Notes</label><span>'+prop.notes+'</span></div>';
+
+    var contactLine = [prop.phone, prop.email].filter(Boolean).join(' &nbsp;·&nbsp; ');
+
+    var card = document.createElement('div');
+    card.className = 'pr-card' + (prop.status!=='active' ? ' inactive-prop' : '');
+    card.dataset.hub = prop.hub;
+    card.dataset.name = prop.name.toLowerCase();
+    card.dataset.city = (prop.city||'').toLowerCase();
+    card.dataset.status = prop.status;
+    card.innerHTML =
+      '<div class="pr-header" onclick="togProp(this.parentElement)">'
+        +'<div class="pr-avatar">'+initials+'</div>'
+        +'<div class="pr-info">'
+          +'<div class="pr-name">'+prop.name+'</div>'
+          +'<div class="pr-addr">&#128205; '+prop.addr+', '+prop.city+', '+prop.state+' '+prop.zip+'</div>'
+          +(contactLine ? '<div class="pr-contact">'+contactLine+'</div>' : '')
+        +'</div>'
+        +'<div class="pr-meta">'+hubBadge+'<span class="pp">'+prop.units+' Units</span>'+statusBadge+'</div>'
+        +'<div class="pr-actions" onclick="event.stopPropagation()">'+actionBtns+'</div>'
+        +'<span class="pr-chevron">&#9660;</span>'
+      +'</div>'
+      +'<div class="pr-body">'
+        +(detailHtml ? '<div class="pr-section-title">Contact &amp; Details</div><div class="pr-detail-grid">'+detailHtml+'</div>' : '')
+        +'<div class="pr-section-title">Floor Plans</div>'
+        +'<div class="fp-table-wrap"><table class="fpt">'
+          +'<thead><tr><th>Plan Name</th><th>Type</th><th>Size</th><th>Images</th><th>Rooms</th><th>Preset Scopes</th><th>Status</th><th></th></tr></thead>'
+          +'<tbody>'+fpRows+'</tbody>'
+        +'</table></div>'
+        +'<button class="bs gd" data-prop="' + prop.id + '" onclick="addFpClick(this)">+ Add Floor Plan</button>'
+      +'</div>';
+    list.appendChild(card);
+  });
+  filterProps();
+}
+
+// ── PROPERTY CRUD ──
+function openAddPropModal() {
+  document.getElementById('madd_id').value = '';
+  document.getElementById('madd_title').textContent = 'Add New Property';
+  document.getElementById('madd_name').value = '';
+  document.getElementById('madd_mgmt').value = '';
+  document.getElementById('madd_web').value = '';
+  document.getElementById('madd_addr').value = '';
+  document.getElementById('madd_city').value = '';
+  document.getElementById('madd_state').value = 'TN';
+  document.getElementById('madd_zip').value = '';
+  document.getElementById('madd_phone').value = '';
+  document.getElementById('madd_email').value = '';
+  document.getElementById('madd_units').value = '';
+  document.getElementById('madd_hub').value = 'memphis';
+  document.getElementById('madd_status').value = 'active';
+  document.getElementById('madd_notes').value = '';
+  document.getElementById('madd_url').value = '';
+  document.getElementById('madd_err').style.display = 'none';
+  document.getElementById('madd_delbtn').style.display = 'none';
+  openM('madd');
+}
+function openEditProp(propId) {
+  var props = getActiveProps();
+  var prop = null;
+  for(var i=0;i<props.length;i++){ if(props[i].id===propId){prop=props[i];break;} }
+  if (!prop) return;
+  document.getElementById('madd_id').value = prop.id;
+  document.getElementById('madd_title').textContent = 'Edit Property';
+  document.getElementById('madd_name').value = prop.name||'';
+  document.getElementById('madd_mgmt').value = prop.mgmt||'';
+  document.getElementById('madd_web').value = prop.web||'';
+  document.getElementById('madd_addr').value = prop.addr||'';
+  document.getElementById('madd_city').value = prop.city||'';
+  document.getElementById('madd_state').value = prop.state||'TN';
+  document.getElementById('madd_zip').value = prop.zip||'';
+  document.getElementById('madd_phone').value = prop.phone||'';
+  document.getElementById('madd_email').value = prop.email||'';
+  document.getElementById('madd_units').value = prop.units||'';
+  document.getElementById('madd_hub').value = prop.hub||'memphis';
+  document.getElementById('madd_status').value = prop.status||'active';
+  document.getElementById('madd_notes').value = prop.notes||'';
+  document.getElementById('madd_url').value = prop.web||'';
+  document.getElementById('madd_err').style.display = 'none';
+  // Show delete button only for superadmin
+  var delbtn = document.getElementById('madd_delbtn');
+  delbtn.style.display = (window.currentTeamUser && window.currentTeamUser.role==='superadmin') ? 'inline-flex' : 'none';
+  openM('madd');
+}
+function saveProperty() {
+  var name = (document.getElementById('madd_name').value||'').trim();
+  var addr = (document.getElementById('madd_addr').value||'').trim();
+  var city = (document.getElementById('madd_city').value||'').trim();
+  var zip  = (document.getElementById('madd_zip').value||'').trim();
+  if (!name||!addr||!city||!zip) {
+    var err = document.getElementById('madd_err');
+    err.textContent = 'Please fill in Property Name, Street Address, City, and Zip.';
+    err.style.display = 'block'; return;
+  }
+  var props = getProps();
+  var id = document.getElementById('madd_id').value;
+  var isNew = !id;
+  if (isNew) id = 'prop-' + Date.now().toString(36);
+  var obj = {
+    id:id, name:name,
+    mgmt:(document.getElementById('madd_mgmt').value||'').trim(),
+    addr:addr, city:city,
+    state:document.getElementById('madd_state').value,
+    zip:zip,
+    phone:(document.getElementById('madd_phone').value||'').trim(),
+    email:(document.getElementById('madd_email').value||'').trim(),
+    web:(document.getElementById('madd_web').value||'').trim(),
+    hub:document.getElementById('madd_hub').value,
+    units:parseInt(document.getElementById('madd_units').value)||0,
+    status:document.getElementById('madd_status').value,
+    notes:(document.getElementById('madd_notes').value||'').trim(),
+    created: isNew ? new Date().toISOString().slice(0,10) : null,
+    deletedAt: null
+  };
+  if (!isNew) {
+    // preserve created date
+    for(var i=0;i<props.length;i++){
+      if(props[i].id===id){ obj.created=props[i].created; break; }
+    }
+    props = props.map(function(pr){ return pr.id===id ? obj : pr; });
+  } else {
+    props.push(obj);
+  }
+  saveProps(props);
+  closeM('madd');
+  renderPropList();
+  rebuildLegacy();
+  toast(isNew ? 'Property added.' : 'Property updated.');
+}
+function deactivateProp(propId) {
+  if (!confirm('Deactivate this property? It will be hidden from clients but can be reactivated later.')) return;
+  var props = getProps().map(function(pr){
+    return pr.id===propId ? Object.assign({},pr,{status:'inactive'}) : pr;
+  });
+  saveProps(props);
+  renderPropList();
+  toast('Property deactivated.');
+}
+function reactivateProp(propId) {
+  var props = getProps().map(function(pr){
+    return pr.id===propId ? Object.assign({},pr,{status:'active'}) : pr;
+  });
+  saveProps(props);
+  renderPropList();
+  toast('Property reactivated.');
+}
+function deleteProperty() {
+  var id = document.getElementById('madd_id').value;
+  if (!id) return;
+  if (!confirm('Permanently hide this property? It will not be deleted from the database but will no longer appear anywhere. A superadmin can restore it.')) return;
+  var props = getProps().map(function(pr){
+    return pr.id===id ? Object.assign({},pr,{deletedAt: new Date().toISOString()}) : pr;
+  });
+  saveProps(props);
+  closeM('madd');
+  renderPropList();
+  rebuildLegacy();
+  toast('Property removed.');
+}
+
+// ── URL IMPORT ──
+function importFromUrl() {
+  var url = (document.getElementById('madd_url').value||'').trim();
+  if (!url) { toast('Please enter a URL first.'); return; }
+  // Extract property name from URL path segments
+  var name = '';
+  try {
+    var u = new URL(url);
+    // Take the last meaningful path segment, clean hyphens
+    var segs = u.pathname.split('/').filter(function(s){return s.length>2;});
+    if (segs.length) {
+      var last = segs[segs.length-1].replace(/-/g,' ').replace(/\.html$/,'');
+      name = last.split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+    }
+    // Pre-fill website
+    document.getElementById('madd_web').value = url;
+    // Try to detect city from path (common URL pattern: property-name-city-state)
+    var parts = last ? last.split(' ') : [];
+    var stateAbbrs = ['tn','ms','al','ar','ky','ga'];
+    var stateIdx = parts.findIndex(function(p){ return stateAbbrs.indexOf(p.toLowerCase())>=0; });
+    if (stateIdx > 0) {
+      var city = parts.slice(stateIdx-1, stateIdx).join(' ');
+      var state = parts[stateIdx].toUpperCase();
+      if (city) document.getElementById('madd_city').value = city.charAt(0).toUpperCase()+city.slice(1);
+      if (state) document.getElementById('madd_state').value = state;
+      // Remove city+state from name
+      name = parts.slice(0, stateIdx-1).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+    }
+  } catch(e) {}
+  if (name) document.getElementById('madd_name').value = name;
+  toast('Auto-filled from URL. Please review and complete the form.');
+}
+
+// Rebuild legacy fpByProp/fpDetails when properties change
+function rebuildLegacy() {
+  getActiveProps().forEach(function(prop) {
+    var fps = loadFpForProp(prop.id);
+    var legacyKey = prop.name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    fpByProp[legacyKey] = fps.map(function(fp) {
+      var label = fp.renovated ? fp.name + ' (Renovated)' : fp.name;
+      return {id: fp.id, name: label, sqft: fp.sqft};
+    });
+    fps.forEach(function(fp) {
+      fpDetails[fp.id] = {name:fp.name,sqft:fp.sqft+' sq ft',beds:fp.beds,baths:fp.baths,rooms:fp.rooms,renovated:fp.renovated};
+    });
+    fpByProp[prop.id] = fpByProp[legacyKey];
+  });
+}
+
+// ── FLOOR PLAN EDITOR ──
+var _fpeRooms = [];
+var _fpeImages = {floorPlan:null, seam:null, cutSheet:null};
+
+function openAddFpForProp(propId) {
+  _fpeRooms = [];
+  _fpeImages = {floorPlan:null, seam:null, cutSheet:null};
+  document.getElementById('fpetitle').textContent = 'Add Floor Plan';
+  document.getElementById('fpe_prop_id').value = propId;
+  document.getElementById('fpe_fp_id').value = '';
+  document.getElementById('fpe_name').value = '';
+  document.getElementById('fpe_sqft').value = '';
+  document.getElementById('fpe_units').value = '';
+  document.getElementById('fpe_beds').value = '1';
+  document.getElementById('fpe_baths').value = '1';
+  document.getElementById('fpe_renov').value = 'false';
+  document.getElementById('fpe_delbtn').style.display = 'none';
+  document.getElementById('fpe_err').style.display = 'none';
+  renderRoomChips();
+  resetAllSlots();
+  renderScopeCheckboxes([]);
+  openM('mfpe');
+}
+function openEditFpForProp(propId, fpId) {
+  var fps = loadFpForProp(propId);
+  var fp = null;
+  for(var i=0;i<fps.length;i++){ if(fps[i].id===fpId){fp=fps[i];break;} }
+  if (!fp) return;
+  _fpeRooms = (fp.rooms||[]).slice();
+  _fpeImages = {
+    floorPlan: (fp.images&&fp.images.floorPlan) ? Object.assign({},fp.images.floorPlan) : null,
+    seam:      (fp.images&&fp.images.seam)      ? Object.assign({},fp.images.seam)      : null,
+    cutSheet:  (fp.images&&fp.images.cutSheet)  ? Object.assign({},fp.images.cutSheet)  : null
+  };
+  document.getElementById('fpetitle').textContent = 'Edit Floor Plan';
+  document.getElementById('fpe_prop_id').value = propId;
+  document.getElementById('fpe_fp_id').value = fpId;
+  document.getElementById('fpe_name').value = fp.name||'';
+  document.getElementById('fpe_sqft').value = fp.sqft||'';
+  document.getElementById('fpe_units').value = fp.unitCount||'';
+  document.getElementById('fpe_beds').value = String(fp.beds||0);
+  document.getElementById('fpe_baths').value = String(fp.baths||1);
+  document.getElementById('fpe_renov').value = fp.renovated ? 'true' : 'false';
+  document.getElementById('fpe_delbtn').style.display = 'inline-flex';
+  document.getElementById('fpe_err').style.display = 'none';
+  renderRoomChips();
+  resetAllSlots();
+  ['floorPlan','seam','cutSheet'].forEach(function(slot) {
+    if (_fpeImages[slot] && _fpeImages[slot].src) showSlotPreview(slot, _fpeImages[slot].src, _fpeImages[slot].name);
+  });
+  var fpScopes = (fp.scopes||[]).concat((fp.customScopes||[]).map(function(cs){return 'custom:'+cs.name;}));
+  renderScopeCheckboxes(fpScopes, fp.customScopes||[]);
+  openM('mfpe');
+}
+
+function renderRoomChips() {
+  var wrap = document.getElementById('fpe_room_chips');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  _fpeRooms.forEach(function(room, idx) {
+    var chip = document.createElement('div');
+    chip.className = 'room-chip';
+    chip.innerHTML = '<span>'+room+'</span><button type="button" onclick="removeRoomChip('+idx+')">&#215;</button>';
+    wrap.appendChild(chip);
+  });
+}
+function addRoomChip() {
+  var inp = document.getElementById('fpe_room_input');
+  var val = (inp.value||'').trim();
+  if (!val) return;
+  if (_fpeRooms.indexOf(val) < 0) _fpeRooms.push(val);
+  inp.value = '';
+  renderRoomChips();
+}
+function addRoomChipVal(val) {
+  if (_fpeRooms.indexOf(val) < 0) _fpeRooms.push(val);
+  renderRoomChips();
+}
+function removeRoomChip(idx) {
+  _fpeRooms.splice(idx,1);
+  renderRoomChips();
+}
+
+// ── IMAGE SLOTS ──
+function triggerSlotUpload(slot) { document.getElementById('file_'+slot).click(); }
+function handleSlotUpload(slot, input) {
+  var file = input.files[0]; if (!file) return;
+  var rd = new FileReader();
+  rd.onload = function(e) {
+    _fpeImages[slot] = {src: e.target.result, name: file.name};
+    showSlotPreview(slot, e.target.result, file.name);
+  };
+  rd.readAsDataURL(file);
+}
+function showSlotPreview(slot, src, fname) {
+  document.getElementById('drop_'+slot).style.display = 'none';
+  document.getElementById('prev_'+slot).style.display = 'block';
+  var img = document.getElementById('img_'+slot);
+  if (img) img.src = src;
+  var fn = document.getElementById('fname_'+slot);
+  if (fn) fn.textContent = fname||'';
+  var hd = document.getElementById('slot_'+slot).querySelector('.img-slot-print');
+  if (hd) hd.style.display = 'inline-flex';
+  var clr = document.getElementById('slot_'+slot).querySelector('.img-slot-clear');
+  if (clr) clr.style.display = 'inline-flex';
+}
+function clearSlot(slot) {
+  _fpeImages[slot] = null;
+  document.getElementById('drop_'+slot).style.display = '';
+  document.getElementById('prev_'+slot).style.display = 'none';
+  var img = document.getElementById('img_'+slot);
+  if (img) img.src = '';
+  document.getElementById('file_'+slot).value = '';
+  var hd = document.getElementById('slot_'+slot).querySelector('.img-slot-print');
+  if (hd) hd.style.display = 'none';
+  var clr = document.getElementById('slot_'+slot).querySelector('.img-slot-clear');
+  if (clr) clr.style.display = 'none';
+}
+function resetAllSlots() {
+  ['floorPlan','seam','cutSheet'].forEach(function(slot){ clearSlot(slot); });
+}
+
+// ── PRINT SLOT ──
+function printSlot(slot) {
+  var propId  = document.getElementById('fpe_prop_id').value;
+  var fpName  = document.getElementById('fpe_name').value || 'Floor Plan';
+  var propName = '';
+  getActiveProps().forEach(function(pr){ if(pr.id===propId) propName=pr.name; });
+  var imgData = _fpeImages[slot];
+  if (!imgData || !imgData.src) { toast('No image uploaded for this slot.'); return; }
+  var labels = {floorPlan:'Floor Plan', seam:'Seam Diagram', cutSheet:'Cut Sheet'};
+  openPrintPage(imgData.src, labels[slot], fpName, propName);
+}
+function openFpDoc(propId, fpId, slot) {
+  var fps = loadFpForProp(propId);
+  var fp = null;
+  for(var i=0;i<fps.length;i++){ if(fps[i].id===fpId){fp=fps[i];break;} }
+  if (!fp) return;
+  var img = fp.images && fp.images[slot];
+  if (!img || !img.src) { toast('No image uploaded for this slot yet.'); return; }
+  var propName = '';
+  getActiveProps().forEach(function(pr){ if(pr.id===propId) propName=pr.name; });
+  var labels = {floorPlan:'Floor Plan', seam:'Seam Diagram', cutSheet:'Cut Sheet'};
+  openPrintPage(img.src, labels[slot], fp.name, propName);
+}
+function openPrintPage(src, docLabel, planName, propName) {
+  var pg = document.getElementById('print-page');
+  if (!pg) {
+    pg = document.createElement('div');
+    pg.id = 'print-page';
+    pg.className = 'print-page';
+    document.body.appendChild(pg);
+  }
+  pg.innerHTML =
+    '<div class="print-page-hd">'
+      +'<div><div class="print-page-title">'+docLabel+': '+planName+'</div>'
+      +'<div class="print-page-sub">'+propName+' &nbsp;·&nbsp; Protective Flooring &nbsp;·&nbsp; '+new Date().toLocaleDateString()+'</div></div>'
+    +'</div>'
+    +'<img src="'+src+'" alt="'+docLabel+'">'
+    +'<div class="print-page-actions">'
+      +'<button class="bl ol" onclick="closePrintPage()">&#8592; Close</button>'
+      +'<button class="bl gd" onclick="window.print()">&#128438; Print</button>'
+    +'</div>';
+  pg.style.display = 'block';
+}
+function closePrintPage() {
+  var pg = document.getElementById('print-page');
+  if (pg) pg.style.display = 'none';
+}
+
+// ── SCOPES ──
+function getScopesForFp(fp) {
+  var global = loadScopes();
+  var sel = fp.scopes || [];
+  var customs = fp.customScopes || [];
+  var result = [];
+  global.forEach(function(sc){ if(sel.indexOf(sc.id)>=0) result.push(sc); });
+  customs.forEach(function(cs){ result.push({id:'custom:'+cs.name, name:cs.name, svc:cs.svc||''}); });
+  return result;
+}
+function renderScopeCheckboxes(selectedIds, customScopes) {
+  var list = document.getElementById('fpe_scopes_list');
+  if (!list) return;
+  list.innerHTML = '';
+  var global = loadScopes();
+  global.forEach(function(sc) {
+    var checked = selectedIds.indexOf(sc.id) >= 0;
+    var row = document.createElement('div');
+    row.className = 'scope-row';
+    row.innerHTML = '<label><input type="checkbox" value="'+sc.id+'" '+(checked?'checked':'')+'> '+sc.name+' <span class="svc-tag">'+sc.svc+'</span></label>';
+    list.appendChild(row);
+  });
+  (customScopes||[]).forEach(function(cs) {
+    var row = document.createElement('div');
+    row.className = 'scope-row';
+    row.innerHTML = '<label><input type="checkbox" value="custom:'+cs.name+'" checked> '+cs.name+' <span class="svc-tag">'+(cs.svc||'custom')+'</span></label>'
+      +'<span class="del-scope" onclick="this.parentElement.remove()">&#10005;</span>';
+    list.appendChild(row);
+  });
+}
+function addCustomScope() {
+  var inp = document.getElementById('fpe_custom_scope');
+  var val = (inp.value||'').trim();
+  if (!val) return;
+  var list = document.getElementById('fpe_scopes_list');
+  var row = document.createElement('div');
+  row.className = 'scope-row';
+  row.innerHTML = '<label><input type="checkbox" value="custom:'+val+'" checked> '+val+' <span class="svc-tag">custom</span></label>'
+    +'<span class="del-scope" onclick="this.parentElement.remove()">&#10005;</span>';
+  list.appendChild(row);
+  inp.value = '';
+}
+
+function saveFpFromModal() {
+  var propId = document.getElementById('fpe_prop_id').value;
+  var fpId   = document.getElementById('fpe_fp_id').value;
+  var name   = (document.getElementById('fpe_name').value||'').trim();
+  if (!name) { var e=document.getElementById('fpe_err'); e.textContent='Plan name is required.'; e.style.display='block'; return; }
+  // Collect selected scopes
+  var globalScopes = [], customScopes = [];
+  document.querySelectorAll('#fpe_scopes_list input[type=checkbox]:checked').forEach(function(cb) {
+    var v = cb.value;
+    if (v.startsWith('custom:')) {
+      customScopes.push({name: v.slice(7), svc:''});
+    } else {
+      globalScopes.push(v);
+    }
+  });
+  var fps = loadFpForProp(propId);
+  var isNew = !fpId;
+  if (isNew) fpId = propId.replace('prop-','') + '-' + Date.now().toString(36).toUpperCase();
+  var obj = {
+    id: fpId,
+    name: name,
+    sqft: (document.getElementById('fpe_sqft').value||'').trim(),
+    beds: parseInt(document.getElementById('fpe_beds').value)||0,
+    baths: parseFloat(document.getElementById('fpe_baths').value)||1,
+    unitCount: parseInt(document.getElementById('fpe_units').value)||0,
+    renovated: document.getElementById('fpe_renov').value === 'true',
+    rooms: _fpeRooms.slice(),
+    images: {
+      floorPlan: _fpeImages.floorPlan ? {src:_fpeImages.floorPlan.src, name:_fpeImages.floorPlan.name} : null,
+      seam:      _fpeImages.seam      ? {src:_fpeImages.seam.src,      name:_fpeImages.seam.name}      : null,
+      cutSheet:  _fpeImages.cutSheet  ? {src:_fpeImages.cutSheet.src,  name:_fpeImages.cutSheet.name}  : null
+    },
+    scopes: globalScopes,
+    customScopes: customScopes,
+    status: 'active'
+  };
+  if (isNew) {
+    fps.push(obj);
+  } else {
+    fps = fps.map(function(fp){ return fp.id===fpId ? obj : fp; });
+  }
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+  closeM('mfpe');
+  renderPropList();
+  toast(isNew ? 'Floor plan added.' : 'Floor plan updated.');
+}
+function deleteFpFromModal() {
+  var propId = document.getElementById('fpe_prop_id').value;
+  var fpId   = document.getElementById('fpe_fp_id').value;
+  if (!fpId) return;
+  if (!confirm('Delete this floor plan? This cannot be undone.')) return;
+  var fps = loadFpForProp(propId).filter(function(fp){ return fp.id!==fpId; });
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+  closeM('mfpe');
+  renderPropList();
+  toast('Floor plan deleted.');
+}
+
+// ── GLOBAL SCOPE MANAGER (Settings panel) ──
+function renderScopeAdmin() {
+  var list = document.getElementById('scope_list_admin');
+  if (!list) return;
+  var scopes = loadScopes();
+  list.innerHTML = '';
+  scopes.forEach(function(sc, i) {
+    var row = document.createElement('div');
+    row.className = 'scope-row';
+    row.innerHTML = '<span style="flex:1;font-size:13px;font-weight:500;">'+sc.name
+      +'<span class="svc-tag">'+sc.svc+'</span></span>'
+      +'<span class="del-scope" data-sid="'+sc.id+'" onclick="delScopeClick(this)">&#10005; Remove</span>';
+    list.appendChild(row);
+  });
+}
+function addGlobalScope() {
+  var name = (document.getElementById('scope_new_name').value||'').trim();
+  var svc  = document.getElementById('scope_new_svc').value||'';
+  if (!name) { toast('Please enter a scope name.'); return; }
+  var scopes = loadScopes();
+  scopes.push({id:'sc_'+Date.now().toString(36), name:name, svc:svc});
+  saveScopes(scopes);
+  document.getElementById('scope_new_name').value = '';
+  renderScopeAdmin();
+  toast('Scope added to global library.');
+}
+function deleteGlobalScope(id) {
+  if (!confirm('Remove this scope from the global library?')) return;
+  var scopes = loadScopes().filter(function(sc){ return sc.id!==id; });
+  saveScopes(scopes);
+  renderScopeAdmin();
+  toast('Scope removed.');
+}
+
+// Wire openM for madd to use new function
+function openAddPropertyBtn() { openAddPropModal(); }
+
+// Patch legacy openAddFp / openEditFp calls embedded in old HTML
+function openAddFp() {
+  toast('Use the "+ Add Floor Plan" button inside a property card.');
+}
+function openEditFp(id) {
+  toast('Use the "Edit" button inside a property card.');
+}
+
+
 
 // ── AUTH ──
 var currentUser = null;
@@ -1305,6 +2037,27 @@ function doLogin() {
   go('cl');
 }
 // demoLogin removed - login screen has no demo buttons
+
+// Data-attribute click handlers (avoid escaping issues in dynamic HTML)
+function delScopeClick(btn) {
+  deleteGlobalScope(btn.getAttribute('data-sid'));
+}
+function fpDocClick(btn) {
+  var propId = btn.getAttribute('data-prop');
+  var fpId   = btn.getAttribute('data-fp');
+  var slot   = btn.getAttribute('data-slot');
+  openFpDoc(propId, fpId, slot);
+}
+function editFpClick(btn) {
+  var propId = btn.getAttribute('data-prop');
+  var fpId   = btn.getAttribute('data-fp');
+  openEditFpForProp(propId, fpId);
+}
+function addFpClick(btn) {
+  var propId = btn.getAttribute('data-prop');
+  openAddFpForProp(propId);
+}
+
 function goClientPortalFromChooser() {
   // Admin/team users going to client portal view - use first client account or a generic view
   var clients = getUsers();
@@ -1365,8 +2118,9 @@ function buildFloorPlansPage(user) {
   title.textContent = user.props.join(' / ');
   grid.innerHTML = '';
   user.props.forEach(function(pname) {
-    var pid = pname.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-    var fps = (typeof getFpData === 'function') ? getFpData(pid) : (fpByProp[pid] || []);
+    var matchedProp = null;
+    getActiveProps().forEach(function(pr){ if(pr.name===pname) matchedProp=pr; });
+    var fps = matchedProp ? loadFpForProp(matchedProp.id) : [];
     fps.forEach(function(fp) {
       // Support both rich objects (from getFpData) and legacy fpDetails lookup
       var det = fpDetails[fp.id] || {};
@@ -1401,7 +2155,7 @@ function updatePropFloorPlans(propId) {
   document.getElementById('fppreview').style.display = 'none';
   document.getElementById('presetzone').style.display = 'none';
   if (!propId) return;
-  var fps = fpByProp[propId] || [];
+  var fps = loadFpForProp(propId);
   fps.forEach(function(fp) {
     var opt = document.createElement('option');
     opt.value = fp.id;
@@ -1446,6 +2200,8 @@ function cnav(pid, el) {
   document.getElementById('ctitle').textContent = titles[pid] || pid;
 }
 function anav(pid, el) {
+  if (pid==='aprops') renderPropList();
+  if (pid==='aset') renderScopeAdmin();
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
   if (el) el.classList.add('on');
   document.querySelectorAll('#ad .panel').forEach(function(p){ p.classList.remove('on'); });
@@ -1454,7 +2210,7 @@ function anav(pid, el) {
   var titles = {adash:'Admin Dashboard',aord:'All Orders',aprops:'Properties',ausers:'Client Logins',aset:'Portal Settings'};
   if (pid === 'ausers') renderUserTable();
   if (pid === 'ateam') renderTeamTable();
-  if (pid === 'afloorplans') { renderAdminFpPropSelector(); renderAdminFpTable(); }
+  // floor plans now live inside property cards
   document.getElementById('atitle').textContent = titles[pid] || pid;
 }
 
@@ -1684,84 +2440,7 @@ function saveFp() {
 
 // ── FLOOR PLAN ADMIN MANAGEMENT ──
 
-// Returns prop-keyed floor plan data from localStorage (falls back to built-in fpByProp/fpDetails)
-function getFpData(propKey) {
-  try {
-    var stored = localStorage.getItem('pf_fp_' + propKey);
-    if (stored) return JSON.parse(stored);
-  } catch(e) {}
-  // Build from built-in data
-  var list = fpByProp[propKey] || [];
-  return list.map(function(fp) {
-    var det = fpDetails[fp.id] || {};
-    return {
-      id: fp.id,
-      name: fp.name,
-      sqft: fp.sqft,
-      beds: det.beds || 0,
-      baths: det.baths || 1,
-      rooms: det.rooms || [],
-      renovated: det.renovated || false
-    };
-  });
-}
 
-function saveFpData(propKey, arr) {
-  try { localStorage.setItem('pf_fp_' + propKey, JSON.stringify(arr)); } catch(e) {}
-  // Also refresh the in-memory fpByProp and fpDetails so client portal sees it immediately
-  fpByProp[propKey] = arr.map(function(fp) {
-    return {id: fp.id, name: fp.name, sqft: fp.sqft};
-  });
-  arr.forEach(function(fp) {
-    fpDetails[fp.id] = {name: fp.name, sqft: fp.sqft + ' sq ft', beds: fp.beds, baths: fp.baths, rooms: fp.rooms, renovated: fp.renovated};
-  });
-}
-
-function renderAdminFpPropSelector() {
-  var sel = document.getElementById('afp_propsel');
-  if (!sel) return;
-  // Build options from all known properties (fpByProp keys + any in localStorage)
-  var keys = Object.keys(fpByProp);
-  // Also add any extra props from client users
-  try {
-    var clients = getUsers();
-    clients.forEach(function(u) {
-      (u.props||[]).forEach(function(pname) {
-        var pid = pname.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-        if (keys.indexOf(pid) < 0) keys.push(pid);
-      });
-    });
-  } catch(e) {}
-  sel.innerHTML = keys.map(function(k) {
-    var label = k.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
-    return '<option value="'+k+'">'+label+'</option>';
-  }).join('');
-}
-
-function renderAdminFpTable() {
-  renderAdminFpPropSelector();
-  var propKey = document.getElementById('afp_propsel').value;
-  var fps = getFpData(propKey);
-  var tb = document.getElementById('afpTbody');
-  if (!tb) return;
-  if (!fps.length) {
-    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:32px;">No floor plans found for this property.</td></tr>';
-    return;
-  }
-  tb.innerHTML = fps.map(function(fp, i) {
-    var bedLabel = fp.beds === 0 ? 'Studio' : fp.beds + ' Bed';
-    var renovBadge = fp.renovated ? ' <span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;">RENOV</span>' : '';
-    return '<tr>'
-      + '<td><strong>' + fp.name + '</strong>' + renovBadge + '</td>'
-      + '<td>' + bedLabel + ' / ' + fp.baths + ' Bath</td>'
-      + '<td>' + fp.sqft + ' sq ft</td>'
-      + '<td>' + (fp.beds === 0 ? '—' : fp.beds) + '</td>'
-      + '<td>' + fp.baths + '</td>'
-      + '<td style="font-size:11px;color:var(--gray);">' + (fp.rooms || []).slice(0,4).join(', ') + (fp.rooms.length > 4 ? '…' : '') + '</td>'
-      + '<td><button class="bs ol" onclick="openEditFloorPlan(' + i + ')">Edit</button></td>'
-      + '</tr>';
-  }).join('');
-}
 
 function openAddFloorPlan() {
   var propKey = document.getElementById('afp_propsel').value;
