@@ -754,6 +754,11 @@ table.fpt tr:hover td{background:var(--cream);}
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
           <h2 style="margin:0;" id="adash_table_title">New Orders — Action Required</h2>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select class="fs" id="adash_hub" onchange="switchDashTab(_dashTab)" style="min-width:130px;">
+              <option value="">All Hubs</option>
+              <option value="Memphis">Memphis</option>
+              <option value="Nashville">Nashville</option>
+            </select>
             <div style="display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
               <button id="tab_recent" class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
               <button id="tab_today"  class="tab-toggle"    onclick="switchDashTab('today')">Today's Installs</button>
@@ -773,21 +778,45 @@ table.fpt tr:hover td{background:var(--cream);}
 
       <!-- ADMIN ALL ORDERS -->
       <div class="panel" id="aord">
-        <div class="fb">
-          <div class="sw"><span class="si2">&#128269;</span><input type="text" placeholder="Search orders..."></div>
-          <select class="fs"><option>All Properties</option><option>Cherry Creek Apartments</option><option>Riverside Apartments</option><option>Parkview Commons</option><option>Arbor Ridge Nashville</option></select>
-          <select class="fs"><option>All Statuses</option><option>Requested</option><option>Scheduled</option><option>In Progress</option><option>Completed</option></select>
-          <select class="fs"><option>All Hubs</option><option>Memphis Hub</option><option>Nashville Hub</option></select>
+        <div class="shd" style="margin-bottom:16px;">
+          <h2>All Orders</h2>
+          <span id="aord_count" style="font-size:13px;color:var(--gray);font-weight:400;margin-left:8px;"></span>
+        </div>
+        <div class="fb" style="flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <div class="sw" style="min-width:200px;flex:1;">
+            <span class="si2">&#128269;</span>
+            <input type="text" id="aord_search" placeholder="Search by WO#, property, unit, service..." oninput="renderAdminOrders()">
+          </div>
+          <select class="fs" id="aord_prop" onchange="renderAdminOrders()">
+            <option value="">All Properties</option>
+          </select>
+          <select class="fs" id="aord_status" onchange="renderAdminOrders()">
+            <option value="">All Statuses</option>
+            <option value="requested">Requested</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="vd">Void</option>
+          </select>
+          <select class="fs" id="aord_hub" onchange="renderAdminOrders()">
+            <option value="">All Hubs</option>
+            <option value="Memphis">Memphis</option>
+            <option value="Nashville">Nashville</option>
+          </select>
+          <select class="fs" id="aord_sort" onchange="renderAdminOrders()">
+            <option value="newest">Newest First</option>
+            <option value="date">By Install Date</option>
+            <option value="property">By Property</option>
+            <option value="status">By Status</option>
+            <option value="service">By Service</option>
+          </select>
         </div>
         <div class="tw"><table>
-          <thead><tr><th>Work Order</th><th>Property</th><th>Hub</th><th>Unit</th><th>Service</th><th>Requested</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            <tr onclick="oworder('CC-001')"><td><strong>#WO-CC-001</strong></td><td>Cherry Creek Apts</td><td><span class="b nv">Nashville</span></td><td>214</td><td>Carpet Install</td><td>Feb 20</td><td><span class="b sc">Scheduled</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-001')">View</button></td></tr>
-            <tr onclick="oworder('CC-002')"><td><strong>#WO-CC-002</strong></td><td>Cherry Creek Apts</td><td><span class="b nv">Nashville</span></td><td>108</td><td>Sheet Vinyl</td><td>Feb 18</td><td><span class="b rq">Requested</span></td><td><div style="display:flex;gap:5px;"><button class="bs ol" onclick="event.stopPropagation();oworder('CC-002')">View</button><button class="bs gd" onclick="event.stopPropagation();openConfirm('CC-002')">Confirm</button></div></td></tr>
-            <tr onclick="oworder('2414')"><td><strong>#WO-2414</strong></td><td>Parkview Commons</td><td><span class="b mp">Memphis</span></td><td>08B</td><td>Carpet+Pet Seal</td><td>Mar 3</td><td><span class="b rq">Requested</span></td><td><div style="display:flex;gap:5px;"><button class="bs ol" onclick="event.stopPropagation();oworder('2414')">View</button><button class="bs gd" onclick="event.stopPropagation();openConfirm('2414')">Confirm</button></div></td></tr>
-            <tr onclick="oworder('2411')"><td><strong>#WO-2411</strong></td><td>Riverside Apts</td><td><span class="b mp">Memphis</span></td><td>204</td><td>LVP</td><td>Feb 28</td><td><span class="b sc">Scheduled</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('2411')">View</button></td></tr>
-            <tr onclick="oworder('CC-003')"><td><strong>#WO-CC-003</strong></td><td>Cherry Creek Apts</td><td><span class="b nv">Nashville</span></td><td>301</td><td>LVP Full Unit</td><td>Feb 10</td><td><span class="b cp">Completed</span></td><td><button class="bs ol" onclick="event.stopPropagation();oworder('CC-003')">View</button></td></tr>
-          </tbody>
+          <thead><tr>
+            <th>Work Order</th><th>Property</th><th>Hub</th><th>Unit</th>
+            <th>Service</th><th>Requested</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="aord_tbody"></tbody>
         </table></div>
       </div>
 
@@ -796,7 +825,7 @@ table.fpt tr:hover td{background:var(--cream);}
         <div class="shd"><h2>Properties</h2>
           <div style="display:flex;gap:8px;">
             <button class="bs ol" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*="co"]'));},150);">&#128221; Place Order</button>
-            <button class="bs gd" onclick="openM('madd')">+ Add Property</button>
+            <button class="bs gd" onclick="openAddPropModal()">+ Add Property</button>
           </div></div>
         <div class="fb" style="margin-bottom:16px;">
           <div class="sw" style="max-width:400px;"><span class="si2">&#128269;</span><input type="text" id="psearch" placeholder="Search by name, city, or zip..." oninput="filterProps()"></div>
@@ -1161,23 +1190,23 @@ table.fpt tr:hover td{background:var(--cream);}
         <div class="img-slots">
 
           <!-- Slot 1: Floor Plan -->
-          <div class="img-slot" id="slot_floorplan">
+          <div class="img-slot" id="slot_floorPlan">
             <div class="img-slot-hd">
               <div class="img-slot-label">&#127760; Floor Plan</div>
               <div style="display:flex;gap:6px;">
-                <button class="bs ol img-slot-print" onclick="printSlot('floorplan')" style="display:none;">&#128438; Print</button>
-                <button class="bs dn img-slot-clear" onclick="clearSlot('floorplan')" style="display:none;">&#10005; Remove</button>
+                <button class="bs ol img-slot-print" onclick="printSlot('floorPlan')" style="display:none;">&#128438; Print</button>
+                <button class="bs dn img-slot-clear" onclick="clearSlot('floorPlan')" style="display:none;">&#10005; Remove</button>
               </div>
             </div>
-            <div class="img-slot-drop" id="drop_floorplan" onclick="triggerSlotUpload('floorplan')">
+            <div class="img-slot-drop" id="drop_floorPlan" onclick="triggerSlotUpload('floorPlan')">
               <div class="img-slot-icon">&#127760;</div>
               <div class="img-slot-hint">Click to upload floor plan image</div>
             </div>
-            <div class="img-slot-preview" id="prev_floorplan" style="display:none;">
-              <img id="img_floorplan" src="" alt="Floor Plan">
-              <div class="img-slot-fname" id="fname_floorplan"></div>
+            <div class="img-slot-preview" id="prev_floorPlan" style="display:none;">
+              <img id="img_floorPlan" src="" alt="Floor Plan">
+              <div class="img-slot-fname" id="fname_floorPlan"></div>
             </div>
-            <input type="file" id="file_floorplan" accept="image/*,.pdf" style="display:none;" onchange="handleSlotUpload('floorplan',this)">
+            <input type="file" id="file_floorPlan" accept="image/*,.pdf" style="display:none;" onchange="handleSlotUpload('floorPlan',this)">
           </div>
 
           <!-- Slot 2: Seam Diagram -->
@@ -1201,23 +1230,23 @@ table.fpt tr:hover td{background:var(--cream);}
           </div>
 
           <!-- Slot 3: Cut Sheet -->
-          <div class="img-slot" id="slot_cutsheet">
+          <div class="img-slot" id="slot_cutSheet">
             <div class="img-slot-hd">
               <div class="img-slot-label">&#9986; Cut Sheet</div>
               <div style="display:flex;gap:6px;">
-                <button class="bs ol img-slot-print" onclick="printSlot('cutsheet')" style="display:none;">&#128438; Print</button>
-                <button class="bs dn img-slot-clear" onclick="clearSlot('cutsheet')" style="display:none;">&#10005; Remove</button>
+                <button class="bs ol img-slot-print" onclick="printSlot('cutSheet')" style="display:none;">&#128438; Print</button>
+                <button class="bs dn img-slot-clear" onclick="clearSlot('cutSheet')" style="display:none;">&#10005; Remove</button>
               </div>
             </div>
-            <div class="img-slot-drop" id="drop_cutsheet" onclick="triggerSlotUpload('cutsheet')">
+            <div class="img-slot-drop" id="drop_cutSheet" onclick="triggerSlotUpload('cutSheet')">
               <div class="img-slot-icon">&#9986;</div>
               <div class="img-slot-hint">Click to upload cut sheet</div>
             </div>
-            <div class="img-slot-preview" id="prev_cutsheet" style="display:none;">
-              <img id="img_cutsheet" src="" alt="Cut Sheet">
-              <div class="img-slot-fname" id="fname_cutsheet"></div>
+            <div class="img-slot-preview" id="prev_cutSheet" style="display:none;">
+              <img id="img_cutSheet" src="" alt="Cut Sheet">
+              <div class="img-slot-fname" id="fname_cutSheet"></div>
             </div>
-            <input type="file" id="file_cutsheet" accept="image/*,.pdf" style="display:none;" onchange="handleSlotUpload('cutsheet',this)">
+            <input type="file" id="file_cutSheet" accept="image/*,.pdf" style="display:none;" onchange="handleSlotUpload('cutSheet',this)">
           </div>
 
         </div><!-- .img-slots -->
@@ -1769,6 +1798,28 @@ function openAddPropModal() {
   document.getElementById('madd_fp_section').style.display = 'none';
   openM('madd');
 }
+function openAddPropModal() {
+  document.getElementById('madd_id').value = '';
+  document.getElementById('madd_title').textContent = 'Add New Property';
+  document.getElementById('madd_name').value = '';
+  document.getElementById('madd_mgmt').value = '';
+  document.getElementById('madd_web').value = '';
+  document.getElementById('madd_addr').value = '';
+  document.getElementById('madd_city').value = '';
+  document.getElementById('madd_state').value = 'TN';
+  document.getElementById('madd_zip').value = '';
+  document.getElementById('madd_phone').value = '';
+  document.getElementById('madd_email').value = '';
+  document.getElementById('madd_units').value = '';
+  document.getElementById('madd_hub').value = 'memphis';
+  document.getElementById('madd_status').value = 'active';
+  document.getElementById('madd_notes').value = '';
+  document.getElementById('madd_url').value = '';
+  document.getElementById('madd_err').style.display = 'none';
+  document.getElementById('madd_fp_section').style.display = 'none';
+  openM('madd');
+}
+
 function openEditProp(propId) {
   var props = getActiveProps();
   var prop = null;
@@ -2647,32 +2698,80 @@ function confirmVoidOrder() {
 }
 
 function renderAdminOrders() {
-  // Refresh the admin All Orders table with current orders including void status
-  var tbody = document.querySelector('#aord .tw tbody');
+  var tbody = document.getElementById('aord_tbody');
   if (!tbody) return;
-  var rows = '';
-  Object.keys(orders).forEach(function(id) {
+
+  // Populate property dropdown (always refresh)
+  var propSel = document.getElementById('aord_prop');
+  if (propSel) {
+    var curPropVal = propSel.value;
+    propSel.innerHTML = '<option value="">All Properties</option>';
+    var seen = {};
+    Object.keys(orders).forEach(function(id){ seen[orders[id].property] = 1; });
+    Object.keys(seen).sort().forEach(function(pn){
+      var o2 = document.createElement('option'); o2.value = pn; o2.textContent = pn;
+      propSel.appendChild(o2);
+    });
+    propSel.value = curPropVal;
+  }
+
+  var q    = (document.getElementById('aord_search') ||{value:''}).value.trim().toLowerCase();
+  var prop = (document.getElementById('aord_prop')   ||{value:''}).value;
+  var st   = (document.getElementById('aord_status') ||{value:''}).value;
+  var hub  = (document.getElementById('aord_hub')    ||{value:''}).value;
+  var srt  = (document.getElementById('aord_sort')   ||{value:'newest'}).value;
+
+  var ids = Object.keys(orders).filter(function(id){
     var o = orders[id];
-    var hub = o.hub === 'Nashville' ? '<span class="b nv">Nashville</span>' : '<span class="b mp">Memphis</span>';
-    var statusBadge = '<span class="b ' + o.status + '">' + (slab[o.status] || o.status) + '</span>';
-    var voidInfo = o.status === 'vd'
-      ? ' <div style="font-size:11px;color:#7f1d1d;margin-top:3px;">Reason: ' + (o.voidReason||'') + '</div>'
-      : '';
-    var actions = o.status === 'vd'
-      ? '<button class="bs ol" onclick="event.stopPropagation();oworder(\'' + id + '\')" >View</button>'
-      : '<button class="bs ol" onclick="event.stopPropagation();oworder(\'' + id + '\')" >View</button>'
-        + (o.status === 'requested' ? '<button class="bs gd" onclick="event.stopPropagation();openConfirm(\'' + id + '\')" >Confirm</button>' : '')
-        + (o.status !== 'vd' ? '<button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\'' + id + '\')" >Void</button>' : '');
-    rows += '<tr onclick="oworder(\'' + id + '\')">'
-      + '<td><strong>#' + o.num + '</strong>' + voidInfo + '</td>'
-      + '<td>' + o.property + '</td>'
-      + '<td>' + hub + '</td>'
-      + '<td>' + o.unit + '</td>'
-      + '<td>' + o.service + '</td>'
-      + '<td>' + o.reqDate + '</td>'
-      + '<td>' + statusBadge + '</td>'
-      + '<td><div style="display:flex;gap:5px;">' + actions + '</div></td>'
-      + '</tr>';
+    if (prop && o.property !== prop) return false;
+    if (st   && o.status   !== st)   return false;
+    if (hub  && (o.hub||'') !== hub) return false;
+    if (q) {
+      var hay = (o.num+' '+o.property+' '+o.unit+' '+o.service+' '+(o.plan||'')).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+
+  ids.sort(function(a,b){
+    var oa=orders[a], ob=orders[b];
+    if (srt==='property') return (oa.property||'').localeCompare(ob.property||'');
+    if (srt==='status')   return (oa.status||'').localeCompare(ob.status||'');
+    if (srt==='service')  return (oa.service||'').localeCompare(ob.service||'');
+    if (srt==='date')     return (oa.reqDate||'').localeCompare(ob.reqDate||'');
+    // newest: timestamp-keyed orders first
+    var aTs=a.indexOf('WO-')===0, bTs=b.indexOf('WO-')===0;
+    if (aTs && !bTs) return -1; if (!aTs && bTs) return 1;
+    return b > a ? 1 : -1;
+  });
+
+  var countEl = document.getElementById('aord_count');
+  if (countEl) countEl.textContent = ids.length + ' order' + (ids.length===1?'':'s');
+
+  var rows = '';
+  ids.forEach(function(id){
+    var o = orders[id];
+    var hubBadge = (o.hub||'')===('Nashville')
+      ? '<span class="b nv">Nashville</span>'
+      : '<span class="b mp">Memphis</span>';
+    var sb = '<span class="b '+o.status+'">'+(slab[o.status]||o.status)+'</span>';
+    var voidNote = o.status==='vd'
+      ? '<div style="font-size:11px;color:#7f1d1d;margin-top:2px;">'+( o.voidReason||'')+'</div>' : '';
+    var view = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
+    var conf = o.status==='requested'
+      ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">Confirm</button>' : '';
+    var vd   = (o.status!=='vd'&&o.status!=='completed')
+      ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
+    rows += '<tr onclick="oworder(\''+id+'\')">'
+      +'<td><strong>#'+o.num+'</strong>'+voidNote+'</td>'
+      +'<td>'+o.property+'</td>'
+      +'<td>'+hubBadge+'</td>'
+      +'<td>'+o.unit+'</td>'
+      +'<td>'+o.service+'</td>'
+      +'<td>'+fmtDate(o.reqDate)+'</td>'
+      +'<td>'+sb+'</td>'
+      +'<td><div style="display:flex;gap:4px;">'+view+conf+vd+'</div></td>'
+      +'</tr>';
   });
   tbody.innerHTML = rows || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:32px;">No orders found.</td></tr>';
 }
@@ -2722,6 +2821,7 @@ function statusBadge(status) {
 function renderAdashRecent() {
   var tbody = document.getElementById('adash_recent_tbody');
   if (!tbody) return;
+  var adashHub = (document.getElementById('adash_hub')||{value:''}).value;
   var rows = Object.keys(orders)
     .sort(function(a,b){
       var oa=orders[a], ob=orders[b];
@@ -2730,7 +2830,11 @@ function renderAdashRecent() {
       if (ob.status==='requested' && oa.status!=='requested') return 1;
       return 0;
     })
-    .slice(0, 10); // most recent 10
+    .filter(function(id){
+      if (!adashHub) return true;
+      return (orders[id].hub||'')=== adashHub;
+    })
+    .slice(0, 10);
   var html = '';
   rows.forEach(function(id) {
     var o = orders[id];
@@ -2755,25 +2859,27 @@ function renderAdashRecent() {
 function renderAdashToday() {
   var tbody = document.getElementById('adash_today_tbody');
   if (!tbody) return;
+  var adashHub = (document.getElementById('adash_hub')||{value:''}).value;
   var today = todayStr();
   var html = '';
   Object.keys(orders).forEach(function(id) {
     var o = orders[id];
     if (o.reqDate !== today) return;
-    var hub = o.hub==='Nashville'
+    if (adashHub && (o.hub||'') !== adashHub) return;
+    var hub = (o.hub||'')==='Nashville'
       ? '<span class="b nv">Nashville</span>'
       : '<span class="b mp">Memphis</span>';
-    html += '<tr onclick="oworder(\''+id+'\')">'
-      +'<td><strong>#'+o.num+'</strong></td>'
-      +'<td>'+o.property+'</td>'
-      +'<td>'+hub+'</td>'
-      +'<td>'+o.unit+'</td>'
-      +'<td>'+o.service+'</td>'
-      +'<td>'+o.reqDate+'</td>'
-      +'<td>'+o.occ+'</td>'
-      +'<td>'+statusBadge(o.status)+'</td>'
-      +'<td>'+orderActionBtns(id,o)+'</td>'
-      +'</tr>';
+    html += '<tr onclick="oworder(\''+id+'\')">'+
+      '<td><strong>#'+o.num+'</strong></td>'+
+      '<td>'+o.property+'</td>'+
+      '<td>'+hub+'</td>'+
+      '<td>'+o.unit+'</td>'+
+      '<td>'+o.service+'</td>'+
+      '<td>'+o.reqDate+'</td>'+
+      '<td>'+o.occ+'</td>'+
+      '<td>'+statusBadge(o.status)+'</td>'+
+      '<td>'+orderActionBtns(id,o)+'</td>'+
+      '</tr>';
   });
   tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:24px;">No installs scheduled for today.</td></tr>';
 }
@@ -2850,9 +2956,11 @@ function renderClientHistory() {
     return b > a ? 1 : -1;
   });
 
-  // Populate property dropdown dynamically
+  // Populate property dropdown (always refresh)
   var propSel = document.getElementById('ch_prop_filter');
-  if (propSel && propSel.options.length <= 1) {
+  if (propSel) {
+    var curVal = propSel.value;
+    propSel.innerHTML = '<option value="">All Properties</option>';
     var seen = {};
     Object.keys(orders).forEach(function(id){ seen[orders[id].property] = 1; });
     Object.keys(seen).sort().forEach(function(pn){
@@ -2860,6 +2968,7 @@ function renderClientHistory() {
       opt.value = pn; opt.textContent = pn;
       propSel.appendChild(opt);
     });
+    propSel.value = curVal;
   }
 
   var html = '';
@@ -2885,6 +2994,7 @@ function refreshAllOrderViews() {
   renderClientDash();
   renderClientHistory();
   renderAdashRecent();
+  renderAdminOrders();
   if (_dashTab === 'today') renderAdashToday();
 }
 
@@ -3236,6 +3346,7 @@ function cnav(pid, el) {
 }
 function anav(pid, el) {
   if (pid==='adash') renderAdashRecent();
+  if (pid==='aord')  renderAdminOrders();
   if (pid==='aprops') renderPropList();
   if (pid==='aset') renderScopeAdmin();
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
@@ -3287,8 +3398,15 @@ function oworder(id) {
   document.getElementById('woprint').innerHTML =
     '<div class="ppbar"><span>Work Order Preview -- #'+o.num+'</span></div>'+
     '<div class="wod">'+
-      '<div class="woh"><div><img src="'+logo+'" style="height:48px;width:auto;margin-bottom:12px;"><p>Protective Services Company, Inc.<br>3846 Delp Street, Memphis, TN 38118<br>(901) 794-4101 -- info@protectiveflooring.com</p></div>'+
-      '<div class="wor"><div class="won">#'+o.num+'</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Submitted: '+o.submittedDate+'</div><div style="margin-top:10px;">'+sb+' '+hb+'</div></div></div>'+
+      '<div class="woh">'+
+      '<div><img src="'+logo+'" style="height:48px;width:auto;margin-bottom:12px;">'+
+      (o.hub==='Nashville'
+        ? '<p>Protective Services Company, Inc. dba Protective Flooring<br>808 Overton Lea Rd, Nashville, TN 37220<br>(615) 988-5188 &mdash; info@protectiveflooring.com</p>'
+        : '<p>Protective Services Company, Inc. dba Protective Flooring<br>3846 Delp Street, Memphis, TN 38118<br>(901) 794-4101 &mdash; info@protectiveflooring.com</p>'
+      )+
+      '</div>'+
+      '<div class="wor"><div class="won">#'+o.num+'</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Submitted: '+o.submittedDate+'</div><div style="margin-top:10px;">'+sb+' '+hb+'</div></div>'+
+    '</div>'+
       '<div class="wosec"><div class="wosect">Property and Unit</div><div class="wog">'+
         '<div class="wof"><div class="wofl">Property</div><div class="wofv">'+o.property+'</div></div>'+
         '<div class="wof"><div class="wofl">Unit</div><div class="wofv">Unit '+o.unit+'</div></div>'+
@@ -3520,7 +3638,11 @@ function submitOrder() {
   orders[woId] = {
     num:           woNum,
     property:      propName,
-    hub:           'Memphis',
+    hub:           (function(){
+      var _pr = null;
+      getActiveProps().forEach(function(pr){ if(pr.name===propName) _pr=pr; });
+      return _pr ? (_pr.hub==='nashville' ? 'Nashville' : 'Memphis') : 'Memphis';
+    })(),
     unit:          unitVal,
     plan:          planName,
     sqft:          '',
