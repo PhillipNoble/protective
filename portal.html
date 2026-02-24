@@ -732,39 +732,124 @@ table.fpt tr:hover td{background:var(--cream);}
       </div>
 
       <!-- ADMIN SETTINGS -->
+      <!-- PORTAL SETTINGS PANEL -->
       <div class="panel" id="aset">
-
-      <!-- PORTAL USERS PANEL -->
-      <div class="panel" id="ateam">
         <div class="shd">
-          <h2>Portal Users</h2>
-          <button class="bs gd" onclick="openAddTeamUser()">+ Add User</button>
-        </div>
-        <p style="color:var(--gray);font-size:13px;margin-bottom:24px;">Manage staff and admin accounts. Assign roles to control what each person can access.</p>
-
-        <!-- Role legend -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:8px 14px;border-radius:4px;font-size:12px;">
-            <strong style="color:#15803d;">&#128737; Super Admin</strong> &mdash; Full access: all panels, user management, settings
-          </div>
-          <div style="background:#eff6ff;border:1px solid #bfdbfe;padding:8px 14px;border-radius:4px;font-size:12px;">
-            <strong style="color:#1d4ed8;">&#128274; Admin</strong> &mdash; Orders, properties, client logins. Cannot manage portal users or settings.
-          </div>
-          <div style="background:#fefce8;border:1px solid #fde68a;padding:8px 14px;border-radius:4px;font-size:12px;">
-            <strong style="color:#854d0e;">&#128203; Staff</strong> &mdash; View orders and properties only. Read-only.
-          </div>
+          <h2>&#9881; Portal Settings</h2>
         </div>
 
-        <div class="tw"><table>
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th></th></tr></thead>
-          <tbody id="teamTbody"><!-- rendered by renderTeamTable() --></tbody>
-        </table></div>
-      </div>
+        <!-- ── GLOBAL PRESET SCOPES ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span>&#9883; Global Preset Installation Scopes</span>
+          </div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.6;">
+            These scopes appear as checkboxes inside every floor plan editor. Check the ones that apply to each plan.
+            Add property-specific scopes directly from the floor plan editor inside a property.
+          </p>
+          <div id="scope_list_admin"></div>
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="fg" style="flex:1;min-width:160px;margin-bottom:0;">
+              <label>Scope Name</label>
+              <input type="text" id="scope_new_name" placeholder="e.g. Carpet Bedrooms Only">
+            </div>
+            <div class="fg" style="min-width:180px;margin-bottom:0;">
+              <label>Service Type</label>
+              <select id="scope_new_svc">
+                <option value="">No specific service</option>
+                <option value="Carpet Installation">Carpet Installation</option>
+                <option value="Sheet Vinyl">Sheet Vinyl</option>
+                <option value="Luxury Vinyl Plank">Luxury Vinyl Plank</option>
+                <option value="Tile Installation">Tile Installation</option>
+                <option value="Subfloor Repair">Subfloor Repair</option>
+                <option value="Full Turnover Package">Full Turnover Package</option>
+              </select>
+            </div>
+            <button class="bs gd" onclick="addGlobalScope()" style="margin-bottom:0;">+ Add Scope</button>
+          </div>
+        </div>
 
-        <div class="fc"><h3>Email Notifications</h3>
-          <div class="fg"><label>Order Request Notification Email</label><input type="email" value="info@protectiveflooring.com"></div>
-          <div class="fg"><label>Scheduling Confirmation</label><select><option>Client + <template class="__cf_email__" data-cfemail="573e39313817272538233234233e2132313b3838253e39307934383a">[email&#160;protected]</template></option><option>Client Only</option></select></div>
-          <div class="fa"><button class="bl gd" onclick="toast('Settings saved.')">Save Settings</button></div>
+        <!-- ── EMAIL NOTIFICATIONS ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst">&#9993; Email Notifications</div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.6;">
+            Control where order notifications and scheduling confirmations are sent.
+          </p>
+          <div class="form-row">
+            <div class="fg">
+              <label>Order Request Notification Email</label>
+              <input type="email" id="set_notif_email" value="info@protectiveflooring.com" placeholder="info@protectiveflooring.com">
+            </div>
+            <div class="fg">
+              <label>Scheduling Confirmation Recipient</label>
+              <select id="set_conf_recip">
+                <option value="both">Client + Internal Team</option>
+                <option value="client">Client Only</option>
+                <option value="internal">Internal Team Only</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── COMPANY INFO ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst">&#127968; Company Information</div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.6;">
+            Displayed on printed work orders and client-facing documents.
+          </p>
+          <div class="form-row">
+            <div class="fg">
+              <label>Company Name</label>
+              <input type="text" id="set_co_name" value="Protective Services Company, Inc." placeholder="Company legal name">
+            </div>
+            <div class="fg">
+              <label>DBA</label>
+              <input type="text" id="set_co_dba" value="Protective Flooring" placeholder="Doing business as">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Memphis Address</label>
+              <input type="text" id="set_addr_mem" value="3846 Delp Street, Memphis, TN 38118">
+            </div>
+            <div class="fg">
+              <label>Nashville Address</label>
+              <input type="text" id="set_addr_nash" value="Nashville, TN">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Memphis Phone</label>
+              <input type="tel" id="set_ph_mem" value="(901) 794-4101">
+            </div>
+            <div class="fg">
+              <label>Nashville Phone</label>
+              <input type="tel" id="set_ph_nash" value="(615) 988-5188">
+            </div>
+            <div class="fg">
+              <label>General Email</label>
+              <input type="email" id="set_email" value="info@protectiveflooring.com">
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PORTAL BRANDING ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst">&#127775; Portal Branding</div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Portal Title</label>
+              <input type="text" id="set_portal_title" value="Protective Flooring Client Portal" placeholder="Shown in browser tab">
+            </div>
+            <div class="fg">
+              <label>Support Email (shown to clients)</label>
+              <input type="email" id="set_support_email" value="info@protectiveflooring.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="fa" style="padding-top:8px;">
+          <button class="bl gd" onclick="savePortalSettings()">&#10003; Save Settings</button>
         </div>
       </div>
 
@@ -2006,6 +2091,14 @@ function addGlobalScope() {
   renderScopeAdmin();
   toast('Scope added to global library.');
 }
+
+function savePortalSettings() {
+  // Save notification email to localStorage for use in work orders
+  var notifEmail = (document.getElementById('set_notif_email')||{value:''}).value.trim();
+  if (notifEmail) try { localStorage.setItem('pf_notif_email', notifEmail); } catch(e){}
+  toast('Settings saved.');
+}
+
 function deleteGlobalScope(id) {
   if (!confirm('Remove this scope from the global library?')) return;
   var scopes = loadScopes().filter(function(sc){ return sc.id!==id; });
