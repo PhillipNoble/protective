@@ -560,13 +560,20 @@ table.fpt tr:hover td{background:var(--cream);}
               </div>
             </div>
           </div>
-          <div id="fppreview" style="display:none;">
-            <div class="fp-card">
-              <div class="fp-card-img" id="fpcardimg">&#127760;</div>
-              <div>
-                <div style="font-size:13px;font-weight:700;color:var(--navy);" id="fpcardname"></div>
-                <div style="font-size:12px;color:var(--gray);margin-top:3px;" id="fpcardsqft"></div>
-                <div style="margin-top:8px;"><button class="fit hi" onclick="openFpImgById(document.getElementById('cplan').value)">&#127760; View Floor Plan Image</button></div>
+          <div id="fppreview" style="display:none;margin-top:16px;">
+            <div style="background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;">
+              <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+                <div class="fp-card-img" id="fpcardimg" style="flex-shrink:0;cursor:pointer;" onclick="openFpImgById(document.getElementById('cplan').value)">&#127760;</div>
+                <div style="flex:1;min-width:180px;">
+                  <div style="font-size:15px;font-weight:700;color:var(--navy);" id="fpcardname"></div>
+                  <div style="font-size:12px;color:var(--gray);margin-top:2px;" id="fpcardsqft"></div>
+                  <div style="margin-top:8px;" id="fpcardrooms"></div>
+                  <div style="margin-top:4px;" id="fpcardimg-btn"></div>
+                </div>
+              </div>
+              <div id="fpscopes-section" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:none;">
+                <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Installation Scopes for This Plan</div>
+                <div id="fpscopes-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
               </div>
             </div>
           </div>
@@ -577,13 +584,7 @@ table.fpt tr:hover td{background:var(--cream);}
         </div>
         <div class="fc">
           <h3>&#129520; Service &amp; Scope</h3>
-          <div id="presetzone" style="display:none;">
-            <div class="psec">
-              <div class="pstitle">&#9889; Quick Scope Presets</div>
-              <p style="font-size:12px;color:var(--gray);margin-bottom:12px;font-weight:300;">One-click scope shortcuts. Select a preset or choose rooms individually below.</p>
-              <div id="presetbtns" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
-            </div>
-          </div>
+          <!-- presetzone merged into fppreview above -->
           <div class="fg" style="margin-bottom:20px;"><label>Flooring Service *</label>
             <select id="csvc"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select>
           </div>
@@ -2719,38 +2720,105 @@ function updatePropFloorPlans(propId) {
   var planSel = document.getElementById('cplan');
   planSel.innerHTML = '<option value="">-- Select Floor Plan --</option>';
   document.getElementById('fppreview').style.display = 'none';
-  document.getElementById('presetzone').style.display = 'none';
   if (!propId) return;
   var fps = loadFpForProp(propId);
   fps.forEach(function(fp) {
     var opt = document.createElement('option');
     opt.value = fp.id;
-    opt.textContent = fp.name + ' (' + fp.sqft + ' sq ft)';
+    var label = fp.name;
+    if (fp.beds === 0) label += ' (Studio)';
+    else if (fp.beds) label += ' (' + fp.beds + 'bd/' + fp.baths + 'ba)';
+    if (fp.sqft) label += ' — ' + fp.sqft + ' sq ft';
+    if (fp.renovated) label += ' ★';
+    opt.textContent = label;
     planSel.appendChild(opt);
   });
 }
 function onPlanChange(fpId) {
   var prev = document.getElementById('fppreview');
-  if (!fpId) { prev.style.display = 'none'; document.getElementById('presetzone').style.display = 'none'; return; }
-  var det = fpDetails[fpId];
-  if (det) {
-    document.getElementById('fpcardname').textContent = det.name;
-    document.getElementById('fpcardsqft').textContent = det.sqft;
-    var img = document.getElementById('fpcardimg');
-    // get image from new store
-    var propSel = document.getElementById('cpropsel');
-    var propId2 = propSel ? propSel.value : '';
-    var fps2 = propId2 ? loadFpForProp(propId2) : [];
-    var fpObj = fps2.find(function(f){ return f.id===fpId; });
-    var imgSrc = fpObj && fpObj.images && fpObj.images.floorPlan && fpObj.images.floorPlan.src;
-    if (imgSrc) {
-      img.innerHTML = '<img src="'+imgSrc+'" style="width:100%;height:100%;object-fit:cover;">';
-    } else {
-      img.innerHTML = '🗺';
-    }
-    prev.style.display = 'flex';
+  if (!fpId) { prev.style.display = 'none'; return; }
+
+  // Load fp from live store
+  var propSel = document.getElementById('cpropsel');
+  var propId  = propSel ? propSel.value : '';
+  var fps     = propId ? loadFpForProp(propId) : [];
+  var fp      = fps.find(function(f){ return f.id===fpId; });
+
+  // Fallback to fpDetails for legacy plans
+  var det = fpDetails[fpId] || {};
+  var name   = (fp && fp.name)  || det.name  || fpId;
+  var beds   = fp ? fp.beds  : det.beds;
+  var baths  = fp ? fp.baths : det.baths;
+  var sqft   = fp ? fp.sqft  : det.sqft;
+  var rooms  = (fp && fp.rooms && fp.rooms.length) ? fp.rooms : (det.rooms || []);
+  var scopes = (fp && fp.scopes) ? fp.scopes : [];
+  var custom = (fp && fp.customScopes) ? fp.customScopes : [];
+
+  // Build label
+  var label = '';
+  if (beds === 0) label = 'Studio';
+  else if (beds) label = beds + ' Bed / ' + baths + ' Bath';
+  var sqftStr = sqft ? sqft + ' sq ft' : '';
+  var meta = [label, sqftStr].filter(Boolean).join(' — ');
+
+  document.getElementById('fpcardname').textContent = name + ((fp && fp.renovated) ? ' ★ Renovated' : '');
+  document.getElementById('fpcardsqft').textContent = meta;
+
+  // Rooms
+  var roomsEl = document.getElementById('fpcardrooms');
+  if (rooms.length) {
+    roomsEl.innerHTML = rooms.map(function(r){
+      return '<span class="chip" style="font-size:11px;padding:2px 8px;">' + r + '</span>';
+    }).join('');
+  } else {
+    roomsEl.innerHTML = '';
   }
-  loadPresets(fpId);
+
+  // Floor plan image
+  var imgEl    = document.getElementById('fpcardimg');
+  var imgBtnEl = document.getElementById('fpcardimg-btn');
+  var imgSrc   = fp && fp.images && fp.images.floorPlan && fp.images.floorPlan.src;
+  if (imgSrc) {
+    imgEl.innerHTML = '<img src="'+imgSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">';
+        var imgBtn = document.createElement('button');
+    imgBtn.className = 'fit hi'; imgBtn.style.fontSize = '11px';
+    imgBtn.innerHTML = '&#128506; Full View';
+    imgBtn.onclick = function(){ openFpImgById(fpId); };
+    imgBtnEl.innerHTML = ''; imgBtnEl.appendChild(imgBtn);
+  } else {
+    imgEl.innerHTML = '&#127760;';
+    imgBtnEl.innerHTML = '';
+  }
+
+  // Scopes — combine global presets assigned to this plan + custom scopes
+  var scopesEl   = document.getElementById('fpscopes-chips');
+  var scopesSec  = document.getElementById('fpscopes-section');
+  var allGlobal  = loadScopes();
+  var chips = [];
+
+  scopes.forEach(function(sid) {
+    var sc = allGlobal.find(function(s){ return s.id===sid; });
+    if (sc) chips.push({name: sc.name, svc: sc.svc});
+  });
+  custom.forEach(function(c) {
+    var nm = typeof c === 'string' ? c : c.name;
+    if (nm) chips.push({name: nm, svc: ''});
+  });
+
+  if (chips.length) {
+    scopesEl.innerHTML = chips.map(function(c){
+      return '<span class="chip" style="background:rgba(2,10,91,.08);color:var(--navy);font-size:11px;">'
+        + c.name
+        + (c.svc ? ' <span style="opacity:.6;font-weight:400;">(' + c.svc + ')</span>' : '')
+        + '</span>';
+    }).join('');
+    scopesSec.style.display = 'block';
+  } else {
+    scopesEl.innerHTML = '';
+    scopesSec.style.display = 'none';
+  }
+
+  prev.style.display = 'block';
 }
 function openFpImgById(fpId) {
   if (fpId) openFpImg(fpId);
@@ -2926,18 +2994,7 @@ function openEditFp(id) { document.getElementById('fpetitle').textContent='Edit 
 function openAddFp() { document.getElementById('fpetitle').textContent='Add Floor Plan'; openM('mfpe'); }
 
 // ── PRESETS ──
-function loadPresets(key) {
-  var zone=document.getElementById('presetzone'),btns=document.getElementById('presetbtns');
-  if(!key||!planPresets[key]){zone.style.display='none';return;}
-  btns.innerHTML='';
-  planPresets[key].forEach(function(p) {
-    var b=document.createElement('button');
-    b.type='button';b.className='pqb';b.textContent=p.name;
-    b.onclick=function(){applyPreset(b,p);};
-    btns.appendChild(b);
-  });
-  zone.style.display='block';
-}
+function loadPresets(key) { /* merged into onPlanChange */ }
 function applyPreset(btn,p) {
   document.querySelectorAll('.pqb').forEach(function(b){b.classList.remove('ap');});
   btn.classList.add('ap');
