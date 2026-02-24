@@ -357,7 +357,18 @@ table.fpt tr:hover td{background:var(--cream);}
 .img-slot-fname{font-size:10px;color:var(--gray);margin-top:6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* ── SCOPE CHECKBOXES ── */
-.scope-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--border);border-radius:3px;margin-bottom:6px;transition:background .15s;}
+.scope-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:3px;margin-bottom:6px;transition:background .15s;background:var(--white);}
+.scope-row:hover{background:var(--cream);}
+.scope-row.dragging{opacity:.4;border-style:dashed;}
+.scope-row.drag-over{border-color:var(--navy);background:rgba(2,10,91,.05);}
+.drag-handle{cursor:grab;color:var(--gray);font-size:16px;padding:0 4px;user-select:none;flex-shrink:0;}
+.drag-handle:active{cursor:grabbing;}
+.scope-edit-fields{display:none;flex:1;gap:8px;align-items:center;}
+.scope-edit-fields.open{display:flex;}
+.scope-edit-fields input,.scope-edit-fields select{font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:3px;background:var(--white);}
+.scope-edit-fields input{flex:1;min-width:100px;}
+.scope-name-display{flex:1;font-size:13px;font-weight:500;}
+.scope-name-display.hidden{display:none;}
 .scope-row:hover{background:var(--cream);}
 .scope-row label{display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;flex:1;}
 .scope-row .svc-tag{font-size:10px;color:var(--gray);background:var(--cream);border:1px solid var(--border);padding:1px 6px;border-radius:10px;margin-left:4px;}
@@ -2074,14 +2085,101 @@ function renderScopeAdmin() {
   if (!list) return;
   var scopes = loadScopes();
   list.innerHTML = '';
-  scopes.forEach(function(sc, i) {
+  var SVC_OPTS = ['','Carpet Installation','Sheet Vinyl','Luxury Vinyl Plank','Tile Installation','Subfloor Repair','Full Turnover Package'];
+
+  scopes.forEach(function(sc) {
     var row = document.createElement('div');
     row.className = 'scope-row';
-    row.innerHTML = '<span style="flex:1;font-size:13px;font-weight:500;">'+sc.name
-      +'<span class="svc-tag">'+sc.svc+'</span></span>'
-      +'<span class="del-scope" data-sid="'+sc.id+'" onclick="delScopeClick(this)">&#10005; Remove</span>';
+    row.draggable = true;
+    row.dataset.sid = sc.id;
+
+    // Build service select options
+    var svcOpts = SVC_OPTS.map(function(o){
+      return '<option value="'+o+'"'+(o===sc.svc?' selected':'')+'>'+( o||'No specific service')+'</option>';
+    }).join('');
+
+    row.innerHTML =
+      '<span class="drag-handle" title="Drag to reorder">&#8597;</span>'
+      +'<span class="scope-name-display">'+sc.name
+        +(sc.svc ? '<span class="svc-tag" style="margin-left:6px;">'+sc.svc+'</span>' : '')
+      +'</span>'
+      +'<div class="scope-edit-fields">'
+        +'<input type="text" class="scope-edit-name" value="'+sc.name+'" placeholder="Scope name">'
+        +'<select class="scope-edit-svc">'+svcOpts+'</select>'
+        +'<button class="bs gd" style="font-size:11px;white-space:nowrap;" onclick="saveScopeEdit(this)">&#10003; Save</button>'
+        +'<button class="bs ol" style="font-size:11px;" onclick="cancelScopeEdit(this)">Cancel</button>'
+      +'</div>'
+      +'<button class="bs ol" style="font-size:11px;" data-sid="'+sc.id+'" onclick="openScopeEdit(this)">&#9998; Edit</button>'
+      +'<button class="bs dn" style="font-size:11px;" data-sid="'+sc.id+'" onclick="delScopeClick(this)">&#10005;</button>';
+
+    // ── Drag events ──
+    row.addEventListener('dragstart', function(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', sc.id);
+      setTimeout(function(){ row.classList.add('dragging'); }, 0);
+    });
+    row.addEventListener('dragend', function() {
+      row.classList.remove('dragging');
+      document.querySelectorAll('#scope_list_admin .scope-row').forEach(function(r){
+        r.classList.remove('drag-over');
+      });
+    });
+    row.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('#scope_list_admin .scope-row').forEach(function(r){
+        r.classList.remove('drag-over');
+      });
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('drop', function(e) {
+      e.preventDefault();
+      var draggedId = e.dataTransfer.getData('text/plain');
+      if (draggedId === sc.id) return;
+      var scopes = loadScopes();
+      var fromIdx = scopes.findIndex(function(s){ return s.id===draggedId; });
+      var toIdx   = scopes.findIndex(function(s){ return s.id===sc.id; });
+      if (fromIdx < 0 || toIdx < 0) return;
+      var moved = scopes.splice(fromIdx, 1)[0];
+      scopes.splice(toIdx, 0, moved);
+      saveScopes(scopes);
+      renderScopeAdmin();
+      toast('Scope order saved.');
+    });
+
     list.appendChild(row);
   });
+}
+
+function openScopeEdit(btn) {
+  var row = btn.closest('.scope-row');
+  row.querySelector('.scope-name-display').classList.add('hidden');
+  row.querySelector('.scope-edit-fields').classList.add('open');
+  btn.style.display = 'none';
+  row.querySelector('.bs.dn').style.display = 'none';
+  row.querySelector('.scope-edit-name').focus();
+}
+
+function cancelScopeEdit(btn) {
+  var row = btn.closest('.scope-row');
+  row.querySelector('.scope-name-display').classList.remove('hidden');
+  row.querySelector('.scope-edit-fields').classList.remove('open');
+  row.querySelectorAll('.bs').forEach(function(b){ b.style.display=''; });
+}
+
+function saveScopeEdit(btn) {
+  var row    = btn.closest('.scope-row');
+  var sid    = row.dataset.sid;
+  var name   = row.querySelector('.scope-edit-name').value.trim();
+  var svc    = row.querySelector('.scope-edit-svc').value;
+  if (!name) { toast('Scope name cannot be empty.'); return; }
+  var scopes = loadScopes();
+  scopes = scopes.map(function(sc){
+    return sc.id===sid ? Object.assign({},sc,{name:name,svc:svc}) : sc;
+  });
+  saveScopes(scopes);
+  renderScopeAdmin();
+  toast('Scope updated.');
 }
 function addGlobalScope() {
   var name = (document.getElementById('scope_new_name').value||'').trim();
