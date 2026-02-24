@@ -387,6 +387,41 @@ table.fpt tr:hover td{background:var(--cream);}
 .print-page-actions{display:flex;gap:10px;margin-top:24px;justify-content:flex-end;}
 @media print{.print-page-actions{display:none!important;}}
 
+
+/* ── PROPERTY EDIT MODAL LAYOUT ── */
+.modal-xl{max-width:980px;width:95vw;}
+.madd-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;}
+.madd-col{}
+@media(max-width:680px){.madd-cols{grid-template-columns:1fr;}}
+
+/* ── INLINE FLOOR PLAN CARDS (inside Edit Property modal) ── */
+.fp-inline-card{border:1px solid var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden;background:var(--white);}
+.fp-inline-hd{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;background:var(--cream);user-select:none;}
+.fp-inline-hd:hover{background:#eee9e0;}
+.fp-inline-name{font-size:13px;font-weight:700;color:var(--navy);flex:1;}
+.fp-inline-meta{font-size:11px;color:var(--gray);}
+.fp-inline-chevron{font-size:10px;color:var(--gray);transition:transform .2s;margin-left:4px;}
+.fp-inline-card.open .fp-inline-chevron{transform:rotate(180deg);}
+.fp-inline-body{display:none;padding:16px;border-top:1px solid var(--border);}
+.fp-inline-card.open .fp-inline-body{display:block;}
+.fp-inline-section{margin-bottom:18px;}
+.fp-inline-section-title{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.fp-inline-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:10px;border-top:1px solid var(--border);margin-top:4px;}
+
+/* rooms grid inside fp card */
+.room-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.room-toggle{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:var(--white);color:var(--text);}
+.room-toggle.selected{background:var(--navy);border-color:var(--navy);color:var(--white);}
+.room-toggle:hover:not(.selected){background:var(--cream);}
+
+/* scope grid inside fp card */
+.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.scope-toggle{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:3px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:var(--white);}
+.scope-toggle.selected{background:rgba(2,10,91,.06);border-color:var(--navy);}
+.scope-toggle:hover:not(.selected){background:var(--cream);}
+.scope-toggle input[type=checkbox]{accent-color:var(--navy);cursor:pointer;}
+.scope-custom-row{display:flex;gap:8px;margin-top:10px;}
+
 </style>
 </head>
 <body>
@@ -778,7 +813,7 @@ table.fpt tr:hover td{background:var(--cream);}
 </div>
 
 <div class="mb" id="madd">
-  <div class="modal modal-lg">
+  <div class="modal modal-xl">
     <div class="mh">
       <h3 id="madd_title">Add New Property</h3>
       <button class="mx" onclick="closeM('madd')">&#10005;</button>
@@ -793,92 +828,87 @@ table.fpt tr:hover td{background:var(--cream);}
         <button class="bs nv" onclick="importFromUrl()">Import</button>
       </div>
 
-      <!-- SECTION: Property Info -->
-      <div class="ms"><div class="mst">Property Information</div>
-        <div class="fg"><label>Property Name *</label>
-          <input type="text" id="madd_name" placeholder="e.g. Cherry Creek Apartments"></div>
-        <div class="form-row">
-          <div class="fg"><label>Management Company</label>
-            <input type="text" id="madd_mgmt" placeholder="e.g. Willow Bridge Property Co."></div>
-          <div class="fg"><label>Website</label>
-            <input type="url" id="madd_web" placeholder="https://"></div>
-        </div>
-      </div>
+      <!-- TWO-COLUMN LAYOUT for top sections -->
+      <div class="madd-cols">
 
-      <!-- SECTION: Address -->
-      <div class="ms"><div class="mst">Address</div>
-        <div class="fg"><label>Street Address *</label>
-          <input type="text" id="madd_addr" placeholder="e.g. 1100 Crystal Spring Lane"></div>
-        <div class="form-row">
-          <div class="fg"><label>City *</label>
-            <input type="text" id="madd_city" placeholder="e.g. Hermitage"></div>
-          <div class="fg" style="max-width:100px;"><label>State *</label>
-            <select id="madd_state">
-              <option value="TN">TN</option><option value="MS">MS</option>
-              <option value="AR">AR</option><option value="AL">AL</option>
-              <option value="KY">KY</option><option value="GA">GA</option>
-            </select></div>
-          <div class="fg" style="max-width:110px;"><label>Zip *</label>
-            <input type="text" id="madd_zip" placeholder="37076" maxlength="10"></div>
-        </div>
-      </div>
+        <!-- LEFT: Property Info + Address -->
+        <div class="madd-col">
+          <div class="ms"><div class="mst">Property Information</div>
+            <div class="fg"><label>Property Name *</label>
+              <input type="text" id="madd_name" placeholder="e.g. Cherry Creek Apartments"></div>
+            <div class="fg"><label>Management Company</label>
+              <input type="text" id="madd_mgmt" placeholder="e.g. Willow Bridge Property Co."></div>
+            <div class="fg"><label>Website</label>
+              <input type="url" id="madd_web" placeholder="https://"></div>
+          </div>
 
-      <!-- SECTION: Contact -->
-      <div class="ms"><div class="mst">Contact Information</div>
-        <div class="form-row">
-          <div class="fg"><label>Property Phone</label>
-            <input type="tel" id="madd_phone" placeholder="(615) 229-8238"></div>
-          <div class="fg"><label>Property Email</label>
-            <input type="email" id="madd_email" placeholder="office@property.com"></div>
-        
-          <!-- GLOBAL SCOPES MANAGER -->
-          <div class="ms"><div class="mst">&#9883; Preset Installation Scopes</div>
-            <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">
-              Define the global scope library available across all properties. 
-              Individual floor plans can also add property-specific scopes.
-            </p>
-            <div id="scope_list_admin"></div>
-            <div style="display:flex;gap:8px;margin-top:14px;">
-              <input type="text" id="scope_new_name" placeholder="Scope name (e.g. Carpet Bedrooms Only)" style="flex:1;">
-              <select id="scope_new_svc" style="min-width:180px;">
-                <option value="">No specific service</option>
-                <option value="Carpet Installation">Carpet Installation</option>
-                <option value="Sheet Vinyl">Sheet Vinyl</option>
-                <option value="Luxury Vinyl Plank">Luxury Vinyl Plank</option>
-                <option value="Tile Installation">Tile Installation</option>
-                <option value="Subfloor Repair">Subfloor Repair</option>
-                <option value="Full Turnover">Full Turnover Package</option>
-              </select>
-              <button class="bs gd" onclick="addGlobalScope()">+ Add</button>
+          <div class="ms"><div class="mst">Address</div>
+            <div class="fg"><label>Street Address *</label>
+              <input type="text" id="madd_addr" placeholder="e.g. 1100 Crystal Spring Lane"></div>
+            <div class="form-row">
+              <div class="fg"><label>City *</label>
+                <input type="text" id="madd_city" placeholder="e.g. Hermitage"></div>
+              <div class="fg" style="max-width:80px;"><label>State</label>
+                <select id="madd_state">
+                  <option value="TN">TN</option><option value="MS">MS</option>
+                  <option value="AR">AR</option><option value="AL">AL</option>
+                  <option value="KY">KY</option><option value="GA">GA</option>
+                </select></div>
+              <div class="fg" style="max-width:100px;"><label>Zip *</label>
+                <input type="text" id="madd_zip" placeholder="37076" maxlength="10"></div>
             </div>
           </div>
-</div>
-      </div>
-
-      <!-- SECTION: Operations -->
-      <div class="ms"><div class="mst">Operations</div>
-        <div class="form-row">
-          <div class="fg"><label>Total Units</label>
-            <input type="number" id="madd_units" placeholder="e.g. 140" min="1"></div>
-          <div class="fg"><label>Hub *</label>
-            <select id="madd_hub">
-              <option value="memphis">Memphis Hub</option>
-              <option value="nashville">Nashville Hub</option>
-            </select></div>
-          <div class="fg"><label>Status</label>
-            <select id="madd_status">
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select></div>
         </div>
-        <div class="fg"><label>Notes (internal only)</label>
-          <textarea id="madd_notes" rows="2" placeholder="Internal notes, access codes, special instructions..."></textarea></div>
+
+        <!-- RIGHT: Contact + Operations -->
+        <div class="madd-col">
+          <div class="ms"><div class="mst">Contact Information</div>
+            <div class="fg"><label>Property Phone</label>
+              <input type="tel" id="madd_phone" placeholder="(615) 229-8238"></div>
+            <div class="fg"><label>Property Email</label>
+              <input type="email" id="madd_email" placeholder="office@property.com"></div>
+          </div>
+
+          <div class="ms"><div class="mst">Operations</div>
+            <div class="form-row">
+              <div class="fg"><label>Total Units</label>
+                <input type="number" id="madd_units" placeholder="e.g. 140" min="1"></div>
+              <div class="fg"><label>Hub *</label>
+                <select id="madd_hub">
+                  <option value="memphis">Memphis Hub</option>
+                  <option value="nashville">Nashville Hub</option>
+                </select></div>
+              <div class="fg"><label>Status</label>
+                <select id="madd_status">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select></div>
+            </div>
+            <div class="fg"><label>Notes (internal only)</label>
+              <textarea id="madd_notes" rows="3" placeholder="Internal notes, access codes, special instructions..."></textarea></div>
+          </div>
+        </div>
+
+      </div><!-- .madd-cols -->
+
+      <!-- FLOOR PLANS SECTION (shown when editing an existing property) -->
+      <div id="madd_fp_section" style="display:none;">
+        <div class="ms">
+          <div class="mst" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Floor Plans</span>
+            <button class="bs gd" id="madd_fp_addbtn" onclick="openAddFpInline()">+ Add Floor Plan</button>
+          </div>
+          <p style="font-size:12px;color:var(--gray);margin-bottom:14px;">
+            Click a floor plan to assign rooms and preset installation scopes.
+          </p>
+          <div id="madd_fp_list"></div>
+        </div>
       </div>
 
       <div id="madd_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:8px;"></div>
     </div>
     <div class="mf">
-      <button class="bl dn" id="madd_delbtn" style="display:none;margin-right:auto;" onclick="deleteProperty()">&#128465; Delete Property</button>
+      <button class="bl dn" id="madd_delbtn" style="display:none;margin-right:auto;" onclick="deleteProperty()">&#128465; Delete</button>
       <button class="bl ol" onclick="closeM('madd')">Cancel</button>
       <button class="bl gd" onclick="saveProperty()">Save Property</button>
     </div>
@@ -1513,6 +1543,7 @@ function openAddPropModal() {
   document.getElementById('madd_url').value = '';
   document.getElementById('madd_err').style.display = 'none';
   document.getElementById('madd_delbtn').style.display = 'none';
+  document.getElementById('madd_fp_section').style.display = 'none';
   openM('madd');
 }
 function openEditProp(propId) {
@@ -1521,7 +1552,7 @@ function openEditProp(propId) {
   for(var i=0;i<props.length;i++){ if(props[i].id===propId){prop=props[i];break;} }
   if (!prop) return;
   document.getElementById('madd_id').value = prop.id;
-  document.getElementById('madd_title').textContent = 'Edit Property';
+  document.getElementById('madd_title').textContent = 'Edit: ' + prop.name;
   document.getElementById('madd_name').value = prop.name||'';
   document.getElementById('madd_mgmt').value = prop.mgmt||'';
   document.getElementById('madd_web').value = prop.web||'';
@@ -1537,9 +1568,12 @@ function openEditProp(propId) {
   document.getElementById('madd_notes').value = prop.notes||'';
   document.getElementById('madd_url').value = prop.web||'';
   document.getElementById('madd_err').style.display = 'none';
-  // Show delete button only for superadmin
   var delbtn = document.getElementById('madd_delbtn');
   delbtn.style.display = (window.currentTeamUser && window.currentTeamUser.role==='superadmin') ? 'inline-flex' : 'none';
+  // Show floor plan section and render it
+  document.getElementById('madd_fp_section').style.display = 'block';
+  document.getElementById('madd_fp_addbtn').dataset.prop = propId;
+  renderInlineFpList(propId);
   openM('madd');
 }
 function saveProperty() {
@@ -1926,6 +1960,12 @@ function saveFpFromModal() {
   closeM('mfpe');
   renderPropList();
   toast(isNew ? 'Floor plan added.' : 'Floor plan updated.');
+  // If we came from the property edit modal, re-open it
+  if (window._fpModalReturnPropId) {
+    var retId = window._fpModalReturnPropId;
+    window._fpModalReturnPropId = null;
+    setTimeout(function(){ openEditProp(retId); }, 200);
+  }
 }
 function deleteFpFromModal() {
   var propId = document.getElementById('fpe_prop_id').value;
@@ -1986,6 +2026,254 @@ function openEditFp(id) {
 }
 
 
+
+
+// Called from "+ Add Floor Plan" button inside the Edit Property modal
+function openAddFpInline() {
+  var propId = document.getElementById('madd_fp_addbtn').dataset.prop ||
+               document.getElementById('madd_id').value;
+  closeM('madd');  // close property modal first, then open FP modal
+  // brief timeout so modals don't stack weirdly
+  setTimeout(function() {
+    openAddFpForProp(propId);
+    // When FP modal saves, re-open property modal
+    window._fpModalReturnPropId = propId;
+  }, 100);
+}
+
+
+// ── INLINE FLOOR PLAN LIST (inside Edit Property modal) ──
+var COMMON_ROOMS = [
+  'Living Room','Bedroom','Bed 1','Bed 2','Bed 3','Bed 4',
+  'Kitchen','Bathroom','Bath 1','Bath 2',
+  'Dining Area','Hallway','Walk-in Closet','Laundry Room',
+  'Patio/Balcony','Entry','Main Area','W/D Hookup'
+];
+
+function renderInlineFpList(propId) {
+  var list = document.getElementById('madd_fp_list');
+  if (!list) return;
+  var fps = loadFpForProp(propId);
+  var globalScopes = loadScopes();
+  list.innerHTML = '';
+
+  if (fps.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray);font-size:13px;">No floor plans yet. Click "+ Add Floor Plan" above to create the first one.</div>';
+    return;
+  }
+
+  fps.forEach(function(fp, fi) {
+    var bedsLabel = fp.beds === 0 ? 'Studio' :
+      fp.beds + 'BR / ' + fp.baths + 'BA';
+    var renovBadge = fp.renovated
+      ? '<span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;margin-left:6px;">RENOV</span>'
+      : '';
+    var metaStr = [bedsLabel, fp.sqft ? fp.sqft+' sqft' : '', fp.unitCount ? fp.unitCount+' units' : ''].filter(Boolean).join(' · ');
+
+    // ── Rooms section: toggleable chips from COMMON_ROOMS + any custom already on plan ──
+    var planRooms = fp.rooms || [];
+    var allRoomOptions = COMMON_ROOMS.slice();
+    planRooms.forEach(function(r){ if(allRoomOptions.indexOf(r)<0) allRoomOptions.push(r); });
+    var roomsHtml = allRoomOptions.map(function(room) {
+      var sel = planRooms.indexOf(room) >= 0;
+      return '<span class="room-toggle'+(sel?' selected':'')+'" data-room="'+room+'" data-fp="'+fp.id+'" data-prop="'+propId+'" onclick="toggleRoomInline(this)">'+room+'</span>';
+    }).join('');
+
+    // ── Scopes section: global checkboxes + custom scopes for this plan ──
+    var selectedGlobal = fp.scopes || [];
+    var customScopes   = fp.customScopes || [];
+    var scopesHtml = '<div class="scope-grid">'
+      + globalScopes.map(function(sc) {
+          var checked = selectedGlobal.indexOf(sc.id) >= 0;
+          return '<label class="scope-toggle'+(checked?' selected':'')+'">'
+            + '<input type="checkbox" '+(checked?'checked':'')+' value="'+sc.id+'" data-fp="'+fp.id+'" data-prop="'+propId+'" onchange="syncScopeToggle(this)">'
+            + '<span style="flex:1;">'+sc.name+'</span>'
+            + (sc.svc ? '<span class="svc-tag">'+sc.svc+'</span>' : '')
+            + '</label>';
+        }).join('')
+      + '</div>';
+
+    // Custom scopes for this plan
+    var customScopesHtml = '<div id="cscopes_'+fp.id+'" style="margin-top:8px;">'
+      + customScopes.map(function(cs, ci) {
+          return '<div class="scope-row" style="margin-bottom:4px;">'
+            + '<span style="flex:1;font-size:12px;">'+cs.name+(cs.svc?'<span class="svc-tag">'+cs.svc+'</span>':'')+'</span>'
+            + '<button class="bs dn" style="font-size:10px;padding:2px 6px;" data-fp="'+fp.id+'" data-prop="'+propId+'" data-ci="'+ci+'" onclick="deleteCustomScopeInline(this)">&#10005;</button>'
+            + '</div>';
+        }).join('')
+      + '</div>'
+      + '<div class="scope-custom-row" style="margin-top:8px;">'
+      +   '<input type="text" id="csc_inp_'+fp.id+'" placeholder="Add scope specific to this plan..." style="flex:1;font-size:12px;">'
+      +   '<button class="bs nv" style="font-size:11px;" data-fp="'+fp.id+'" data-prop="'+propId+'" onclick="addCustomScopeInline(this)">+ Add</button>'
+      + '</div>';
+
+    var card = document.createElement('div');
+    card.className = 'fp-inline-card';
+    card.id = 'fpic_' + fp.id;
+    card.innerHTML =
+      '<div class="fp-inline-hd" onclick="toggleInlineFpCard(this.parentElement)">'
+        + '<span class="fp-inline-name">'+fp.name+renovBadge+'</span>'
+        + '<span class="fp-inline-meta">'+metaStr+'</span>'
+        + '<div style="display:flex;gap:6px;margin-left:12px;" onclick="event.stopPropagation();">'
+          + '<button class="bs ol" data-prop="'+propId+'" data-fp="'+fp.id+'" onclick="editFpFromInline(this)">&#9998; Edit Plan Details</button>'
+          + '<button class="bs dn" data-prop="'+propId+'" data-fp="'+fp.id+'" onclick="deleteFpInline(this)">&#128465;</button>'
+        + '</div>'
+        + '<span class="fp-inline-chevron">&#9660;</span>'
+      + '</div>'
+      + '<div class="fp-inline-body">'
+        + '<div class="fp-inline-section">'
+          + '<div class="fp-inline-section-title">Rooms Included in This Floor Plan</div>'
+          + '<div class="room-grid">'+roomsHtml+'</div>'
+          + '<div style="display:flex;gap:8px;margin-top:10px;">'
+            + '<input type="text" id="room_inp_'+fp.id+'" placeholder="Add custom room..." style="flex:1;font-size:12px;">'
+            + '<button class="bs nv" style="font-size:11px;" data-fp="'+fp.id+'" data-prop="'+propId+'" onclick="addCustomRoomInline(this)">+ Add</button>'
+          + '</div>'
+        + '</div>'
+        + '<div class="fp-inline-section">'
+          + '<div class="fp-inline-section-title">Preset Installation Scopes — Check All That Apply</div>'
+          + scopesHtml
+          + customScopesHtml
+        + '</div>'
+      + '</div>';
+
+    list.appendChild(card);
+  });
+}
+
+function toggleInlineFpCard(card) {
+  card.classList.toggle('open');
+}
+
+// Toggle a room on/off for a floor plan inline
+function toggleRoomInline(el) {
+  var room   = el.dataset.room;
+  var propId = el.dataset.prop;
+  var fpId   = el.dataset.fp;
+  el.classList.toggle('selected');
+  // Save immediately
+  var fps = loadFpForProp(propId);
+  fps = fps.map(function(fp) {
+    if (fp.id !== fpId) return fp;
+    var rooms = (fp.rooms || []).slice();
+    var idx = rooms.indexOf(room);
+    if (el.classList.contains('selected')) {
+      if (idx < 0) rooms.push(room);
+    } else {
+      if (idx >= 0) rooms.splice(idx, 1);
+    }
+    fp.rooms = rooms;
+    return fp;
+  });
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+}
+
+// Add a custom room not in the preset list
+function addCustomRoomInline(btn) {
+  var propId = btn.dataset.prop;
+  var fpId   = btn.dataset.fp;
+  var inp    = document.getElementById('room_inp_' + fpId);
+  var val    = (inp ? inp.value : '').trim();
+  if (!val) return;
+  var fps = loadFpForProp(propId);
+  fps = fps.map(function(fp) {
+    if (fp.id !== fpId) return fp;
+    var rooms = (fp.rooms || []).slice();
+    if (rooms.indexOf(val) < 0) rooms.push(val);
+    fp.rooms = rooms;
+    return fp;
+  });
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+  inp.value = '';
+  renderInlineFpList(propId);
+  toast('Room added.');
+}
+
+// Sync scope checkbox to data store
+function syncScopeToggle(cb) {
+  var propId  = cb.dataset.prop;
+  var fpId    = cb.dataset.fp;
+  var scId    = cb.value;
+  // Update the label style
+  var lbl = cb.closest('label');
+  if (lbl) lbl.classList.toggle('selected', cb.checked);
+  // Save
+  var fps = loadFpForProp(propId);
+  fps = fps.map(function(fp) {
+    if (fp.id !== fpId) return fp;
+    var scopes = (fp.scopes || []).slice();
+    var i = scopes.indexOf(scId);
+    if (cb.checked) { if (i < 0) scopes.push(scId); }
+    else            { if (i >= 0) scopes.splice(i, 1); }
+    fp.scopes = scopes;
+    return fp;
+  });
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+}
+
+// Add a floor-plan-specific custom scope
+function addCustomScopeInline(btn) {
+  var propId = btn.dataset.prop;
+  var fpId   = btn.dataset.fp;
+  var inp    = document.getElementById('csc_inp_' + fpId);
+  var val    = (inp ? inp.value : '').trim();
+  if (!val) return;
+  var fps = loadFpForProp(propId);
+  fps = fps.map(function(fp) {
+    if (fp.id !== fpId) return fp;
+    var customs = (fp.customScopes || []).slice();
+    customs.push({name: val, svc: ''});
+    fp.customScopes = customs;
+    return fp;
+  });
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+  inp.value = '';
+  renderInlineFpList(propId);
+  toast('Scope added.');
+}
+
+// Delete a custom scope from a floor plan
+function deleteCustomScopeInline(btn) {
+  var propId = btn.dataset.prop;
+  var fpId   = btn.dataset.fp;
+  var ci     = parseInt(btn.dataset.ci);
+  var fps = loadFpForProp(propId);
+  fps = fps.map(function(fp) {
+    if (fp.id !== fpId) return fp;
+    var customs = (fp.customScopes || []).slice();
+    customs.splice(ci, 1);
+    fp.customScopes = customs;
+    return fp;
+  });
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+  renderInlineFpList(propId);
+}
+
+// Edit plan details from inline card (opens mfpe modal, returns to property edit)
+function editFpFromInline(btn) {
+  var propId = btn.dataset.prop;
+  var fpId   = btn.dataset.fp;
+  window._fpModalReturnPropId = propId;
+  closeM('madd');
+  setTimeout(function() { openEditFpForProp(propId, fpId); }, 100);
+}
+
+// Delete floor plan directly from inline card
+function deleteFpInline(btn) {
+  var propId = btn.dataset.prop;
+  var fpId   = btn.dataset.fp;
+  if (!confirm('Delete this floor plan? This cannot be undone.')) return;
+  var fps = loadFpForProp(propId).filter(function(fp){ return fp.id !== fpId; });
+  saveFpForProp(propId, fps);
+  rebuildLegacy();
+  renderInlineFpList(propId);
+  renderPropList();
+  toast('Floor plan deleted.');
+}
 
 // ── AUTH ──
 var currentUser = null;
