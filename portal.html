@@ -499,12 +499,20 @@ table.fpt tr:hover td{background:var(--cream);}
       <div class="ni" onclick="cnav('cf',this)"><span class="ic">&#127760;</span> Floor Plans</div>
       <div class="ni" onclick="cnav('cx',this)"><span class="ic">&#128196;</span> Documents</div>
     </nav>
-    <div class="sbot"><button class="lo" onclick="doLogout()">&#8594; Sign Out</button></div>
+    <div class="sbot">
+    <button class="lo" style="background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;" onclick="goClientPortalFromChooser();go('cl');">&#128101; View Client Portal</button>
+    <button class="lo" style="background:rgba(255,255,255,.06);margin-bottom:8px;width:100%;justify-content:center;" onclick="goToChooser();">&#8592; Back to Hub</button>
+    <button class="lo" onclick="doLogout()">&#8594; Sign Out</button>
+  </div>
   </aside>
   <div class="main">
     <div class="topbar">
       <div class="tbtitle" id="ctitle">Dashboard</div>
-      <div class="tbr"><div class="tprop" id="ctopprop">&#128205; Cherry Creek Apartments</div><button class="nbtn">&#128276;<div class="ndot"></div></button></div>
+      <div class="tbr">
+        <div class="tprop" id="ctopprop">&#128205; Cherry Creek Apartments</div>
+        <button class="nbtn" id="adminBackBtn" onclick="goBackToAdmin()" style="display:none;background:rgba(200,149,42,.15);color:var(--gold);border:1px solid rgba(200,149,42,.3);border-radius:3px;padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;margin-right:8px;">&#9756; Admin Panel</button>
+        <button class="nbtn">&#128276;<div class="ndot"></div></button>
+      </div>
     </div>
     <div class="content">
 
@@ -670,7 +678,11 @@ table.fpt tr:hover td{background:var(--cream);}
       <div class="nlabel">Settings</div>
       <div class="ni" onclick="anav('aset',this)"><span class="ic">&#9881;</span> Portal Settings</div>
     </nav>
-    <div class="sbot"><button class="lo" onclick="doLogout()">&#8594; Sign Out</button></div>
+    <div class="sbot">
+    <button class="lo" style="background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;" onclick="goClientPortalFromChooser();go('cl');">&#128101; View Client Portal</button>
+    <button class="lo" style="background:rgba(255,255,255,.06);margin-bottom:8px;width:100%;justify-content:center;" onclick="goToChooser();">&#8592; Back to Hub</button>
+    <button class="lo" onclick="doLogout()">&#8594; Sign Out</button>
+  </div>
   </aside>
   <div class="main">
     <div class="topbar">
@@ -687,7 +699,10 @@ table.fpt tr:hover td{background:var(--cream);}
           <div class="sc"><div class="si n">&#127968;</div><div><div class="snum">8</div><div class="slbl">Active Properties</div></div></div>
           <div class="sc"><div class="si gr">&#128101;</div><div><div class="snum">36</div><div class="slbl">Client Logins</div></div></div>
         </div>
-        <div class="shd"><h2>New Orders -- Action Required</h2></div>
+        <div class="shd" style="margin-bottom:16px;">
+          <h2>New Orders — Action Required</h2>
+          <button class="bs gd" onclick="goClientPortalFromChooser();go('cl');setTimeout(function(){cnav('co',document.querySelectorAll('#cl .ni')[1]);},200);">&#128221; Place New Order</button>
+        </div>
         <div class="tw" style="margin-bottom:28px;"><table>
           <thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Requested</th><th>Occupancy</th><th>Status</th><th>Action</th></tr></thead>
           <tbody>
@@ -721,7 +736,11 @@ table.fpt tr:hover td{background:var(--cream);}
 
       <!-- ADMIN PROPERTIES -->
       <div class="panel" id="aprops">
-        <div class="shd"><h2>Properties</h2><button class="bs gd" onclick="openM('madd')">+ Add Property</button></div>
+        <div class="shd"><h2>Properties</h2>
+          <div style="display:flex;gap:8px;">
+            <button class="bs ol" onclick="goClientPortalFromChooser();go('cl');setTimeout(function(){cnav('co',document.querySelectorAll('#cl .ni')[1]);},200);">&#128221; Place Order</button>
+            <button class="bs gd" onclick="openM('madd')">+ Add Property</button>
+          </div></div>
         <div class="fb" style="margin-bottom:16px;">
           <div class="sw" style="max-width:400px;"><span class="si2">&#128269;</span><input type="text" id="psearch" placeholder="Search by name, city, or zip..." oninput="filterProps()"></div>
           <select class="fs" id="pstatus" onchange="filterProps()"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
@@ -2517,6 +2536,7 @@ function doLogin() {
   }
   loadClientPortal(user);
   go('cl');
+  var bb = document.getElementById('adminBackBtn'); if(bb) bb.style.display='none';
 }
 // demoLogin removed - login screen has no demo buttons
 
@@ -2541,18 +2561,49 @@ function addFpClick(btn) {
 }
 
 function goClientPortalFromChooser() {
-  // Admin/team users going to client portal view - use first client account or a generic view
-  var clients = getUsers();
-  if (clients.length > 0) {
-    loadClientPortal(clients[0]);
-  } else if (window.currentTeamUser) {
-    // Build a synthetic user object for the team member
-    loadClientPortal({name: window.currentTeamUser.name, props: Object.keys(fpByProp).map(function(k){
-      // Convert key back to title-case name
-      return k.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
-    }), email: window.currentTeamUser.email});
-  }
+  // Build a synthetic admin user with ALL active properties
+  var allProps = getActiveProps().map(function(pr){ return pr.name; });
+  var tu = window.currentTeamUser || {};
+  var synth = {
+    name: tu.name || 'Admin View',
+    initials: tu.initials || 'PF',
+    email: tu.email || 'info@protectiveflooring.com',
+    props: allProps.length ? allProps : ['Cherry Creek Apartments'],
+    role: 'Property Manager'
+  };
+  loadClientPortal(synth);
   go('cl');
+  var bb = document.getElementById('adminBackBtn'); if(bb) bb.style.display='inline-flex';
+}
+
+// Go back to admin panel from client portal (for admin users)
+function goBackToAdmin() {
+  go('ad');
+}
+
+// Go to chooser screen
+function goToChooser() {
+  go('sc');
+}
+
+// Place an order for a specific property — opens client portal order tab pre-selected
+function adminPlaceOrder(propName) {
+  goClientPortalFromChooser();
+  setTimeout(function() {
+    cnav('co', document.querySelectorAll('#cl .ni')[1]);
+    if (propName) {
+      var sel = document.getElementById('cpropsel');
+      if (sel) {
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].text === propName) {
+            sel.selectedIndex = i;
+            updatePropFloorPlans(sel.value);
+            break;
+          }
+        }
+      }
+    }
+  }, 200);
 }
 
 function doLogout() {
