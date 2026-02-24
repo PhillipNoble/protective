@@ -1039,10 +1039,11 @@ table.fpt tr:hover td{background:var(--cream);}
     <div class="mh"><h3>Confirm Installation Date</h3><button class="mx" onclick="closeM('mconf')">&#10005;</button></div>
     <div class="mbody">
       <div class="di" style="margin-bottom:18px;"><div class="dl">Order</div><div class="dv" id="confinfo"></div></div>
-      <div class="fg"><label>Confirmed Installation Date *</label><input type="date"></div>
-      <div class="fg"><label>Notes to Client (optional)</label><textarea placeholder="e.g. Crew will arrive 8-10 AM."></textarea></div>
+      <div class="fg"><label>Confirmed Installation Date *</label><input type="date" id="conf_date_input"></div>
+      <div class="fg"><label>Notes to Client (optional)</label><textarea id="conf_notes_input" placeholder="e.g. Crew will arrive 8-10 AM."></textarea></div>
+      <div id="conf_err" style="display:none;color:#b91c1c;font-size:13px;margin-top:6px;"></div>
     </div>
-    <div class="mf"><button class="bl ol" onclick="closeM('mconf')">Cancel</button><button class="bl gd" onclick="closeM('mconf');toast('Date confirmed! Scheduling emails sent.')">&#10003; Confirm &amp; Send</button></div>
+    <div class="mf"><button class="bl ol" onclick="closeM('mconf')">Cancel</button><button class="bl gd" onclick="saveConf()">&#10003; Confirm &amp; Schedule</button></div>
   </div>
 </div>
 
@@ -1604,8 +1605,10 @@ table.fpt tr:hover td{background:var(--cream);}
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
 document.addEventListener('DOMContentLoaded', function() {
-  // Tables render when user navigates to panels (via cnav/anav hooks)
-  // and after submitOrder via refreshAllOrderViews()
+  // Sync seed orders into localStorage if this is a fresh load
+  if (!localStorage.getItem('pf_orders')) {
+    saveOrders();
+  }
 });
 
 </script><script>// ── DATA ──
@@ -2938,8 +2941,8 @@ function saveWoEdit() {
     changes: changes.length ? changes : [{field:'No field changes', from:'—', to:'(saved with no detected differences)'}]
   });
 
+  saveOrders();
   closeM('mwoedit');
-  // Re-open the work order view to show updated data
   oworder(id);
   refreshAllOrderViews();
   toast('Work order #' + o.num + ' updated.');
@@ -3044,6 +3047,7 @@ function confirmVoidOrder() {
   o.voidNotes     = notes;
   o.voidDate      = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   o.voidBy        = (window.currentTeamUser && window.currentTeamUser.name) || 'Admin';
+  saveOrders();
   closeM('mvoid');
   closeM('mwo');
   toast('Work order #' + o.num + ' has been voided.');
@@ -3715,7 +3719,8 @@ function anav(pid, el) {
 }
 
 // ── ORDERS DATA ──
-var orders = {
+// ── ORDER STORE ──
+var ORDER_SEED = {
   'CC-001':{num:'WO-CC-001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'February 20, 2025',confDate:'February 25, 2025',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
   'CC-002':{num:'WO-CC-002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 18, 2025',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2025',email:'manager@cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'No Preference',photos:true},
   'CC-003':{num:'WO-CC-003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'February 10, 2025',confDate:'February 10, 2025',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2025',email:'manager@cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
@@ -3724,6 +3729,29 @@ var orders = {
   '2413':{num:'WO-2413',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'February 26, 2025',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2025',email:'rmoore@riverside.com',notes:'',timeWindow:'No Preference',photos:false},
   '2410':{num:'WO-2410',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 24, 2025',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2025',email:'kdavis@arborridge.com',notes:'',timeWindow:'No Preference',photos:false}
 };
+
+function saveOrders() {
+  try {
+    // Only save non-seed orders (WO- prefix keys) plus mutations to seed orders
+    localStorage.setItem('pf_orders', JSON.stringify(orders));
+  } catch(e) { console.warn('saveOrders failed', e); }
+}
+
+function loadOrders() {
+  try {
+    var stored = localStorage.getItem('pf_orders');
+    if (stored) {
+      var parsed = JSON.parse(stored);
+      // Merge: stored takes priority over seed (preserves admin edits to seed WOs)
+      var merged = JSON.parse(JSON.stringify(ORDER_SEED));
+      Object.keys(parsed).forEach(function(k) { merged[k] = parsed[k]; });
+      return merged;
+    }
+  } catch(e) { console.warn('loadOrders failed', e); }
+  return JSON.parse(JSON.stringify(ORDER_SEED));
+}
+
+var orders = loadOrders();
 var slab = {'vd':'Void',requested:'Requested',scheduled:'Scheduled','in-progress':'In Progress',completed:'Completed'};
 
 // ── WORK ORDER PRINT ──
@@ -3926,8 +3954,41 @@ document.querySelectorAll('.mb').forEach(function(b){
 });
 function openConfirm(id) {
   var o=orders[id];
-  if(o) document.getElementById('confinfo').textContent='#'+o.num+' -- '+o.property+', Unit '+o.unit+' -- '+o.service;
+  if(o) document.getElementById('confinfo').textContent='#'+o.num+' — '+o.property+', Unit '+o.unit+' — '+o.service;
+  document.getElementById('mconf').dataset.confId = id;
+  var dateEl = document.getElementById('conf_date_input');
+  if (dateEl) dateEl.value = '';
+  var notesEl = document.getElementById('conf_notes_input');
+  if (notesEl) notesEl.value = '';
+  document.getElementById('conf_err').style.display='none';
   openM('mconf');
+}
+
+function saveConf() {
+  var id = document.getElementById('mconf').dataset.confId;
+  var o  = orders[id]; if (!o) return;
+  var dateEl  = document.getElementById('conf_date_input');
+  var notesEl = document.getElementById('conf_notes_input');
+  var errEl   = document.getElementById('conf_err');
+  var rawDate = dateEl ? dateEl.value : '';
+  if (!rawDate) { errEl.style.display='block'; errEl.textContent='Please select a confirmed date.'; return; }
+  var d = new Date(rawDate + 'T12:00:00');
+  var confDateStr = d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  o.status   = 'scheduled';
+  o.confDate = confDateStr;
+  if (notesEl && notesEl.value.trim()) {
+    o.notes = (o.notes && o.notes !== 'No additional notes.' ? o.notes + '\n' : '') + 'Scheduling note: ' + notesEl.value.trim();
+  }
+  if (!o.log) o.log = [];
+  o.log.push({
+    ts: cstNow(), by: (window.currentTeamUser && window.currentTeamUser.name) || 'Admin',
+    reason: 'Scheduled', changes:[{field:'Status',from:'Requested',to:'Scheduled'},{field:'Confirmed Date',from:'Pending',to:confDateStr}]
+  });
+  saveOrders();
+  closeM('mconf');
+  oworder(id);
+  refreshAllOrderViews();
+  toast('Order #'+o.num+' confirmed for '+confDateStr+'.');
 }
 
 // ── FORM HELPERS ──
@@ -4048,7 +4109,7 @@ function submitOrder() {
   var prev = document.getElementById('fppreview');
   if (prev) prev.style.display = 'none';
 
-  refreshAllOrderViews();
+  saveOrders();
   refreshAllOrderViews();
   setTimeout(function(){ cnav('ch', document.querySelector('#cl .ni[onclick*=\"ch\"]')); }, 1400);
 }
