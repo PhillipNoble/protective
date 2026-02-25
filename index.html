@@ -596,6 +596,7 @@ footer{
   <div class="hero-slides" id="heroSlides">
     <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=1600&q=85')"></div>
     <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1560440021-33f9b867899d?w=1600&q=85')"></div>
+    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=85')"></div>
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
@@ -611,7 +612,9 @@ footer{
     </div>
   </div>
   <div class="slide-dots">
-    <div class="slide-dot active" onclick="goSlide(0)"><button class="slide-dot" onclick="goSlide(2)" aria-label="Slide 3"></button></div>
+    <div class="slide-dot active" onclick="goSlide(0)"></div>
+    <div class="slide-dot" onclick="goSlide(1)"></div>
+    <div class="slide-dot" onclick="goSlide(2)"></div>
     <div class="slide-dot" onclick="goSlide(1)"></div>
   </div>
 </section>
@@ -980,13 +983,6 @@ revealEls.forEach(function(el) { io.observe(el); });
 (function() {
   var SLIDES = [
     {
-      eyebrow: 'Same-Day Response Available',
-      h1: 'Vacancy Costs You<br><em>Every Single Day.</em>',
-      tagline: '&ldquo;We Stand on Our Word&rdquo;',
-      sub: 'Our same-day emergency crews and next-day guaranteed installation are built for exactly that reason. When a unit needs to be rent-ready, we move fast &mdash; without cutting corners on quality.',
-      btns: '<a href="#contact" class="btn-gold">&#9889; Get Emergency Help</a><a href="#services" class="btn-outline">All Services</a>'
-    },
-    {
       eyebrow: 'Family Owned Since 1976',
       h1: 'A Partner You Can<br><em>Actually Rely On.</em>',
       tagline: '&ldquo;We Stand on Our Word&rdquo;',
@@ -994,11 +990,18 @@ revealEls.forEach(function(el) { io.observe(el); });
       btns: '<a href="#about" class="btn-gold">Our Story</a><a href="#contact" class="btn-outline">Contact Us</a>'
     },
     {
-      eyebrow: 'Memphis &amp; Nashville &mdash; Since 1976',
-      h1: 'Flooring Done Right.<br><em>Every Unit. Every Time.</em>',
-      tagline: '',
+      eyebrow: 'Same-Day Response Available',
+      h1: 'Vacancy Costs You<br><em>Every Single Day.</em>',
+      tagline: '&ldquo;We Stand on Our Word&rdquo;',
+      sub: 'Our same-day emergency crews and next-day guaranteed installation are built for exactly that reason. When a unit needs to be rent-ready, we move fast &mdash; without cutting corners on quality.',
+      btns: '<a href="#contact" class="btn-gold">&#9889; Get Emergency Help</a><a href="#services" class="btn-outline">All Services</a>'
+    },
+    {
+      eyebrow: 'Mid-South &amp; Middle Tennessee&rsquo;s Multifamily Flooring Specialist',
+      h1: 'Quality Flooring.<br><em>Consistent Results.</em>',
+      tagline: '&ldquo;We Stand on Our Word&rdquo;',
       sub: 'Protective Flooring has been the trusted partner of multifamily property managers across the Mid-South and Middle Tennessee since 1976 &mdash; built on craftsmanship, driven by communication, and backed by nearly 50 years of proven results.',
-      btns: '<a href="#contact" class="btn-gold">&#128222; Get a Quote</a><a href="#portal" class="btn-outline">Client Portal &#8599;</a>'
+      btns: '<a href="#contact" class="btn-gold">&#128222; Get a Quote</a><a href="portal.html" class="btn-outline">Client Portal &#8599;</a>'
     }
   ];
   var cur = 0;
