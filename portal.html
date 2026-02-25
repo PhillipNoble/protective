@@ -3563,6 +3563,7 @@ function statusBadge(status) {
 function renderAdashRecent() {
   var tbody = document.getElementById('adash_recent_tbody');
   if (!tbody) return;
+  populateHubSelect('adash_hub', (document.getElementById('adash_hub')||{value:''}).value, 'All Hubs');
   var adashHub = (document.getElementById('adash_hub')||{value:''}).value;
 
   // Show: all 'requested' orders first, then recent 'scheduled', exclude completed/void
@@ -3607,6 +3608,7 @@ function renderAdashRecent() {
 }
 
 function renderAdashToday() {
+  populateHubSelect('adash_hub', (document.getElementById('adash_hub')||{value:''}).value, 'All Hubs');
   var tbody = document.getElementById('adash_today_tbody');
   if (!tbody) return;
   var adashHub = (document.getElementById('adash_hub')||{value:''}).value;
