@@ -3442,6 +3442,7 @@ function confirmVoidOrder() {
 function renderAdminOrders() {
   var tbody = document.getElementById('aord_tbody');
   if (!tbody) return;
+  populateHubSelect('aord_hub', (document.getElementById('aord_hub')||{value:''}).value, 'All Hubs');
 
   // Populate property dropdown (always refresh)
   var propSel = document.getElementById('aord_prop');
@@ -3669,6 +3670,7 @@ function renderClientDash() {
 function renderClientHistory() {
   var tbody = document.getElementById('ch_tbody');
   if (!tbody || !currentUser) return;
+  populateHubKeySelect('ch_hub_filter', (document.getElementById('ch_hub_filter')||{value:''}).value, 'All Hubs');
   var userProps = currentUser.props || [];
   var allPN = getActiveProps().map(function(pr){ return pr.name; });
   var isAdm = userProps.length === 0 || userProps.length >= allPN.length - 1;
