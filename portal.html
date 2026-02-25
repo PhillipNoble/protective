@@ -3768,6 +3768,10 @@ function doLogin() {
       // Store logged-in team user info for permission checks
       window.currentTeamUser = tu;
       go('ad');
+      applyRoleRestrictions(tu.role || 'admin');
+      // Activate dashboard tab and render it
+      var dashNavEl = document.querySelector('#ad .ni[onclick*="adash"]');
+      anav('adash', dashNavEl);
       return;
     }
   }
