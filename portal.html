@@ -495,6 +495,19 @@ table.fpt tr:hover td{background:var(--cream);}
 .perm-yes{color:#15803d;font-size:14px;}
 .perm-no{color:#dc2626;font-size:14px;}
 .perm-part{color:#d97706;font-size:14px;}
+/* ── PERMISSION CHECKBOXES ── */
+.perm-section{margin-top:20px;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.perm-section-hd{background:var(--navy);color:#fff;padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.perm-rows{padding:6px 0;}
+.perm-row{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.perm-row:last-child{border-bottom:none;}
+.perm-row:hover{background:var(--cream);}
+.perm-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;}
+.perm-row-label{flex:1;font-size:12px;font-weight:500;color:var(--text);}
+.perm-row-desc{font-size:11px;color:var(--gray);margin-left:auto;text-align:right;max-width:200px;}
+.perm-row.locked{opacity:.45;pointer-events:none;}
+.perm-note{font-size:11px;color:var(--gray);font-style:italic;padding:6px 14px 8px;}
+.role-defaults-hint{font-size:11px;background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;border-radius:3px;padding:7px 12px;margin-top:12px;display:flex;align-items:flex-start;gap:6px;}
 </style>
 </head>
 <body>
@@ -1244,6 +1257,8 @@ table.fpt tr:hover td{background:var(--cream);}
             <select id="fpe_baths">
               <option value="1">1 Bath</option><option value="1.5">1.5 Bath</option>
               <option value="2">2 Bath</option><option value="2.5">2.5 Bath</option>
+              <option value="3">3 Bath</option><option value="3.5">3.5 Bath</option>
+              <option value="4">4 Bath</option>
             </select></div>
           <div class="fg"><label>Renovated</label>
             <select id="fpe_renov">
@@ -1426,7 +1441,7 @@ table.fpt tr:hover td{background:var(--cream);}
           <select id="fpa_beds"><option value="0">Studio</option><option value="1">1 Bed</option><option value="2">2 Bed</option><option value="3">3 Bed</option><option value="4">4 Bed</option></select>
         </div>
         <div class="fg"><label>Bathrooms *</label>
-          <select id="fpa_baths"><option value="1">1 Bath</option><option value="1.5">1.5 Bath</option><option value="2">2 Bath</option><option value="2.5">2.5 Bath</option></select>
+          <select id="fpa_baths"><option value="1">1 Bath</option><option value="1.5">1.5 Bath</option><option value="2">2 Bath</option><option value="2.5">2.5 Bath</option><option value="3">3 Bath</option><option value="3.5">3.5 Bath</option><option value="4">4 Bath</option></select>
         </div>
       </div>
       <div class="fg"><label>Rooms (one per line)</label>
@@ -1443,7 +1458,7 @@ table.fpt tr:hover td{background:var(--cream);}
 </div>
 
 <div class="mb" id="mteam">
-  <div class="modal">
+  <div class="modal" style="max-width:680px;">
     <div class="mh"><h3>Add Portal User</h3><button class="mx" onclick="closeM('mteam')">&#10005;</button></div>
     <div class="mbody">
       <div class="form-row">
@@ -1456,15 +1471,50 @@ table.fpt tr:hover td{background:var(--cream);}
         <div class="fg"><label>Confirm Password *</label><input type="password" id="tm_pw2" placeholder="Repeat password"></div>
       </div>
       <div class="fg"><label>Role / Access Level *</label>
-        <select id="tm_role">
+        <select id="tm_role" onchange="syncPermCheckboxes('tm')">
           <option value="superadmin">&#128737; Super Admin — Full system access + user management + settings</option>
           <option value="admin" selected>&#128274; Admin — Orders, properties, client logins, reports</option>
-          <option value="management">&#127970; Management — Orders, properties, view reports</option>
+          <option value="management">&#127970; Management — Orders, properties, leads &amp; proposals, reports</option>
           <option value="sales">&#128200; Sales — Leads, proposals, view orders</option>
           <option value="editor">&#9998; Editor — Create &amp; edit orders and floor plans</option>
         </select>
       </div>
-      <div id="tm_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
+      <div class="role-defaults-hint">&#8505;&#65039; Permissions below are pre-set based on the selected role. You can customize individual access for this user.</div>
+      <!-- PERMISSIONS -->
+      <div class="perm-section" style="margin-top:14px;">
+        <div class="perm-section-hd">&#9783; Orders &amp; Work</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="tm_p_view_orders"> <span class="perm-row-label">View Orders</span><span class="perm-row-desc">See all work orders &amp; dashboard</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_edit_orders"> <span class="perm-row-label">Create &amp; Edit Orders</span><span class="perm-row-desc">Submit and modify work orders</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_void_orders"> <span class="perm-row-label">Void / Cancel Orders</span><span class="perm-row-desc">Mark orders void or cancelled</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_confirm_orders"> <span class="perm-row-label">Confirm &amp; Schedule Orders</span><span class="perm-row-desc">Set install dates and confirm jobs</span></label>
+        </div>
+      </div>
+      <div class="perm-section">
+        <div class="perm-section-hd">&#127968; Properties &amp; Floor Plans</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="tm_p_view_props"> <span class="perm-row-label">View Properties</span><span class="perm-row-desc">Browse property list and details</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_edit_props"> <span class="perm-row-label">Add &amp; Edit Properties</span><span class="perm-row-desc">Create and modify property records</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_edit_fps"> <span class="perm-row-label">Manage Floor Plans</span><span class="perm-row-desc">Add, edit, and delete floor plans</span></label>
+        </div>
+      </div>
+      <div class="perm-section">
+        <div class="perm-section-hd">&#128200; Sales &amp; Proposals</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="tm_p_leads"> <span class="perm-row-label">Leads &amp; CRM</span><span class="perm-row-desc">Access lead tracker and contacts</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_proposals"> <span class="perm-row-label">Proposals &amp; Pricing</span><span class="perm-row-desc">Create and send pricing proposals</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_reports"> <span class="perm-row-label">Reports &amp; Analytics</span><span class="perm-row-desc">View revenue and performance data</span></label>
+        </div>
+      </div>
+      <div class="perm-section">
+        <div class="perm-section-hd">&#128274; Admin Controls</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="tm_p_clients"> <span class="perm-row-label">Client Logins</span><span class="perm-row-desc">Add and manage client portal access</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_users"> <span class="perm-row-label">Portal Users</span><span class="perm-row-desc">Add, edit, and manage team users</span></label>
+          <label class="perm-row"><input type="checkbox" id="tm_p_settings"> <span class="perm-row-label">Portal Settings</span><span class="perm-row-desc">Scopes, markets, service types, branding</span></label>
+        </div>
+      </div>
+      <div id="tm_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:12px;"></div>
     </div>
     <div class="mf">
       <button class="bl ol" onclick="closeM('mteam')">Cancel</button>
@@ -1474,7 +1524,7 @@ table.fpt tr:hover td{background:var(--cream);}
 </div>
 
 <div class="mb" id="mteamedit">
-  <div class="modal">
+  <div class="modal" style="max-width:680px;">
     <div class="mh"><h3>Edit Portal User</h3><button class="mx" onclick="closeM('mteamedit')">&#10005;</button></div>
     <div class="mbody">
       <input type="hidden" id="te_id">
@@ -1490,22 +1540,59 @@ table.fpt tr:hover td{background:var(--cream);}
           <div class="fg" style="margin-bottom:0;"><label>Confirm</label><input type="password" id="te_pw2"></div>
         </div>
       </div>
-      <div class="fg"><label>Role / Access Level</label>
-        <select id="te_role">
-          <option value="superadmin">&#128737; Super Admin — Full system access + user management + settings</option>
-          <option value="admin">&#128274; Admin — Orders, properties, client logins, reports</option>
-          <option value="management">&#127970; Management — Orders, properties, view reports</option>
-          <option value="sales">&#128200; Sales — Leads, proposals, view orders</option>
-          <option value="editor">&#9998; Editor — Create &amp; edit orders and floor plans</option>
-        </select>
+      <div class="form-row">
+        <div class="fg"><label>Role / Access Level</label>
+          <select id="te_role" onchange="syncPermCheckboxes('te')">
+            <option value="superadmin">&#128737; Super Admin — Full system access + user management + settings</option>
+            <option value="admin">&#128274; Admin — Orders, properties, client logins, reports</option>
+            <option value="management">&#127970; Management — Orders, properties, leads &amp; proposals, reports</option>
+            <option value="sales">&#128200; Sales — Leads, proposals, view orders</option>
+            <option value="editor">&#9998; Editor — Create &amp; edit orders and floor plans</option>
+          </select>
+        </div>
+        <div class="fg"><label>Status</label>
+          <select id="te_status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive / Suspended</option>
+          </select>
+        </div>
       </div>
-      <div class="fg"><label>Status</label>
-        <select id="te_status">
-          <option value="active">Active</option>
-          <option value="inactive">Inactive / Suspended</option>
-        </select>
+      <div class="role-defaults-hint">&#8505;&#65039; Permissions are pre-set by role. Customize individual access as needed — changes here override the role defaults.</div>
+      <!-- PERMISSIONS -->
+      <div class="perm-section" style="margin-top:14px;">
+        <div class="perm-section-hd">&#9783; Orders &amp; Work</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="te_p_view_orders"> <span class="perm-row-label">View Orders</span><span class="perm-row-desc">See all work orders &amp; dashboard</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_edit_orders"> <span class="perm-row-label">Create &amp; Edit Orders</span><span class="perm-row-desc">Submit and modify work orders</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_void_orders"> <span class="perm-row-label">Void / Cancel Orders</span><span class="perm-row-desc">Mark orders void or cancelled</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_confirm_orders"> <span class="perm-row-label">Confirm &amp; Schedule Orders</span><span class="perm-row-desc">Set install dates and confirm jobs</span></label>
+        </div>
       </div>
-      <div id="te_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
+      <div class="perm-section">
+        <div class="perm-section-hd">&#127968; Properties &amp; Floor Plans</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="te_p_view_props"> <span class="perm-row-label">View Properties</span><span class="perm-row-desc">Browse property list and details</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_edit_props"> <span class="perm-row-label">Add &amp; Edit Properties</span><span class="perm-row-desc">Create and modify property records</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_edit_fps"> <span class="perm-row-label">Manage Floor Plans</span><span class="perm-row-desc">Add, edit, and delete floor plans</span></label>
+        </div>
+      </div>
+      <div class="perm-section">
+        <div class="perm-section-hd">&#128200; Sales &amp; Proposals</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="te_p_leads"> <span class="perm-row-label">Leads &amp; CRM</span><span class="perm-row-desc">Access lead tracker and contacts</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_proposals"> <span class="perm-row-label">Proposals &amp; Pricing</span><span class="perm-row-desc">Create and send pricing proposals</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_reports"> <span class="perm-row-label">Reports &amp; Analytics</span><span class="perm-row-desc">View revenue and performance data</span></label>
+        </div>
+      </div>
+      <div class="perm-section">
+        <div class="perm-section-hd">&#128274; Admin Controls</div>
+        <div class="perm-rows">
+          <label class="perm-row"><input type="checkbox" id="te_p_clients"> <span class="perm-row-label">Client Logins</span><span class="perm-row-desc">Add and manage client portal access</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_users"> <span class="perm-row-label">Portal Users</span><span class="perm-row-desc">Add, edit, and manage team users</span></label>
+          <label class="perm-row"><input type="checkbox" id="te_p_settings"> <span class="perm-row-label">Portal Settings</span><span class="perm-row-desc">Scopes, markets, service types, branding</span></label>
+        </div>
+      </div>
+      <div id="te_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:12px;"></div>
     </div>
     <div class="mf">
       <button class="bl dn" style="margin-right:auto;padding:10px 20px;font-size:12px;" onclick="deleteTeamUser()">&#128465; Delete</button>
@@ -1944,7 +2031,12 @@ function switchHub(hub, el) {
 function filterProps() {
   var q = (document.getElementById('psearch')||{value:''}).value.toLowerCase();
   var sf = (document.getElementById('pstatus')||{value:''}).value;
-  var all=0;
+  // Reset all counts to 0 before recounting
+  var allEl = document.getElementById('call');
+  if (allEl) allEl.textContent = '0';
+  document.querySelectorAll('.tabs .tc').forEach(function(el){ el.textContent='0'; });
+  var counts = {};
+  var all = 0;
   document.querySelectorAll('#proplist .pr-card').forEach(function(card) {
     var hub=card.dataset.hub||'', nameCity=(card.dataset.name||'')+' '+(card.dataset.city||'')+' '+(card.dataset.zip||'');
     var status=card.dataset.status||'';
@@ -1956,11 +2048,14 @@ function filterProps() {
     // Counts: always based on search+status match (not hub tab) so tabs show correct totals
     if (matchQ && matchS) {
       all++;
-      var cEl = document.getElementById('c_'+hub);
-      if (cEl) cEl.textContent = parseInt(cEl.textContent||0)+1;
+      counts[hub] = (counts[hub]||0) + 1;
     }
   });
-  if(document.getElementById('call')) document.getElementById('call').textContent=all;
+  if (allEl) allEl.textContent = all;
+  Object.keys(counts).forEach(function(hub) {
+    var cEl = document.getElementById('c_'+hub);
+    if (cEl) cEl.textContent = counts[hub];
+  });
 }
 function togProp(card) {
   card.classList.toggle('open');
@@ -4814,7 +4909,59 @@ function openAddTeamUser() {
   ['tm_first','tm_last','tm_email','tm_pw','tm_pw2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('tm_role').value = 'admin';
   document.getElementById('tm_err').style.display = 'none';
+  syncPermCheckboxes('tm');
+  // Hide superadmin option if not superadmin
+  var isSA = (window._portalRole==='superadmin');
+  var saOpt = document.querySelector('#tm_role option[value="superadmin"]');
+  if (saOpt) saOpt.style.display = isSA ? '' : 'none';
   openM('mteam');
+}
+
+// ── PERMISSION SYSTEM ──
+
+// Role default permission sets
+var ROLE_PERMS = {
+  superadmin:  {view_orders:1,edit_orders:1,void_orders:1,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:1,proposals:1,reports:1,clients:1,users:1,settings:1},
+  admin:       {view_orders:1,edit_orders:1,void_orders:1,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:1,proposals:1,reports:1,clients:1,users:1,settings:1},
+  management:  {view_orders:1,edit_orders:1,void_orders:1,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:1,proposals:1,reports:1,clients:0,users:0,settings:0},
+  sales:       {view_orders:1,edit_orders:0,void_orders:0,confirm_orders:0,view_props:1,edit_props:0,edit_fps:0,leads:1,proposals:1,reports:0,clients:0,users:0,settings:0},
+  editor:      {view_orders:1,edit_orders:1,void_orders:0,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:0,proposals:0,reports:0,clients:0,users:0,settings:0}
+};
+
+var PERM_KEYS = ['view_orders','edit_orders','void_orders','confirm_orders','view_props','edit_props','edit_fps','leads','proposals','reports','clients','users','settings'];
+
+// Sync checkboxes to role defaults (prefix = 'tm' or 'te')
+function syncPermCheckboxes(prefix) {
+  var role = (document.getElementById(prefix+'_role')||{}).value || 'editor';
+  var defaults = ROLE_PERMS[role] || ROLE_PERMS.editor;
+  PERM_KEYS.forEach(function(k) {
+    var cb = document.getElementById(prefix+'_p_'+k);
+    if (cb) cb.checked = !!defaults[k];
+  });
+  // Lock superadmin — all perms always on
+  var isLocked = (role === 'superadmin');
+  PERM_KEYS.forEach(function(k) {
+    var row = document.getElementById(prefix+'_p_'+k);
+    if (row) row.parentElement.classList.toggle('locked', isLocked);
+  });
+}
+
+// Read checkboxes into permissions object
+function readPermCheckboxes(prefix) {
+  var perms = {};
+  PERM_KEYS.forEach(function(k) {
+    var cb = document.getElementById(prefix+'_p_'+k);
+    perms[k] = cb ? (cb.checked ? 1 : 0) : 0;
+  });
+  return perms;
+}
+
+// Set checkboxes from saved permissions object
+function setPermCheckboxes(prefix, perms) {
+  PERM_KEYS.forEach(function(k) {
+    var cb = document.getElementById(prefix+'_p_'+k);
+    if (cb) cb.checked = !!(perms && perms[k]);
+  });
 }
 
 function saveNewTeamUser() {
@@ -4836,7 +4983,7 @@ function saveNewTeamUser() {
   team.push({
     id:'t'+Date.now(), email:email, password:pw,
     name:first+' '+last, initials:(first[0]+last[0]).toUpperCase(),
-    role:role, status:'active',
+    role:role, status:'active', perms:readPermCheckboxes('tm'),
     created:months[today.getMonth()]+' '+today.getDate()+', '+today.getFullYear()
   });
   saveTeam(team);
@@ -4860,6 +5007,15 @@ function openEditTeamUser(uid) {
   document.getElementById('te_role').value=u.role||'admin';
   document.getElementById('te_status').value=u.status||'active';
   document.getElementById('te_err').style.display='none';
+  // Load saved perms or fall back to role defaults
+  if (u.perms) { setPermCheckboxes('te', u.perms); }
+  else { syncPermCheckboxes('te'); }
+  // Lock if superadmin
+  var isLocked = (u.role==='superadmin');
+  PERM_KEYS.forEach(function(k) {
+    var row = document.getElementById('te_p_'+k);
+    if (row) row.parentElement.classList.toggle('locked', isLocked);
+  });
   openM('mteamedit');
 }
 
@@ -4884,6 +5040,7 @@ function saveEditTeamUser() {
       team[i].email=email;
       team[i].role=document.getElementById('te_role').value;
       team[i].status=document.getElementById('te_status').value;
+      team[i].perms=readPermCheckboxes('te');
       if(pw) team[i].password=pw;
       break;
     }
@@ -4962,10 +5119,18 @@ function applyRoleRestrictions(role) {
   // ── DASHBOARD ACCESS ──
   // Sales: dashboard shows but only their own leads/proposals (future)
   // Editor: can see dashboard orders but not financials
-  if (role==='sales') {
-    // Hide properties and client logins nav items entirely
+  // Hide nav items based on actual permissions
+  if (!can('edit_props') && !can('view_props')) {
     document.querySelectorAll('[onclick*="aprops"]').forEach(function(el){ el.style.display='none'; });
+  }
+  if (!can('clients')) {
     document.querySelectorAll('[onclick*="ausers"]').forEach(function(el){ el.style.display='none'; });
+  }
+  if (!can('users')) {
+    document.querySelectorAll('[onclick*="ateam"]').forEach(function(el){ el.style.display='none'; });
+  }
+  if (!can('settings')) {
+    document.querySelectorAll('[onclick*="aset"]').forEach(function(el){ el.style.display='none'; });
   }
 
   // ── HEADER BADGE ──
@@ -4981,15 +5146,15 @@ function applyRoleRestrictions(role) {
 
 // Runtime permission check — call anywhere to gate actions
 function can(action) {
+  // Check per-user override perms first (stored on currentTeamUser)
+  var u = window.currentTeamUser;
+  if (u && u.perms && typeof u.perms[action] !== 'undefined') {
+    return !!u.perms[action];
+  }
+  // Fall back to role defaults
   var r = window._portalRole || 'editor';
-  var perms = {
-    superadmin: ['view_all','edit_orders','edit_props','edit_clients','edit_users','settings','delete','reports','leads','proposals'],
-    admin:      ['view_all','edit_orders','edit_props','edit_clients','edit_users','settings','reports'],
-    management: ['view_all','edit_orders','edit_props','reports'],
-    sales:      ['view_all','leads','proposals'],
-    editor:     ['edit_orders','edit_props']
-  };
-  return (perms[r]||[]).indexOf(action) >= 0;
+  var defaults = ROLE_PERMS[r] || ROLE_PERMS.editor;
+  return !!defaults[action];
 }
 
 // ── END PORTAL USER MANAGEMENT ──
