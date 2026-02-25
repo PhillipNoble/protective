@@ -574,8 +574,8 @@ table.fpt tr:hover td{background:var(--cream);}
       <div class="ni" onclick="cnav('cf',this)"><span class="ic">&#127760;</span> Floor Plans</div>
       <div class="ni" onclick="cnav('cx',this)"><span class="ic">&#128196;</span> Documents</div>
     </nav>
-    <div class="sbot">
-    <button class="lo" style="background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');},100);">&#128101; View Client Portal</button>
+    <div<div class="sbot">
+    <button class="lo" id="adminBackBtnSidebar" onclick="goBackToAdmin()" style="display:none;background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;">&#9756; Admin Panel</button>
     <button class="lo" onclick="doLogout()">&#8594; Sign Out</button>
   </div>
   </aside>
@@ -4004,12 +4004,19 @@ function goClientPortalFromChooser() {
   };
   loadClientPortal(synth);
   go('cl');
+  // Show both back buttons for team users
   var bb = document.getElementById('adminBackBtn'); if(bb) bb.style.display='inline-flex';
+  var bs = document.getElementById('adminBackBtnSidebar'); if(bs) bs.style.display='';
 }
 
 // Go back to admin panel from client portal (for admin users)
 function goBackToAdmin() {
   go('ad');
+  // Re-apply role restrictions after returning
+  applyRoleRestrictions(window._portalRole || 'admin');
+  // Re-activate the dashboard tab
+  var dashNavEl = document.querySelector('#ad .ni[onclick*="adash"]');
+  anav('adash', dashNavEl);
 }
 
 // Go to chooser screen
