@@ -373,7 +373,7 @@ table.fpt tr:hover td{background:var(--cream);}
 .img-slot-fname{font-size:10px;color:var(--gray);margin-top:6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* ── SCOPE CHECKBOXES ── */
-.scope-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:3px;margin-bottom:6px;transition:background .15s;background:var(--white);}
+.scope-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:4px;margin-bottom:6px;background:var(--white);flex-wrap:wrap;}
 .scope-row:hover{background:var(--cream);}
 .scope-row.dragging{opacity:.4;border-style:dashed;}
 .scope-row.drag-over{border-color:var(--navy);background:rgba(2,10,91,.05);}
@@ -903,12 +903,6 @@ table.fpt tr:hover td{background:var(--cream);}
               <label>Service Type</label>
               <select id="scope_new_svc">
                 <option value="">No specific service</option>
-                <option value="Carpet Installation">Carpet Installation</option>
-                <option value="Sheet Vinyl">Sheet Vinyl</option>
-                <option value="Luxury Vinyl Plank">Luxury Vinyl Plank</option>
-                <option value="Tile Installation">Tile Installation</option>
-                <option value="Subfloor Repair">Subfloor Repair</option>
-                <option value="Full Turnover Package">Full Turnover Package</option>
               </select>
             </div>
             <button class="bs gd" onclick="addGlobalScope()" style="margin-bottom:0;">+ Add Scope</button>
@@ -1665,6 +1659,27 @@ var DEFAULT_SCOPES = [
   {id:"sc6",name:"Full Turnover",        svc:"Full Turnover Package"},
   {id:"sc7",name:"Subfloor Repair Only", svc:"Subfloor Repair"}
 ];
+// ── Canonical service type list — used everywhere scopes reference a service ──
+var SVC_LIST = [
+  'Carpet Installation',
+  'Luxury Vinyl Plank (LVP)',
+  'Sheet Vinyl',
+  'Tile Installation',
+  'Pet Seal Treatment',
+  'Subfloor Repair',
+  'Full Turnover Package',
+  'Repair',
+  'Call Back'
+];
+function svcOptions(selected) {
+  var html = '<option value="">' + (selected ? '' : 'No specific service') + '</option>';
+  if (selected) html = '<option value="">No specific service</option>';
+  SVC_LIST.forEach(function(s) {
+    html += '<option value="' + s + '"' + (s === selected ? ' selected' : '') + '>' + s + '</option>';
+  });
+  return html;
+}
+
 function loadScopes() {
   try { var s=localStorage.getItem('pf_scopes'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_SCOPES)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_SCOPES)); }
 }
@@ -2380,8 +2395,17 @@ function renderScopeAdmin() {
   var list = document.getElementById('scope_list_admin');
   if (!list) return;
   var scopes = loadScopes();
+
+  // Keep scope_new_svc in sync with SVC_LIST
+  var newSvcSel = document.getElementById('scope_new_svc');
+  if (newSvcSel) {
+    newSvcSel.innerHTML = svcOptions('');
+  }
   list.innerHTML = '';
-  var SVC_OPTS = ['','Carpet Installation','Sheet Vinyl','Luxury Vinyl Plank','Tile Installation','Subfloor Repair','Full Turnover Package'];
+
+  if (!scopes.length) {
+    list.innerHTML = '<div style="padding:16px;color:var(--gray);font-size:13px;">No scopes yet. Add one below.</div>';
+  }
 
   scopes.forEach(function(sc) {
     var row = document.createElement('div');
@@ -2389,24 +2413,24 @@ function renderScopeAdmin() {
     row.draggable = true;
     row.dataset.sid = sc.id;
 
-    // Build service select options
-    var svcOpts = SVC_OPTS.map(function(o){
-      return '<option value="'+o+'"'+(o===sc.svc?' selected':'')+'>'+( o||'No specific service')+'</option>';
-    }).join('');
+    var svcLabel = sc.svc
+      ? '<span class="svc-tag">' + sc.svc + '</span>'
+      : '<span style="font-size:11px;color:var(--gray);font-style:italic;">No service assigned</span>';
 
     row.innerHTML =
       '<span class="drag-handle" title="Drag to reorder">&#8597;</span>'
-      +'<span class="scope-name-display">'+sc.name
-        +(sc.svc ? '<span class="svc-tag" style="margin-left:6px;">'+sc.svc+'</span>' : '')
-      +'</span>'
-      +'<div class="scope-edit-fields">'
-        +'<input type="text" class="scope-edit-name" value="'+sc.name+'" placeholder="Scope name">'
-        +'<select class="scope-edit-svc">'+svcOpts+'</select>'
-        +'<button class="bs gd" style="font-size:11px;white-space:nowrap;" onclick="saveScopeEdit(this)">&#10003; Save</button>'
-        +'<button class="bs ol" style="font-size:11px;" onclick="cancelScopeEdit(this)">Cancel</button>'
-      +'</div>'
-      +'<button class="bs ol" style="font-size:11px;" data-sid="'+sc.id+'" onclick="openScopeEdit(this)">&#9998; Edit</button>'
-      +'<button class="bs dn" style="font-size:11px;" data-sid="'+sc.id+'" onclick="delScopeClick(this)">&#10005;</button>';
+      + '<div class="scope-name-display" style="flex:1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+          + '<strong style="font-size:13px;">' + sc.name + '</strong>'
+          + svcLabel
+        + '</div>'
+      + '<div class="scope-edit-fields" style="flex:1;">'
+          + '<input type="text" class="scope-edit-name" value="' + sc.name + '" placeholder="Scope name" style="width:160px;">'
+          + '<select class="scope-edit-svc" style="min-width:180px;">' + svcOptions(sc.svc) + '</select>'
+          + '<button class="bs gd" style="font-size:11px;white-space:nowrap;" onclick="saveScopeEdit(this)">&#10003; Save</button>'
+          + '<button class="bs ol" style="font-size:11px;" onclick="cancelScopeEdit(this)">Cancel</button>'
+        + '</div>'
+      + '<button class="bs nv" style="font-size:11px;flex-shrink:0;" data-sid="' + sc.id + '" onclick="openScopeEdit(this)">&#9998; Edit</button>'
+      + '<button class="bs dn" style="font-size:11px;flex-shrink:0;" data-sid="' + sc.id + '" onclick="delScopeClick(this)">&#10005; Remove</button>';
 
     // ── Drag events ──
     row.addEventListener('dragstart', function(e) {
@@ -2432,13 +2456,13 @@ function renderScopeAdmin() {
       e.preventDefault();
       var draggedId = e.dataTransfer.getData('text/plain');
       if (draggedId === sc.id) return;
-      var scopes = loadScopes();
-      var fromIdx = scopes.findIndex(function(s){ return s.id===draggedId; });
-      var toIdx   = scopes.findIndex(function(s){ return s.id===sc.id; });
+      var fresh = loadScopes();
+      var fromIdx = fresh.findIndex(function(s){ return s.id===draggedId; });
+      var toIdx   = fresh.findIndex(function(s){ return s.id===sc.id; });
       if (fromIdx < 0 || toIdx < 0) return;
-      var moved = scopes.splice(fromIdx, 1)[0];
-      scopes.splice(toIdx, 0, moved);
-      saveScopes(scopes);
+      var moved = fresh.splice(fromIdx, 1)[0];
+      fresh.splice(toIdx, 0, moved);
+      saveScopes(fresh);
       renderScopeAdmin();
       toast('Scope order saved.');
     });
