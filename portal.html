@@ -1649,6 +1649,61 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script><script>// ── DATA ──
+
+// ── MARKETS ──
+var DEFAULT_MARKETS = [
+  {id:'mkt1', key:'memphis',   label:'Memphis',   address:'3846 Delp Street, Memphis, TN 38118',    phone:'(901) 794-4101'},
+  {id:'mkt2', key:'nashville', label:'Nashville', address:'808 Overton Lea Rd, Nashville, TN 37220', phone:'(615) 988-5188'}
+];
+function loadMarkets() {
+  try { var s=localStorage.getItem('pf_markets'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_MARKETS)); }
+  catch(e){ return JSON.parse(JSON.stringify(DEFAULT_MARKETS)); }
+}
+function saveMarkets(arr) { try { localStorage.setItem('pf_markets',JSON.stringify(arr)); } catch(e){} }
+function getMarket(keyOrLabel) {
+  if (!keyOrLabel) return null;
+  var k = (keyOrLabel+'').toLowerCase();
+  return loadMarkets().find(function(m){ return m.key===k || m.label.toLowerCase()===k; }) || null;
+}
+function hubBadgeHtml(hub) {
+  var m = getMarket(hub);
+  if (!hub) return '<span style="color:var(--gray);">—</span>';
+  var lbl = m ? m.label : (hub.charAt(0).toUpperCase()+hub.slice(1));
+  return '<span class="b hub-b" style="background:rgba(2,10,91,.08);color:var(--navy);border:1px solid rgba(2,10,91,.15);">'+lbl+'</span>';
+}
+// Populate a <select> with hub options (label as value, for orders)
+function populateHubSelect(elId, selectedVal, allLabel) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedVal !== undefined ? selectedVal : el.value;
+  var html = '<option value="">'+(allLabel||'All Hubs')+'</option>';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.label+'"'+(m.label===cur?' selected':'')+'>'+m.label+'</option>'; });
+  el.innerHTML = html;
+}
+// Populate a <select> with hub key options (key as value, for filtering)
+function populateHubKeySelect(elId, selectedKey, allLabel) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedKey !== undefined ? selectedKey : el.value;
+  var html = '<option value="">'+(allLabel||'All Hubs')+'</option>';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+'</option>'; });
+  el.innerHTML = html;
+}
+// Populate a hub select for property add/edit (key as value, "X Hub" as label)
+function populatePropHubSelect(elId, selectedKey) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedKey !== undefined ? selectedKey : el.value;
+  var html = '';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+' Hub</option>'; });
+  el.innerHTML = html;
+}
+// Populate All Markets select (for client login modal, key as value)
+function populateAllMarketsSelect(elId, selectedKey) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedKey !== undefined ? selectedKey : el.value;
+  var html = '<option value="all">All Markets</option>';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+'</option>'; });
+  el.innerHTML = html;
+}
+
 // ── TEAM STORE ──
 var DEFAULT_TEAM = [
   {id:"t1", email:"admin@protectiveflooring.com",  password:"PF-Admin-2025!", name:"PF Admin",     initials:"PA", role:"superadmin", status:"active", created:"Jan 1, 2025"},
@@ -4362,60 +4417,6 @@ function togScope(el) {
   var c=el.querySelector('.ck');
   if(c) c.textContent=el.classList.contains('on')?'\u2713':'';
 }
-// ── MARKETS ──
-var DEFAULT_MARKETS = [
-  {id:'mkt1', key:'memphis',   label:'Memphis',   address:'3846 Delp Street, Memphis, TN 38118',    phone:'(901) 794-4101'},
-  {id:'mkt2', key:'nashville', label:'Nashville', address:'808 Overton Lea Rd, Nashville, TN 37220', phone:'(615) 988-5188'}
-];
-function loadMarkets() {
-  try { var s=localStorage.getItem('pf_markets'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_MARKETS)); }
-  catch(e){ return JSON.parse(JSON.stringify(DEFAULT_MARKETS)); }
-}
-function saveMarkets(arr) { try { localStorage.setItem('pf_markets',JSON.stringify(arr)); } catch(e){} }
-function getMarket(keyOrLabel) {
-  if (!keyOrLabel) return null;
-  var k = (keyOrLabel+'').toLowerCase();
-  return loadMarkets().find(function(m){ return m.key===k || m.label.toLowerCase()===k; }) || null;
-}
-function hubBadgeHtml(hub) {
-  var m = getMarket(hub);
-  if (!hub) return '<span style="color:var(--gray);">—</span>';
-  var lbl = m ? m.label : (hub.charAt(0).toUpperCase()+hub.slice(1));
-  return '<span class="b hub-b" style="background:rgba(2,10,91,.08);color:var(--navy);border:1px solid rgba(2,10,91,.15);">'+lbl+'</span>';
-}
-// Populate a <select> with hub options (label as value, for orders)
-function populateHubSelect(elId, selectedVal, allLabel) {
-  var el = document.getElementById(elId); if (!el) return;
-  var cur = selectedVal !== undefined ? selectedVal : el.value;
-  var html = '<option value="">'+(allLabel||'All Hubs')+'</option>';
-  loadMarkets().forEach(function(m){ html+='<option value="'+m.label+'"'+(m.label===cur?' selected':'')+'>'+m.label+'</option>'; });
-  el.innerHTML = html;
-}
-// Populate a <select> with hub key options (key as value, for filtering)
-function populateHubKeySelect(elId, selectedKey, allLabel) {
-  var el = document.getElementById(elId); if (!el) return;
-  var cur = selectedKey !== undefined ? selectedKey : el.value;
-  var html = '<option value="">'+(allLabel||'All Hubs')+'</option>';
-  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+'</option>'; });
-  el.innerHTML = html;
-}
-// Populate a hub select for property add/edit (key as value, "X Hub" as label)
-function populatePropHubSelect(elId, selectedKey) {
-  var el = document.getElementById(elId); if (!el) return;
-  var cur = selectedKey !== undefined ? selectedKey : el.value;
-  var html = '';
-  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+' Hub</option>'; });
-  el.innerHTML = html;
-}
-// Populate All Markets select (for client login modal, key as value)
-function populateAllMarketsSelect(elId, selectedKey) {
-  var el = document.getElementById(elId); if (!el) return;
-  var cur = selectedKey !== undefined ? selectedKey : el.value;
-  var html = '<option value="all">All Markets</option>';
-  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+'</option>'; });
-  el.innerHTML = html;
-}
-
 // ── CLIENT LOGIN POSITIONS ──
 var DEFAULT_POSITIONS = [
   {id:'pos1', name:'Property Manager'},
