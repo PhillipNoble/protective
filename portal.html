@@ -1348,12 +1348,12 @@ table.fpt tr:hover td{background:var(--cream);}
       </div>
       <div class="fg">
         <label>Assign to Properties * <span style="font-size:10px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">Select one or more</span></label>
-        <div style="display:flex;gap:8px;margin-top:6px;margin-bottom:8px;">
-          <div style="position:relative;flex:1;">
-            <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--gray);pointer-events:none;">&#128269;</span>
-            <input type="text" id="mu_prop_search" placeholder="Search properties..." oninput="filterUserPropSearch(this.value)" style="width:100%;padding:7px 10px 7px 28px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;box-sizing:border-box;">
+        <div style="margin-top:6px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px;">
+          <div style="position:relative;">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gray);pointer-events:none;font-size:14px;">&#128269;</span>
+            <input type="text" id="mu_prop_search" placeholder="Search properties..." oninput="filterUserPropSearch(this.value)" style="width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;box-sizing:border-box;">
           </div>
-          <select id="mu_hub" onchange="filterUserProps(this.value)" style="min-width:130px;">
+          <select id="mu_hub" onchange="filterUserProps(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;">
             <option value="all">All Markets</option>
             <option value="memphis">&#128205; Memphis</option>
             <option value="nashville">&#128205; Nashville</option>
