@@ -856,7 +856,7 @@ table.fpt tr:hover td{background:var(--cream);}
           </div></div>
         <div class="fb" style="margin-bottom:16px;">
           <div class="sw" style="max-width:400px;"><span class="si2">&#128269;</span><input type="text" id="psearch" placeholder="Search by name, city, or zip..." oninput="filterProps()"></div>
-          <select class="fs" id="pstatus" onchange="filterProps()"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+          <select class="fs" id="pstatus" onchange="filterProps()"><option value="">All Statuses</option><option value="active" selected>Active</option><option value="inactive">Inactive</option></select>
         </div>
         <div class="tabs">
           <div class="tab on" onclick="switchHub('all',this)">All <span class="tc" id="call">8</span></div>
@@ -1785,8 +1785,10 @@ function filterProps() {
     var matchHub = curHub==='all'||hub===curHub;
     var matchQ = !q || nameCity.indexOf(q)>=0;
     var matchS = !sf || status===sf;
-    card.style.display = (matchHub&&matchQ&&matchS)?'':'none';
-    if (card.style.display!=='none') {
+    var visible = matchHub && matchQ && matchS;
+    card.style.display = visible ? '' : 'none';
+    // Counts: always based on search+status match (not hub tab) so tabs show correct totals
+    if (matchQ && matchS) {
       all++;
       if(hub==='memphis') mem++;
       if(hub==='nashville') nash++;
@@ -1802,6 +1804,9 @@ function togProp(card) {
 function renderPropList() {
   var list = document.getElementById('proplist');
   if (!list) return;
+  // Reset hub filter to 'all' and sync tab highlight
+  curHub = 'all';
+  document.querySelectorAll('.tabs .tab').forEach(function(t,i){ t.classList.toggle('on', i===0); });
   var props = getProps().filter(function(pr){ return !pr.deletedAt; });
   list.innerHTML = '';
   props.forEach(function(prop) {
@@ -3742,7 +3747,7 @@ function cnav(pid, el) {
 function anav(pid, el) {
   if (pid==='adash') renderAdashRecent();
   if (pid==='aord')  renderAdminOrders();
-  if (pid==='aprops') renderPropList();
+  if (pid==='aprops') { renderPropList(); setTimeout(filterProps, 50); }
   if (pid==='aset') renderScopeAdmin();
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
   if (el) el.classList.add('on');
