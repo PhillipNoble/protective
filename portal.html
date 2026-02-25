@@ -1359,7 +1359,7 @@ table.fpt tr:hover td{background:var(--cream);}
             <option value="nashville">&#128205; Nashville</option>
           </select>
         </div>
-        <div id="uproplist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;padding:2px;border:1px solid var(--border);border-radius:var(--r);padding:8px;"></div>
+        <div id="uproplist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:8px;"></div>
         <div id="mu_prop_count" style="font-size:11px;color:var(--gray);margin-top:5px;"></div>
       </div>
     </div>
@@ -4334,9 +4334,9 @@ function buildUserPropList(containerId, checkedProps) {
 }
 
 function filterUserProps(hub) {
-  var search = (document.getElementById('mu_prop_search') || {value:''}).value.toLowerCase();
+  var search = (document.getElementById('mu_prop_search') || {value:''}).value.toLowerCase().trim();
   document.querySelectorAll('#uproplist .uprop-item').forEach(function(item) {
-    var hubMatch = hub === 'all' || !hub || item.dataset.hub === hub;
+    var hubMatch = !hub || hub === 'all' || item.dataset.hub === hub;
     var nameMatch = !search || (item.dataset.name || '').indexOf(search) >= 0;
     item.style.display = (hubMatch && nameMatch) ? '' : 'none';
   });
@@ -4345,7 +4345,13 @@ function filterUserProps(hub) {
 
 function filterUserPropSearch(val) {
   var hub = (document.getElementById('mu_hub') || {value:'all'}).value;
-  filterUserProps(hub);
+  var search = (val || '').toLowerCase().trim();
+  document.querySelectorAll('#uproplist .uprop-item').forEach(function(item) {
+    var hubMatch = !hub || hub === 'all' || item.dataset.hub === hub;
+    var nameMatch = !search || (item.dataset.name || '').indexOf(search) >= 0;
+    item.style.display = (hubMatch && nameMatch) ? '' : 'none';
+  });
+  updatePropCount('uproplist');
 }
 
 function updatePropCount(containerId) {
