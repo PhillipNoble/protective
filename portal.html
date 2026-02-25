@@ -3938,28 +3938,7 @@ function clearFpUp() {
   document.getElementById('fupinput')._src = null;
 }
 
-// ── PROPERTIES (ADMIN) ──
-var curHub = 'all';
-function switchHub(hub, el) {
-  curHub = hub;
-  document.querySelectorAll('.tabs .tab').forEach(function(t){ t.classList.remove('on'); });
-  el.classList.add('on');
-  filterProps();
-}
-function filterProps() {
-  var q = (document.getElementById('psearch')||{value:''}).value.toLowerCase();
-  var sf = (document.getElementById('pstatus')||{value:''}).value;
-  var all=0,mem=0,nash=0;
-  document.querySelectorAll('#proplist .pr').forEach(function(row) {
-    var hub=row.dataset.hub||'',name=row.dataset.name||'',city=row.dataset.city||'',status=row.dataset.status||'';
-    var show=(curHub==='all'||hub===curHub)&&(!q||name.indexOf(q)>=0||city.indexOf(q)>=0)&&(!sf||status===sf);
-    row.style.display=show?'':'none';
-    if(show){all++;if(hub==='memphis')mem++;if(hub==='nashville')nash++;}
-  });
-  document.getElementById('call').textContent=all;
-  document.getElementById('cmem').textContent=mem;
-  document.getElementById('cnash').textContent=nash;
-}
+// ── PROPERTIES (ADMIN) — functions defined earlier in script ──
 function togProp(row) { row.classList.toggle('op'); }
 function openEditFp(id) { document.getElementById('fpetitle').textContent='Edit Floor Plan'; openM('mfpe'); }
 function openAddFp() { document.getElementById('fpetitle').textContent='Add Floor Plan'; openM('mfpe'); }
