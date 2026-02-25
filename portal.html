@@ -909,6 +909,27 @@ table.fpt tr:hover td{background:var(--cream);}
           </div>
         </div>
 
+        <!-- ── SERVICE TYPES ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span>&#127963; Flooring Service Types</span>
+            <span style="font-size:11px;font-weight:400;color:var(--gray);">Used in work orders &amp; scope assignments</span>
+          </div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.6;">
+            Manage the list of flooring service types available when creating work orders and assigning scopes.
+            Changes apply immediately across the portal. Drag rows to reorder.
+          </p>
+          <div id="svc_type_list"></div>
+          <div style="display:flex;gap:8px;margin-top:14px;align-items:flex-end;flex-wrap:wrap;">
+            <div class="fg" style="flex:1;min-width:200px;margin-bottom:0;">
+              <label>New Service Type Name</label>
+              <input type="text" id="svc_new_name" placeholder="e.g. Hardwood Installation" onkeydown="if(event.key==='Enter')addServiceType();">
+            </div>
+            <button class="bs gd" onclick="addServiceType()" style="margin-bottom:0;">+ Add Service Type</button>
+          </div>
+        </div>
+
+
         <!-- ── EMAIL NOTIFICATIONS ── -->
         <div class="ms" style="margin-bottom:28px;">
           <div class="mst">&#9993; Email Notifications</div>
@@ -1600,9 +1621,9 @@ table.fpt tr:hover td{background:var(--cream);}
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
 document.addEventListener('DOMContentLoaded', function() {
   // Sync seed orders into localStorage if this is a fresh load
-  if (!localStorage.getItem('pf_orders')) {
-    saveOrders();
-  }
+  if (!localStorage.getItem('pf_orders')) { saveOrders(); }
+  // Sync SVC_LIST from stored services on every load
+  SVC_LIST = loadServices().map(function(s){ return s.name; });
 });
 
 </script><script>// ── DATA ──
@@ -1660,22 +1681,35 @@ var DEFAULT_SCOPES = [
   {id:"sc7",name:"Subfloor Repair Only", svc:"Subfloor Repair"}
 ];
 // ── Canonical service type list — used everywhere scopes reference a service ──
-var SVC_LIST = [
-  'Carpet Installation',
-  'Luxury Vinyl Plank (LVP)',
-  'Sheet Vinyl',
-  'Tile Installation',
-  'Pet Seal Treatment',
-  'Subfloor Repair',
-  'Full Turnover Package',
-  'Repair',
-  'Call Back'
+var DEFAULT_SERVICES = [
+  {id:'svc1', name:'Carpet Installation'},
+  {id:'svc2', name:'Luxury Vinyl Plank (LVP)'},
+  {id:'svc3', name:'Sheet Vinyl'},
+  {id:'svc4', name:'Tile Installation'},
+  {id:'svc5', name:'Pet Seal Treatment'},
+  {id:'svc6', name:'Subfloor Repair'},
+  {id:'svc7', name:'Full Turnover Package'},
+  {id:'svc8', name:'Repair'},
+  {id:'svc9', name:'Call Back'}
 ];
+// Live list — kept in sync with localStorage by saveServices()
+var SVC_LIST = DEFAULT_SERVICES.map(function(s){ return s.name; });
+function loadServices() {
+  try {
+    var s = localStorage.getItem('pf_services');
+    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_SERVICES));
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_SERVICES)); }
+}
+function saveServices(arr) {
+  try { localStorage.setItem('pf_services', JSON.stringify(arr)); } catch(e) {}
+  // Refresh SVC_LIST so all dropdowns stay in sync
+  SVC_LIST = arr.map(function(s){ return s.name; });
+}
 function svcOptions(selected) {
-  var html = '<option value="">' + (selected ? '' : 'No specific service') + '</option>';
-  if (selected) html = '<option value="">No specific service</option>';
-  SVC_LIST.forEach(function(s) {
-    html += '<option value="' + s + '"' + (s === selected ? ' selected' : '') + '>' + s + '</option>';
+  var list = loadServices();
+  var html = '<option value="">No specific service</option>';
+  list.forEach(function(s) {
+    html += '<option value="' + s.name + '"' + (s.name === selected ? ' selected' : '') + '>' + s.name + '</option>';
   });
   return html;
 }
@@ -2391,6 +2425,153 @@ function deleteFpFromModal() {
 }
 
 // ── GLOBAL SCOPE MANAGER (Settings panel) ──
+// ── SERVICE TYPES MANAGER ──
+function renderServiceTypes() {
+  var list = document.getElementById('svc_type_list');
+  if (!list) return;
+  var services = loadServices();
+  list.innerHTML = '';
+
+  if (!services.length) {
+    list.innerHTML = '<div style="padding:12px;color:var(--gray);font-size:13px;font-style:italic;">No service types defined.</div>';
+    return;
+  }
+
+  services.forEach(function(svc, idx) {
+    var row = document.createElement('div');
+    row.className = 'scope-row';
+    row.dataset.svid = svc.id;
+
+    row.innerHTML =
+      '<span class="drag-handle" title="Drag to reorder">&#8597;</span>'
+      + '<div class="svc-name-display" style="flex:1;font-size:13px;font-weight:600;color:var(--navy);">'
+          + '<span class="svc-num" style="display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:10px;font-weight:700;text-align:center;line-height:22px;margin-right:8px;">' + (idx + 1) + '</span>'
+          + svc.name
+        + '</div>'
+      + '<div class="svc-edit-fields" style="display:none;flex:1;gap:8px;align-items:center;">'
+          + '<input type="text" class="svc-edit-name" value="' + svc.name + '" placeholder="Service type name" style="flex:1;min-width:180px;">'
+          + '<button class="bs gd" style="font-size:11px;white-space:nowrap;" onclick="saveSvcEdit(this)">&#10003; Save</button>'
+          + '<button class="bs ol" style="font-size:11px;" onclick="cancelSvcEdit(this)">Cancel</button>'
+        + '</div>'
+      + '<button class="bs nv" style="font-size:11px;flex-shrink:0;" onclick="openSvcEdit(this)">&#9998; Edit</button>'
+      + '<button class="bs dn" style="font-size:11px;flex-shrink:0;" onclick="deleteSvcType(this)" data-svid="' + svc.id + '">&#10005; Remove</button>';
+
+    // Drag to reorder
+    row.draggable = true;
+    row.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', svc.id);
+      setTimeout(function(){ row.classList.add('dragging'); }, 0);
+    });
+    row.addEventListener('dragend', function() {
+      row.classList.remove('dragging');
+      document.querySelectorAll('#svc_type_list .scope-row').forEach(function(r){ r.classList.remove('drag-over'); });
+    });
+    row.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('#svc_type_list .scope-row').forEach(function(r){ r.classList.remove('drag-over'); });
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('drop', function(e) {
+      e.preventDefault();
+      var draggedId = e.dataTransfer.getData('text/plain');
+      if (draggedId === svc.id) return;
+      var fresh = loadServices();
+      var from = fresh.findIndex(function(s){ return s.id === draggedId; });
+      var to   = fresh.findIndex(function(s){ return s.id === svc.id; });
+      if (from < 0 || to < 0) return;
+      var moved = fresh.splice(from, 1)[0];
+      fresh.splice(to, 0, moved);
+      saveServices(fresh);
+      renderServiceTypes();
+      toast('Service type order saved.');
+    });
+
+    list.appendChild(row);
+  });
+}
+
+function openSvcEdit(btn) {
+  var row = btn.closest('.scope-row');
+  row.querySelector('.svc-name-display').style.display = 'none';
+  row.querySelector('.svc-edit-fields').style.display = 'flex';
+  btn.style.display = 'none';
+  row.querySelector('.bs.dn').style.display = 'none';
+  row.querySelector('.svc-edit-name').focus();
+  row.querySelector('.svc-edit-name').select();
+}
+
+function cancelSvcEdit(btn) {
+  var row = btn.closest('.scope-row');
+  row.querySelector('.svc-name-display').style.display = '';
+  row.querySelector('.svc-edit-fields').style.display = 'none';
+  row.querySelectorAll('.bs').forEach(function(b){ b.style.display = ''; });
+}
+
+function saveSvcEdit(btn) {
+  var row  = btn.closest('.scope-row');
+  var svid = row.dataset.svid;
+  var name = row.querySelector('.svc-edit-name').value.trim();
+  if (!name) { toast('Service type name cannot be empty.'); return; }
+  var services = loadServices();
+  var old = '';
+  services = services.map(function(s) {
+    if (s.id === svid) { old = s.name; return {id: s.id, name: name}; }
+    return s;
+  });
+  saveServices(services);
+  // Also update any scopes that reference the old name
+  if (old && old !== name) {
+    var scopes = loadScopes().map(function(sc) {
+      return sc.svc === old ? Object.assign({}, sc, {svc: name}) : sc;
+    });
+    saveScopes(scopes);
+  }
+  renderServiceTypes();
+  renderScopeAdmin();
+  toast('Service type updated.');
+}
+
+function deleteSvcType(btn) {
+  var svid = btn.getAttribute('data-svid');
+  var services = loadServices();
+  var svc = services.find(function(s){ return s.id === svid; });
+  if (!svc) return;
+  // Check if any scopes use this service type
+  var using = loadScopes().filter(function(sc){ return sc.svc === svc.name; });
+  var msg = 'Remove "' + svc.name + '" from service types?';
+  if (using.length) {
+    msg += '\n\n' + using.length + ' scope(s) reference this service type and will be set to "No specific service".';
+  }
+  if (!confirm(msg)) return;
+  // Clear references in scopes
+  if (using.length) {
+    var updated = loadScopes().map(function(sc) {
+      return sc.svc === svc.name ? Object.assign({}, sc, {svc: ''}) : sc;
+    });
+    saveScopes(updated);
+  }
+  saveServices(services.filter(function(s){ return s.id !== svid; }));
+  renderServiceTypes();
+  renderScopeAdmin();
+  toast('"' + svc.name + '" removed.');
+}
+
+function addServiceType() {
+  var inp = document.getElementById('svc_new_name');
+  var name = (inp ? inp.value : '').trim();
+  if (!name) { toast('Please enter a service type name.'); return; }
+  var services = loadServices();
+  if (services.find(function(s){ return s.name.toLowerCase() === name.toLowerCase(); })) {
+    toast('A service type with that name already exists.'); return;
+  }
+  services.push({id: 'svc_' + Date.now().toString(36), name: name});
+  saveServices(services);
+  if (inp) inp.value = '';
+  renderServiceTypes();
+  renderScopeAdmin();
+  toast('"' + name + '" added to service types.');
+}
+
 function renderScopeAdmin() {
   var list = document.getElementById('scope_list_admin');
   if (!list) return;
@@ -3772,7 +3953,7 @@ function anav(pid, el) {
   if (pid==='adash') renderAdashRecent();
   if (pid==='aord')  renderAdminOrders();
   if (pid==='aprops') { renderPropList(); setTimeout(filterProps, 50); }
-  if (pid==='aset') renderScopeAdmin();
+  if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); }
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
   if (el) el.classList.add('on');
   document.querySelectorAll('#ad .panel').forEach(function(p){ p.classList.remove('on'); });
