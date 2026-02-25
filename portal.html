@@ -1678,7 +1678,7 @@ function loadProps() {
 function saveProps(arr) { try { localStorage.setItem('pf_props',JSON.stringify(arr)); } catch(e) {} }
 function getProps() { return loadProps(); }
 // Return only visible (non-deleted, non-filtered) props
-function getActiveProps() { return getProps().filter(function(pr){ return pr.deletedAt===null||pr.deletedAt===undefined; }); }
+function getActiveProps() { return getProps().filter(function(pr){ return !pr.deletedAt || pr.deletedAt==='null'; }); }
 
 // ── GLOBAL SCOPE STORE ──
 var DEFAULT_SCOPES = [
@@ -4311,48 +4311,54 @@ function addQuickPosition() {
 }
 
 function buildUserPropList(containerId, checkedProps) {
-  // Render dynamic property checkboxes from active props
   var container = document.getElementById(containerId);
   if (!container) return;
   var props = getActiveProps();
   container.innerHTML = '';
+  if (!props.length) {
+    container.innerHTML = '<div style="padding:12px;color:var(--gray);font-size:13px;grid-column:1/-1;">No active properties found.</div>';
+    return;
+  }
   props.forEach(function(pr) {
-    var checked = checkedProps && checkedProps.indexOf(pr.name) >= 0;
+    var isChecked = checkedProps && checkedProps.indexOf(pr.name) >= 0;
+    var hub = (pr.hub || 'memphis').toLowerCase();
+    var hubLabel = hub === 'nashville' ? 'Nashville' : 'Memphis';
     var lbl = document.createElement('label');
     lbl.className = 'uprop-item';
-    lbl.dataset.hub = pr.hub || 'memphis';
-    lbl.dataset.name = pr.name.toLowerCase();
-    lbl.innerHTML =
-      '<input type="checkbox" name="uprop" value="' + pr.name + '"' + (checked ? ' checked' : '') + '>'
-      + '<div>'
-        + '<div style="font-size:13px;font-weight:600;color:var(--navy);">' + pr.name + '</div>'
-        + '<div style="font-size:11px;color:var(--gray);">' + (pr.hub === 'nashville' ? 'Nashville' : 'Memphis') + '</div>'
-      + '</div>';
+    lbl.setAttribute('data-hub', hub);
+    lbl.setAttribute('data-name', pr.name.toLowerCase());
+    lbl.innerHTML = '<input type="checkbox" name="uprop" value="' + pr.name + '"' + (isChecked ? ' checked' : '') + '>'
+      + '<div><div style="font-size:13px;font-weight:600;color:var(--navy);">' + pr.name + '</div>'
+      + '<div style="font-size:11px;color:var(--gray);">' + hubLabel + '</div></div>';
+    lbl.querySelector('input').addEventListener('change', function(){ applyUserPropFilters(); });
     container.appendChild(lbl);
   });
-  updatePropCount(containerId);
+  applyUserPropFilters();
 }
 
-function filterUserProps(hub) {
-  var search = (document.getElementById('mu_prop_search') || {value:''}).value.toLowerCase().trim();
+function applyUserPropFilters() {
+  var hub    = (document.getElementById('mu_hub') || {value:'all'}).value;
+  var search = ((document.getElementById('mu_prop_search') || {value:''}).value || '').toLowerCase().trim();
+  var shown = 0, total = 0;
   document.querySelectorAll('#uproplist .uprop-item').forEach(function(item) {
-    var hubMatch = !hub || hub === 'all' || item.dataset.hub === hub;
-    var nameMatch = !search || (item.dataset.name || '').indexOf(search) >= 0;
-    item.style.display = (hubMatch && nameMatch) ? '' : 'none';
+    total++;
+    var itemHub  = (item.getAttribute('data-hub') || '').toLowerCase();
+    var itemName = (item.getAttribute('data-name') || '').toLowerCase();
+    var hubOk  = !hub || hub === 'all' || itemHub === hub;
+    var nameOk = !search || itemName.indexOf(search) >= 0;
+    var show = hubOk && nameOk;
+    item.style.display = show ? 'flex' : 'none';
+    if (show) shown++;
   });
-  updatePropCount('uproplist');
+  var checked = document.querySelectorAll('#uproplist input[type=checkbox]:checked').length;
+  var countEl = document.getElementById('mu_prop_count');
+  if (countEl) {
+    countEl.textContent = checked + ' selected · ' + (shown < total ? shown + ' of ' + total + ' shown' : total + ' properties');
+  }
 }
 
-function filterUserPropSearch(val) {
-  var hub = (document.getElementById('mu_hub') || {value:'all'}).value;
-  var search = (val || '').toLowerCase().trim();
-  document.querySelectorAll('#uproplist .uprop-item').forEach(function(item) {
-    var hubMatch = !hub || hub === 'all' || item.dataset.hub === hub;
-    var nameMatch = !search || (item.dataset.name || '').indexOf(search) >= 0;
-    item.style.display = (hubMatch && nameMatch) ? '' : 'none';
-  });
-  updatePropCount('uproplist');
-}
+function filterUserProps(hub) { applyUserPropFilters(); }
+function filterUserPropSearch(val) { applyUserPropFilters(); }
 
 function updatePropCount(containerId) {
   var container = document.getElementById(containerId);
