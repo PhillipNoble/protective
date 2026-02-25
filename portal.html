@@ -695,8 +695,6 @@ table.fpt tr:hover td{background:var(--cream);}
           </select>
           <select class="fs" id="ch_hub_filter" onchange="renderClientHistory()">
             <option value="">All Hubs</option>
-            <option value="memphis">Memphis</option>
-            <option value="nashville">Nashville</option>
           </select>
           <select class="fs" id="ch_sort" onchange="renderClientHistory()">
             <option value="newest">Newest First</option>
@@ -783,8 +781,6 @@ table.fpt tr:hover td{background:var(--cream);}
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <select class="fs" id="adash_hub" onchange="switchDashTab(_dashTab)" style="min-width:130px;">
               <option value="">All Hubs</option>
-              <option value="Memphis">Memphis</option>
-              <option value="Nashville">Nashville</option>
             </select>
             <div style="display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
               <button id="tab_recent" class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
@@ -827,8 +823,6 @@ table.fpt tr:hover td{background:var(--cream);}
           </select>
           <select class="fs" id="aord_hub" onchange="renderAdminOrders()">
             <option value="">All Hubs</option>
-            <option value="Memphis">Memphis</option>
-            <option value="Nashville">Nashville</option>
           </select>
           <select class="fs" id="aord_sort" onchange="renderAdminOrders()">
             <option value="newest">Newest First</option>
@@ -858,11 +852,7 @@ table.fpt tr:hover td{background:var(--cream);}
           <div class="sw" style="max-width:400px;"><span class="si2">&#128269;</span><input type="text" id="psearch" placeholder="Search by name, city, or zip..." oninput="filterProps()"></div>
           <select class="fs" id="pstatus" onchange="filterProps()"><option value="">All Statuses</option><option value="active" selected>Active</option><option value="inactive">Inactive</option></select>
         </div>
-        <div class="tabs">
-          <div class="tab on" onclick="switchHub('all',this)">All <span class="tc" id="call">8</span></div>
-          <div class="tab" onclick="switchHub('memphis',this)">&#128205; Memphis Hub <span class="tc" id="cmem">5</span></div>
-          <div class="tab" onclick="switchHub('nashville',this)">&#128205; Nashville Hub <span class="tc" id="cnash">3</span></div>
-        </div>
+        <div class="tabs" id="hub_tabs"></div>
         <div id="proplist"></div>
       </div><!-- /aprops -->
 
@@ -929,6 +919,32 @@ table.fpt tr:hover td{background:var(--cream);}
           </div>
         </div>
 
+
+
+        <!-- ── MARKETS / LOCATIONS ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span>&#127759; Markets &amp; Locations</span>
+            <span style="font-size:11px;font-weight:400;color:var(--gray);">Add new markets as you expand</span>
+          </div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.6;">
+            Markets appear as hub options when adding properties, creating work orders, and filtering throughout the portal.
+            Each market has its own address and phone number printed on work orders.
+          </p>
+          <div id="market_list"></div>
+          <div style="margin-top:14px;padding:16px;border:1px dashed var(--border);border-radius:var(--r);background:var(--off);">
+            <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Add New Market</div>
+            <div class="form-row" style="margin-bottom:8px;">
+              <div class="fg" style="margin-bottom:0;"><label>Market Name *</label><input type="text" id="mkt_new_name" placeholder="e.g. Jackson, MS"></div>
+              <div class="fg" style="margin-bottom:0;"><label>Market Key *</label><input type="text" id="mkt_new_key" placeholder="e.g. jackson" style="text-transform:lowercase;"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:8px;">
+              <div class="fg" style="margin-bottom:0;"><label>Office Address</label><input type="text" id="mkt_new_addr" placeholder="123 Main St, Jackson, MS 39201"></div>
+              <div class="fg" style="margin-bottom:0;"><label>Phone</label><input type="text" id="mkt_new_phone" placeholder="(601) 555-0100"></div>
+            </div>
+            <button class="bs gd" onclick="addMarket()" style="margin-top:4px;">+ Add Market</button>
+          </div>
+        </div>
 
         <!-- ── EMAIL NOTIFICATIONS ── -->
         <div class="ms" style="margin-bottom:28px;">
@@ -1125,8 +1141,7 @@ table.fpt tr:hover td{background:var(--cream);}
                 <input type="number" id="madd_units" placeholder="e.g. 140" min="1"></div>
               <div class="fg"><label>Hub *</label>
                 <select id="madd_hub">
-                  <option value="memphis">Memphis Hub</option>
-                  <option value="nashville">Nashville Hub</option>
+                  <option value="">Select market...</option>
                 </select></div>
               <div class="fg"><label>Status</label>
                 <select id="madd_status">
@@ -1355,8 +1370,6 @@ table.fpt tr:hover td{background:var(--cream);}
           </div>
           <select id="mu_hub" onchange="filterUserProps(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;">
             <option value="all">All Markets</option>
-            <option value="memphis">&#128205; Memphis</option>
-            <option value="nashville">&#128205; Nashville</option>
           </select>
         </div>
         <div id="uproplist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:8px;"></div>
@@ -1630,6 +1643,7 @@ table.fpt tr:hover td{background:var(--cream);}
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
 document.addEventListener('DOMContentLoaded', function() {
+  populateAllHubDropdowns();
   // Sync seed orders into localStorage if this is a fresh load
   if (!localStorage.getItem('pf_orders')) { saveOrders(); }
   // Sync SVC_LIST from stored services on every load
@@ -1837,7 +1851,7 @@ function switchHub(hub, el) {
 function filterProps() {
   var q = (document.getElementById('psearch')||{value:''}).value.toLowerCase();
   var sf = (document.getElementById('pstatus')||{value:''}).value;
-  var all=0, mem=0, nash=0;
+  var all=0;
   document.querySelectorAll('#proplist .pr-card').forEach(function(card) {
     var hub=card.dataset.hub||'', nameCity=(card.dataset.name||'')+' '+(card.dataset.city||'')+' '+(card.dataset.zip||'');
     var status=card.dataset.status||'';
@@ -1849,20 +1863,40 @@ function filterProps() {
     // Counts: always based on search+status match (not hub tab) so tabs show correct totals
     if (matchQ && matchS) {
       all++;
-      if(hub==='memphis') mem++;
-      if(hub==='nashville') nash++;
+      var cEl = document.getElementById('c_'+hub);
+      if (cEl) cEl.textContent = parseInt(cEl.textContent||0)+1;
     }
   });
   if(document.getElementById('call')) document.getElementById('call').textContent=all;
-  if(document.getElementById('cmem')) document.getElementById('cmem').textContent=mem;
-  if(document.getElementById('cnash')) document.getElementById('cnash').textContent=nash;
 }
 function togProp(card) {
   card.classList.toggle('open');
+}function buildHubTabs() {
+  var tabs = document.getElementById('hub_tabs');
+  if (!tabs) return;
+  var html = '<div class="tab on" onclick="switchHub(\'all\',this)">All <span class="tc" id="call">0</span></div>';
+  loadMarkets().forEach(function(m) {
+    html += '<div class="tab" onclick="switchHub(\''+m.key+'\',this)">&#128205; '+m.label+' <span class="tc" id="c_'+m.key+'">0</span></div>';
+  });
+  tabs.innerHTML = html;
 }
+
+
+function populateAllHubDropdowns() {
+  populateHubSelect('adash_hub', '', 'All Hubs');
+  populateHubSelect('aord_hub', '', 'All Hubs');
+  populateHubKeySelect('ch_hub_filter', '', 'All Hubs');
+  populatePropHubSelect('madd_hub', 'memphis');
+  populateAllMarketsSelect('mu_hub', 'all');
+}
+
+
+
+
 function renderPropList() {
   var list = document.getElementById('proplist');
   if (!list) return;
+  buildHubTabs();
   // Reset hub filter to 'all' and sync tab highlight
   curHub = 'all';
   document.querySelectorAll('.tabs .tab').forEach(function(t,i){ t.classList.toggle('on', i===0); });
@@ -1871,9 +1905,7 @@ function renderPropList() {
   props.forEach(function(prop) {
     var fps = loadFpForProp(prop.id);
     var initials = prop.name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
-    var hubBadge = prop.hub==='memphis'
-      ? '<span class="b mp">Memphis</span>'
-      : '<span class="b nv">Nashville</span>';
+    var hubBadge = hubBadgeHtml(prop.hub);
     var statusBadge = prop.status==='active'
       ? '<span class="b ac">Active</span>'
       : '<span class="b in">Inactive</span>';
@@ -1957,6 +1989,7 @@ function renderPropList() {
 
 // ── PROPERTY CRUD ──
 function openAddPropModal() {
+  populatePropHubSelect('madd_hub', 'memphis');
   document.getElementById('madd_id').value = '';
   document.getElementById('madd_title').textContent = 'Add New Property';
   document.getElementById('madd_name').value = '';
@@ -2580,6 +2613,113 @@ function addServiceType() {
   renderServiceTypes();
   renderScopeAdmin();
   toast('"' + name + '" added to service types.');
+}
+
+function renderMarketSettings() {
+  var list = document.getElementById('market_list');
+  if (!list) return;
+  var markets = loadMarkets();
+  list.innerHTML = '';
+  if (!markets.length) {
+    list.innerHTML = '<div style="padding:12px;color:var(--gray);font-size:13px;">No markets defined.</div>';
+    return;
+  }
+  markets.forEach(function(m) {
+    var row = document.createElement('div');
+    row.className = 'scope-row';
+    row.dataset.mid = m.id;
+    row.innerHTML =
+      '<div class="svc-name-display" style="flex:1;">'
+        + '<strong style="font-size:13px;color:var(--navy);">'+m.label+'</strong>'
+        + '<span style="font-size:11px;color:var(--gray);margin-left:10px;font-family:monospace;">'+m.key+'</span>'
+        + (m.address ? '<div style="font-size:11px;color:var(--gray);margin-top:2px;">'+m.address+(m.phone?' &bull; '+m.phone:'')+'</div>' : '')
+      + '</div>'
+      + '<div class="svc-edit-fields" style="display:none;flex:1;flex-direction:column;gap:6px;">'
+        + '<div style="display:flex;gap:8px;">'
+          + '<input class="mkt-edit-name" type="text" value="'+m.label+'" placeholder="Market name" style="flex:1;">'
+          + '<input class="mkt-edit-key" type="text" value="'+m.key+'" placeholder="key" style="width:100px;text-transform:lowercase;">'
+        + '</div>'
+        + '<div style="display:flex;gap:8px;">'
+          + '<input class="mkt-edit-addr" type="text" value="'+(m.address||'')+'" placeholder="Address" style="flex:1;">'
+          + '<input class="mkt-edit-phone" type="text" value="'+(m.phone||'')+'" placeholder="Phone" style="width:140px;">'
+        + '</div>'
+        + '<div style="display:flex;gap:6px;">'
+          + '<button class="bs gd" style="font-size:11px;" onclick="saveMarketEdit(this)">&#10003; Save</button>'
+          + '<button class="bs ol" style="font-size:11px;" onclick="cancelMarketEdit(this)">Cancel</button>'
+        + '</div>'
+      + '</div>'
+      + '<button class="bs nv" style="font-size:11px;flex-shrink:0;" onclick="openMarketEdit(this)">&#9998; Edit</button>'
+      + (markets.length > 1 ? '<button class="bs dn" style="font-size:11px;flex-shrink:0;" onclick="deleteMarket(this.dataset.mid)" data-mid="'+m.id+'">&#10005;</button>' : '');
+    list.appendChild(row);
+  });
+}
+
+function openMarketEdit(btn) {
+  var row = btn.closest('.scope-row');
+  row.querySelector('.svc-name-display').style.display = 'none';
+  row.querySelector('.svc-edit-fields').style.display = 'flex';
+  btn.style.display = 'none';
+  var delBtn = row.querySelector('.bs.dn');
+  if (delBtn) delBtn.style.display = 'none';
+  row.querySelector('.mkt-edit-name').focus();
+}
+
+function cancelMarketEdit(btn) {
+  var row = btn.closest('.scope-row');
+  row.querySelector('.svc-name-display').style.display = '';
+  row.querySelector('.svc-edit-fields').style.display = 'none';
+  row.querySelectorAll('.bs').forEach(function(b){ b.style.display = ''; });
+}
+
+function saveMarketEdit(btn) {
+  var row   = btn.closest('.scope-row');
+  var mid   = row.dataset.mid;
+  var name  = row.querySelector('.mkt-edit-name').value.trim();
+  var key   = row.querySelector('.mkt-edit-key').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  var addr  = row.querySelector('.mkt-edit-addr').value.trim();
+  var phone = row.querySelector('.mkt-edit-phone').value.trim();
+  if (!name || !key) { toast('Market name and key are required.'); return; }
+  var markets = loadMarkets();
+  markets = markets.map(function(m) {
+    return m.id === mid ? {id:m.id, key:key, label:name, address:addr, phone:phone} : m;
+  });
+  saveMarkets(markets);
+  renderMarketSettings();
+  populateAllHubDropdowns();
+  toast('Market updated.');
+}
+
+function deleteMarket(mid) {
+  var markets = loadMarkets();
+  if (markets.length <= 1) { toast('Cannot remove the last market.'); return; }
+  var m = markets.find(function(x){ return x.id===mid; });
+  if (!m) return;
+  if (!confirm('Remove "'+m.label+'" market? Properties assigned to this market will need to be reassigned.')) return;
+  saveMarkets(markets.filter(function(x){ return x.id!==mid; }));
+  renderMarketSettings();
+  populateAllHubDropdowns();
+  buildHubTabs();
+  toast('"'+m.label+'" removed.');
+}
+
+function addMarket() {
+  var name  = (document.getElementById('mkt_new_name')||{value:''}).value.trim();
+  var key   = (document.getElementById('mkt_new_key')||{value:''}).value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  var addr  = (document.getElementById('mkt_new_addr')||{value:''}).value.trim();
+  var phone = (document.getElementById('mkt_new_phone')||{value:''}).value.trim();
+  if (!name) { toast('Please enter a market name.'); return; }
+  if (!key)  { toast('Please enter a market key (e.g. jackson).'); return; }
+  var markets = loadMarkets();
+  if (markets.find(function(m){ return m.key===key; })) { toast('A market with that key already exists.'); return; }
+  markets.push({id:'mkt_'+Date.now().toString(36), key:key, label:name, address:addr, phone:phone});
+  saveMarkets(markets);
+  ['mkt_new_name','mkt_new_key','mkt_new_addr','mkt_new_phone'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  renderMarketSettings();
+  populateAllHubDropdowns();
+  buildHubTabs();
+  toast('"'+name+'" added as a new market.');
 }
 
 function renderScopeAdmin() {
@@ -3355,9 +3495,7 @@ function renderAdminOrders() {
   var rows = '';
   ids.forEach(function(id){
     var o = orders[id];
-    var hubBadge = (o.hub||'')===('Nashville')
-      ? '<span class="b nv">Nashville</span>'
-      : '<span class="b mp">Memphis</span>';
+    var hubBadge = hubBadgeHtml(o.hub);
     var sb = '<span class="b '+o.status+'">'+(slab[o.status]||o.status)+'</span>';
     var voidNote = o.status==='vd'
       ? '<div style="font-size:11px;color:#7f1d1d;margin-top:2px;">'+( o.voidReason||'')+'</div>' : '';
@@ -3452,9 +3590,7 @@ function renderAdashRecent() {
   var html = '';
   ids.forEach(function(id) {
     var o = orders[id];
-    var hub = (o.hub||'')==='Nashville'
-      ? '<span class="b nv">Nashville</span>'
-      : '<span class="b mp">Memphis</span>';
+    var hub = hubBadgeHtml(o.hub);
     html += '<tr onclick="oworder(\''+id+'\')">'+
       '<td><strong>#'+o.num+'</strong></td>'+
       '<td>'+o.property+'</td>'+
@@ -3481,9 +3617,7 @@ function renderAdashToday() {
     if (o.reqDate !== today) return;
     if (o.status === 'vd' || o.status === 'completed') return;
     if (adashHub && (o.hub||'') !== adashHub) return;
-    var hub = (o.hub||'')==='Nashville'
-      ? '<span class="b nv">Nashville</span>'
-      : '<span class="b mp">Memphis</span>';
+    var hub = hubBadgeHtml(o.hub);
     html += '<tr onclick="oworder(\''+id+'\')">'+
       '<td><strong>#'+o.num+'</strong></td>'+
       '<td>'+o.property+'</td>'+
@@ -3595,7 +3729,7 @@ function renderClientHistory() {
       '<td>'+o.unit+'</td>'+
       '<td>'+svcDisplay(o)+'</td>'+
       '<td>'+fmtDate(o.reqDate)+'</td>'+
-      '<td>'+(o.hub ? '<span class="b '+(o.hub==='Nashville'?'nv':'mp')+'">'+o.hub+'</span>' : '—')+'</td>'+
+      '<td>'+(hubBadgeHtml(o.hub))+'</td>'+
       '<td>'+statusBadge(o.status)+'</td>'+
       '<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'+
       '</tr>';
@@ -3631,10 +3765,7 @@ function doLogin() {
       }
       // Store logged-in team user info for permission checks
       window.currentTeamUser = tu;
-      // Show greeting on chooser screen
-      var greet = document.getElementById('sc_greeting');
-      if (greet) greet.textContent = 'Hi ' + (tu.name || tu.email) + ' — where would you like to go?';
-      go('sc');
+      go('ad');
       return;
     }
   }
@@ -3963,7 +4094,7 @@ function anav(pid, el) {
   if (pid==='adash') renderAdashRecent();
   if (pid==='aord')  renderAdminOrders();
   if (pid==='aprops') { renderPropList(); setTimeout(filterProps, 50); }
-  if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); }
+  if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); renderMarketSettings(); }
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
   if (el) el.classList.add('on');
   document.querySelectorAll('#ad .panel').forEach(function(p){ p.classList.remove('on'); });
@@ -4039,24 +4170,7 @@ function oworder(id) {
     '<div class="wod">'+
       '<div class="woh">'+
       '<div><img src="'+logo+'" style="height:48px;width:auto;margin-bottom:12px;">'+
-      (o.hub==='Nashville'
-        ? '<p>Protective Services Company, Inc. dba Protective Flooring<br>808 Overton Lea Rd, Nashville, TN 37220<br>(615) 988-5188 &mdash; info@protectiveflooring.com</p>'
-        : '<p>Protective Services Company, Inc. dba Protective Flooring<br>3846 Delp Street, Memphis, TN 38118<br>(901) 794-4101 &mdash; info@protectiveflooring.com</p>'
-      )+
-      '</div>'+
-      '<div class="wor"><div class="won">#'+o.num+'</div><div style="font-size:12px;color:var(--gray);margin-top:4px;">Submitted: '+o.submittedDate+'</div><div style="margin-top:10px;">'+sb+' '+hb+'</div></div>'+
-    '</div>'+
-      '<div class="wosec"><div class="wosect">Property and Unit</div><div class="wog">'+
-        '<div class="wof"><div class="wofl">Property</div><div class="wofv">'+o.property+'</div></div>'+
-        '<div class="wof"><div class="wofl">Unit</div><div class="wofv">Unit '+o.unit+'</div></div>'+
-        '<div class="wof"><div class="wofl">Floor Plan</div><div class="wofv">'+o.plan+' -- '+o.sqft+'</div></div>'+
-        '<div class="wof"><div class="wofl">Occupancy</div><div class="wofv">'+o.occ+'</div></div>'+
-      '</div></div>'+
-      '<div class="wosec"><div class="wosect">Service Details</div>'+
-        '<div class="wog3" style="margin-bottom:14px;">'+
-          '<div class="wof"><div class="wofl">Service</div><div class="wofv">'+o.service+'</div></div>'+
-          '<div class="wof"><div class="wofl">Requested Date</div><div class="wofv">'+o.reqDate+'</div></div>'+
-          '<div class="wof"><div class="wofl">Confirmed Date</div><div class="wofv"'+(o.confDate!=='Pending'?' style="color:var(--green);font-weight:700;"':'')+'>'+o.confDate+'</div></div>'+
+      (function(){ var _m=getMarket(o.hub); return '<p>Protective Services Company, Inc. dba Protective Flooring<br>'+(_m&&_m.address?_m.address:'3846 Delp Street, Memphis, TN 38118')+'<br>'+(_m&&_m.phone?_m.phone:'(901) 794-4101')+' &mdash; info@protectiveflooring.com</p>'; }())+'>'+o.confDate+'</div></div>'+
         '</div>'+
         '<div class="wof" style="margin-bottom:14px;"><div class="wofl">Scope of Work</div><div style="margin-top:8px;"><div class="woscl">'+sc+'</div></div></div>'+
         '<div class="wof"><div class="wofl">Time Window</div><div class="wofv">'+o.timeWindow+'</div></div>'+
@@ -4242,6 +4356,60 @@ function togScope(el) {
   var c=el.querySelector('.ck');
   if(c) c.textContent=el.classList.contains('on')?'\u2713':'';
 }
+// ── MARKETS ──
+var DEFAULT_MARKETS = [
+  {id:'mkt1', key:'memphis',   label:'Memphis',   address:'3846 Delp Street, Memphis, TN 38118',    phone:'(901) 794-4101'},
+  {id:'mkt2', key:'nashville', label:'Nashville', address:'808 Overton Lea Rd, Nashville, TN 37220', phone:'(615) 988-5188'}
+];
+function loadMarkets() {
+  try { var s=localStorage.getItem('pf_markets'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_MARKETS)); }
+  catch(e){ return JSON.parse(JSON.stringify(DEFAULT_MARKETS)); }
+}
+function saveMarkets(arr) { try { localStorage.setItem('pf_markets',JSON.stringify(arr)); } catch(e){} }
+function getMarket(keyOrLabel) {
+  if (!keyOrLabel) return null;
+  var k = (keyOrLabel+'').toLowerCase();
+  return loadMarkets().find(function(m){ return m.key===k || m.label.toLowerCase()===k; }) || null;
+}
+function hubBadgeHtml(hub) {
+  var m = getMarket(hub);
+  if (!hub) return '<span style="color:var(--gray);">—</span>';
+  var lbl = m ? m.label : (hub.charAt(0).toUpperCase()+hub.slice(1));
+  return '<span class="b hub-b" style="background:rgba(2,10,91,.08);color:var(--navy);border:1px solid rgba(2,10,91,.15);">'+lbl+'</span>';
+}
+// Populate a <select> with hub options (label as value, for orders)
+function populateHubSelect(elId, selectedVal, allLabel) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedVal !== undefined ? selectedVal : el.value;
+  var html = '<option value="">'+(allLabel||'All Hubs')+'</option>';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.label+'"'+(m.label===cur?' selected':'')+'>'+m.label+'</option>'; });
+  el.innerHTML = html;
+}
+// Populate a <select> with hub key options (key as value, for filtering)
+function populateHubKeySelect(elId, selectedKey, allLabel) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedKey !== undefined ? selectedKey : el.value;
+  var html = '<option value="">'+(allLabel||'All Hubs')+'</option>';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+'</option>'; });
+  el.innerHTML = html;
+}
+// Populate a hub select for property add/edit (key as value, "X Hub" as label)
+function populatePropHubSelect(elId, selectedKey) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedKey !== undefined ? selectedKey : el.value;
+  var html = '';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+' Hub</option>'; });
+  el.innerHTML = html;
+}
+// Populate All Markets select (for client login modal, key as value)
+function populateAllMarketsSelect(elId, selectedKey) {
+  var el = document.getElementById(elId); if (!el) return;
+  var cur = selectedKey !== undefined ? selectedKey : el.value;
+  var html = '<option value="all">All Markets</option>';
+  loadMarkets().forEach(function(m){ html+='<option value="'+m.key+'"'+(m.key===cur?' selected':'')+'>'+m.label+'</option>'; });
+  el.innerHTML = html;
+}
+
 // ── CLIENT LOGIN POSITIONS ──
 var DEFAULT_POSITIONS = [
   {id:'pos1', name:'Property Manager'},
@@ -4269,6 +4437,7 @@ function buildPosOptions(selected) {
 }
 
 function openMuser() {
+  populateAllMarketsSelect('mu_hub', 'all');
   // Populate position dropdown
   document.getElementById('mu_role').innerHTML = buildPosOptions('');
   // Reset hub filter
@@ -4436,7 +4605,7 @@ function submitOrder() {
     hub:           (function(){
       var _pr = null;
       getActiveProps().forEach(function(pr){ if(pr.name===propName) _pr=pr; });
-      return _pr ? (_pr.hub==='nashville' ? 'Nashville' : 'Memphis') : 'Memphis';
+      if (!_pr) return 'Memphis'; var _m=getMarket(_pr.hub); return _m?_m.label:(_pr.hub.charAt(0).toUpperCase()+_pr.hub.slice(1));
     })(),
     unit:          unitVal,
     plan:          planName,
