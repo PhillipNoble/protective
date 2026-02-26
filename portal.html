@@ -5015,7 +5015,12 @@ function oworder(id) {
   if (completeBtn) completeBtn.style.display  = (isAdminView && o.status === 'scheduled') ? 'inline-flex' : 'none';
   if (completeBtn) completeBtn.dataset.woid   = id;
   if (voidBtn) voidBtn.style.display = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
-  if (editBtn) editBtn.style.display  = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
+  if (editBtn) {
+    editBtn.style.display = isAdminView ? 'inline-flex' : 'none';
+    editBtn.dataset.woid  = id;
+    editBtn.textContent   = o.status === 'vd' ? '\u21A9 Restore Order' : '\u270E Edit Order';
+    editBtn.className     = o.status === 'vd' ? 'bs gd' : 'bs nv';
+  }
   if (logBtn)  logBtn.style.display   = (isAdminView && o.log && o.log.length) ? 'inline-flex' : 'none';
   openM('mwo');
 }
