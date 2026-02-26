@@ -5753,7 +5753,7 @@ function renderUserTable() {
     var sbadge = u.status === 'active'
       ? '<span class="b ac">Active</span>'
       : '<span class="b in">Inactive</span>';
-    var props = (u.props || []).join(', ');
+    var props = (u.props || []).join('<br>');
     // Last login cell
     var days = daysSince(u.lastLoginISO);
     var loginCell;
@@ -5770,7 +5770,7 @@ function renderUserTable() {
         + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;cursor:default;" title="'+daysTitle+'">('+daysLabel+')</div>';
     }
     return '<tr>'
-      + '<td><strong>' + u.name + '</strong></td>'
+      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong></td>'
       + '<td style="font-size:12px;color:var(--gray);">' + u.email + '</td>'
       + '<td style="font-size:12px;">' + props + '</td>'
       + '<td>' + hbadge + '</td>'
