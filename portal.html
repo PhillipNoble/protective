@@ -936,10 +936,38 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
       <!-- ADMIN USERS -->
       <div class="panel" id="ausers">
-        <div class="shd"><h2>Client Logins</h2><button class="bs gd" onclick="openMuser()">+ Add Login</button></div>
-        <div class="tw"><table>
-          <thead><tr><th>Name</th><th>Email</th><th>Properties</th><th>Hub</th><th>Role</th><th>Status</th><th>Created</th><th></th></tr></thead>
-          <tbody>
+        <div class="shd" style="margin-bottom:14px;">
+          <h2>Client Logins</h2>
+          <button class="bs gd" onclick="openMuser()">+ Add Login</button>
+        </div>
+        <div class="fb" style="flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center;">
+          <div class="sw" style="min-width:220px;flex:1;">
+            <span class="si2">&#128269;</span>
+            <input type="text" id="ucl_search" placeholder="Search by name, email, or property..." oninput="renderUserTable()">
+          </div>
+          <select class="fs" id="ucl_hub" onchange="renderUserTable()">
+            <option value="">All Hubs</option>
+          </select>
+          <select class="fs" id="ucl_status" onchange="renderUserTable()">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select class="fs" id="ucl_sort" onchange="renderUserTable()">
+            <option value="recent">Last Login: Most Recent</option>
+            <option value="oldest">Last Login: Oldest First</option>
+            <option value="never">Never Logged In First</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+        <div class="tw"><table id="ucl_table">
+          <thead><tr>
+            <th>Name</th><th>Email</th><th>Properties</th><th>Hub</th>
+            <th>Role</th><th>Status</th>
+            <th style="white-space:nowrap;">Last Login <span id="ucl_count" style="font-weight:400;font-size:10px;color:rgba(255,255,255,.6);"></span></th>
+            <th></th>
+          </tr></thead>
+          <tbody id="ucl_tbody">
             <!-- rows rendered by renderUserTable() -->
           </tbody>
         </table></div>
@@ -1957,9 +1985,9 @@ function getTeam() { return loadTeam(); }
 
 // ── CLIENT LOGIN STORE ──
 var DEFAULT_CLIENTS = [
-  {id:"u1",email:"manager@cherrycreek.com",  password:"Cherry2025!", name:"Jessica Lane",   initials:"JL",props:["Cherry Creek Apartments"],  role:"Property Manager",hub:"nashville",status:"active", created:"Feb 20, 2025"},
-  {id:"u2",email:"manager@riverside.com",    password:"PF-River25!", name:"Rachel Moore",   initials:"RM",props:["Riverside Apartments"],      role:"Property Manager",hub:"memphis",  status:"active", created:"Jan 10, 2025"},
-  {id:"u3",email:"manager@arborridge.com",   password:"Arbor2025!",  name:"Keisha Davis",   initials:"KD",props:["Arbor Ridge Nashville"],      role:"Property Manager",hub:"nashville",status:"active", created:"Jan 15, 2025"}
+  {id:"u1",email:"manager@cherrycreek.com",  password:"Cherry2025!", name:"Jessica Lane",   initials:"JL",props:["Cherry Creek Apartments"],  role:"Property Manager",hub:"nashville",status:"active", created:"Feb 20, 2025", lastLogin:"2/24/2026 9:15 AM CST",  lastLoginISO:"2026-02-24T15:15:00.000Z"},
+  {id:"u2",email:"manager@riverside.com",    password:"PF-River25!", name:"Rachel Moore",   initials:"RM",props:["Riverside Apartments"],      role:"Property Manager",hub:"memphis",  status:"active", created:"Jan 10, 2025", lastLogin:"2/18/2026 2:42 PM CST",  lastLoginISO:"2026-02-18T20:42:00.000Z"},
+  {id:"u3",email:"manager@arborridge.com",   password:"Arbor2025!",  name:"Keisha Davis",   initials:"KD",props:["Arbor Ridge Nashville"],      role:"Property Manager",hub:"nashville",status:"active", created:"Jan 15, 2025", lastLogin:"1/30/2026 11:03 AM CST", lastLoginISO:"2026-01-30T17:03:00.000Z"}
 ];
 function loadUsers() {
   try { var s=localStorage.getItem('pf_users'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_CLIENTS)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_CLIENTS)); }
@@ -2185,6 +2213,7 @@ function togProp(card) {
 function populateAllHubDropdowns() {
   populateHubSelect('adash_hub', '', 'All Hubs');
   populateHubSelect('aord_hub', '', 'All Hubs');
+  populateHubKeySelect('ucl_hub', '', 'All Hubs');
   populateHubKeySelect('ch_hub_filter', '', 'All Hubs');
   populatePropHubSelect('madd_hub', 'memphis');
   populateAllMarketsSelect('mu_hub', 'all');
@@ -4314,6 +4343,16 @@ function doLogin() {
         return;
       }
       user = clients[i];
+      // Stamp last login timestamp in CST
+      var _now = new Date();
+      var _cst = new Date(_now.toLocaleString('en-US', {timeZone:'America/Chicago'}));
+      var _pad = function(n){return String(n).padStart(2,'0');};
+      var _hr = _cst.getHours(), _ampm = _hr>=12?'PM':'AM';
+      _hr = _hr%12||12;
+      clients[i].lastLogin = (_cst.getMonth()+1)+'/'+_cst.getDate()+'/'+_cst.getFullYear()
+        +' '+_hr+':'+_pad(_cst.getMinutes())+' '+_ampm+' CST';
+      clients[i].lastLoginISO = _now.toISOString();
+      saveUsers(clients);
       break;
     }
   }
@@ -5569,14 +5608,58 @@ function can(action) {
 // ── END PORTAL USER MANAGEMENT ──
 
 // ── USER MANAGEMENT ──
+function daysSince(isoStr) {
+  if (!isoStr) return null;
+  var then = new Date(isoStr);
+  if (isNaN(then)) return null;
+  var diff = Math.floor((Date.now() - then.getTime()) / 86400000);
+  return diff;
+}
+
 function renderUserTable() {
-  var clients = getUsers();
-  var tb = document.querySelector('#ausers tbody');
+  var tb = document.getElementById('ucl_tbody');
+  if (!tb) tb = document.querySelector('#ausers tbody');
   if (!tb) return;
+
+  // Populate hub filter
+  populateHubKeySelect('ucl_hub', (document.getElementById('ucl_hub')||{value:''}).value, 'All Hubs');
+
+  var q       = ((document.getElementById('ucl_search')||{value:''}).value||'').trim().toLowerCase();
+  var hubF    = (document.getElementById('ucl_hub')||{value:''}).value;
+  var statusF = (document.getElementById('ucl_status')||{value:''}).value;
+  var sortF   = (document.getElementById('ucl_sort')||{value:'recent'}).value;
+
+  var clients = getUsers().filter(function(u) {
+    if (statusF && u.status !== statusF) return false;
+    if (hubF && u.hub !== hubF) return false;
+    if (q) {
+      var hay = (u.name+' '+u.email+' '+(u.props||[]).join(' ')).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+
+  clients.sort(function(a, b) {
+    if (sortF === 'name') return (a.name||'').localeCompare(b.name||'');
+    if (sortF === 'never') {
+      var an = !a.lastLoginISO, bn = !b.lastLoginISO;
+      if (an && bn) return (a.name||'').localeCompare(b.name||'');
+      if (an) return -1; if (bn) return 1;
+    }
+    // recent / oldest — sort by ISO timestamp
+    var at = a.lastLoginISO ? new Date(a.lastLoginISO).getTime() : 0;
+    var bt = b.lastLoginISO ? new Date(b.lastLoginISO).getTime() : 0;
+    return sortF === 'oldest' ? at - bt : bt - at;
+  });
+
+  var countEl = document.getElementById('ucl_count');
+  if (countEl) countEl.textContent = '(' + clients.length + ')';
+
   if (clients.length === 0) {
-    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--gray);">No client logins yet. Click "+ Add Login" to create the first one.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--gray);">No matching client logins.</td></tr>';
     return;
   }
+
   tb.innerHTML = clients.map(function(u) {
     var hbadge = u.hub === 'memphis'
       ? '<span class="b mp">Memphis</span>'
@@ -5587,14 +5670,29 @@ function renderUserTable() {
       ? '<span class="b ac">Active</span>'
       : '<span class="b in">Inactive</span>';
     var props = (u.props || []).join(', ');
+    // Last login cell
+    var days = daysSince(u.lastLoginISO);
+    var loginCell;
+    if (!u.lastLogin) {
+      loginCell = '<span style="color:var(--gray);font-size:12px;">Never</span>';
+    } else {
+      var daysLabel, daysColor;
+      if (days === 0)       { daysLabel = 'today';          daysColor = '#15803d'; }
+      else if (days === 1)  { daysLabel = '1 day ago';      daysColor = '#15803d'; }
+      else if (days <= 7)   { daysLabel = days+' days ago'; daysColor = '#b45309'; }
+      else if (days <= 30)  { daysLabel = days+' days ago'; daysColor = '#b45309'; }
+      else                  { daysLabel = days+' days ago'; daysColor = '#b91c1c'; }
+      loginCell = '<div style="font-size:12px;color:var(--text);">' + u.lastLogin + '</div>'
+        + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;">('+daysLabel+')</div>';
+    }
     return '<tr>'
       + '<td><strong>' + u.name + '</strong></td>'
-      + '<td>' + u.email + '</td>'
+      + '<td style="font-size:12px;color:var(--gray);">' + u.email + '</td>'
       + '<td style="font-size:12px;">' + props + '</td>'
       + '<td>' + hbadge + '</td>'
-      + '<td>' + (u.role || 'Property Manager') + '</td>'
+      + '<td style="font-size:12px;">' + (u.role || 'Property Manager') + '</td>'
       + '<td>' + sbadge + '</td>'
-      + '<td>' + u.created + '</td>'
+      + '<td>' + loginCell + '</td>'
       + '<td><div style="display:flex;gap:6px;">'
       +   '<button class="bs ol" onclick="openEditUser(\'' + u.id + '\')">Edit</button>'
       +   (u.status === 'active'
