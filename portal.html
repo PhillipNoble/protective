@@ -693,50 +693,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             </div>
           </div>
 
-          <!-- OCCUPIED UNIT FORM MODAL -->
-          <div class="mb" id="mocc" style="display:none;z-index:3000;">
-            <div class="modal" style="max-width:600px;">
-              <div class="mh">
-                <div>
-                  <h3>&#128196; Occupied Unit Authorization Form</h3>
-                  <div style="font-size:12px;color:var(--gray);margin-top:2px;">Print, sign, and return to your Preferred Flooring coordinator</div>
-                </div>
-                <button class="mx" onclick="closeM('mocc')">&#10005;</button>
-              </div>
-              <div class="mbody" id="occform_body" style="font-family:Georgia,serif;">
-                <div style="text-align:center;margin-bottom:18px;">
-                  <div style="font-size:18px;font-weight:700;color:var(--navy);letter-spacing:1px;">PREFERRED FLOORING</div>
-                  <div style="font-size:13px;color:var(--gray);margin-top:2px;">Occupied Unit Authorization Form</div>
-                  <div style="border-bottom:2px solid var(--navy);margin-top:10px;"></div>
-                </div>
-                <p style="font-size:13px;line-height:1.7;color:#333;">This form authorizes Preferred Flooring to perform flooring installation or repair services in an <strong>occupied residential unit</strong>. The resident or authorized property representative must complete and sign this form before a confirmed installation date will be scheduled.</p>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;">
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Property Name</div><div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_prop"></div></div>
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Unit Number</div><div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_unit"></div></div>
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Resident Name</div><div style="border-bottom:1px solid #ccc;min-height:28px;"></div></div>
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Phone Number</div><div style="border-bottom:1px solid #ccc;min-height:28px;"></div></div>
-                </div>
-                <div style="margin:14px 0;">
-                  <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Requested Service</div>
-                  <div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_svc"></div>
-                </div>
-                <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:4px;padding:12px 14px;margin:14px 0;font-size:12px;color:#78350f;line-height:1.6;">
-                  <strong>Resident Responsibilities:</strong> The resident must ensure the work area is clear and accessible on the scheduled date. A responsible adult (18+) must be present during the installation. Resident understands that furniture and personal belongings must be removed from the work area prior to arrival.
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Resident Signature</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Signature</div></div>
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date Signed</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Date</div></div>
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Property Manager Signature</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Signature</div></div>
-                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Date</div></div>
-                </div>
-                <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--gray);border-top:1px solid var(--border);padding-top:12px;">Return completed form to your Preferred Flooring coordinator before scheduling. Questions? Call your hub office.</div>
-              </div>
-              <div class="mf">
-                <button class="bs ol" onclick="closeM('mocc')">Close</button>
-                <button class="bl nv" onclick="printOccupiedForm()">&#128424; Print Form</button>
-              </div>
-            </div>
-          </div>
+          
         </div>
         <div class="fc">
           <h3>&#129520; Service &amp; Scope <span style="font-size:13px;font-weight:400;color:var(--gray);">(Additional Services)</span></h3>
@@ -858,8 +815,8 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <!-- DOCUMENTS -->
       <div class="panel" id="cx">
         <div class="shd"><h2>Documents &amp; Forms</h2></div>
-        <div class="tw"><table><thead><tr><th>Document</th><th>Description</th><th>Updated</th><th></th></tr></thead><tbody>
-          <tr><td><strong>Occupied Unit Form</strong></td><td>Required for flooring in occupied units</td><td>Jan 2025</td><td><button class="bs gd" onclick="toast('Download ready in live version.')">&#8681; Download</button></td></tr>
+        <div class="tw"><table><thead><tr><th>Document</th><th>Description</th><th>Updated</th><th></th></tr></thead><tbody id="cdocs_tbody">
+          <tr><td><strong>Occupied Unit Form</strong></td><td>Required for flooring in occupied units</td><td>Jan 2025</td><td><button class="bs ol" onclick="openOccupiedForm()">&#128065; View Form</button> Download</button></td></tr>
           <tr><td><strong>Flooring Care Guide</strong></td><td>Maintenance instructions for residents</td><td>Dec 2024</td><td><button class="bs ol" onclick="toast('Download ready.')">&#8681; Download</button></td></tr>
           <tr><td><strong>Pet Damage Checklist</strong></td><td>Pre-order assessment guide</td><td>Nov 2024</td><td><button class="bs ol" onclick="toast('Download ready.')">&#8681; Download</button></td></tr>
         </tbody></table></div>
@@ -1296,6 +1253,36 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <label>Support Email (shown to clients)</label>
               <input type="email" id="set_support_email" value="info@protectiveflooring.com">
             </div>
+          </div>
+        </div>
+
+        <!-- ── DOCUMENTS MANAGER ── -->
+        <div class="ms" style="margin-bottom:28px;" id="aset_docs_section">
+          <div class="mst">&#128196; Document Manager</div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.6;">
+            Upload the Occupied Unit Authorization Form here. The most recent version will be shown to clients in the Documents tab and in the Place Order form when an occupied unit is selected.
+          </p>
+          <div id="occ_form_current" style="display:none;background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span style="font-size:20px;">&#128196;</span>
+              <div style="flex:1;">
+                <div style="font-weight:600;color:var(--navy);font-size:13px;">Occupied Unit Authorization Form</div>
+                <div id="occ_form_label" style="font-size:11px;color:var(--gray);margin-top:2px;"></div>
+              </div>
+              <button class="bs nv" onclick="openOccupiedForm()" style="font-size:11px;">&#128065; Preview</button>
+              <button class="bs dn" onclick="removeOccupiedForm()" style="font-size:11px;">&#128465; Remove</button>
+            </div>
+          </div>
+          <div id="occ_form_upload_area" style="border:2px dashed var(--border);border-radius:4px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('occ_form_file').click()">
+            <div style="font-size:28px;margin-bottom:8px;">&#128228;</div>
+            <div style="font-weight:600;color:var(--navy);font-size:13px;">Click to upload Occupied Unit Form</div>
+            <div style="font-size:11px;color:var(--gray);margin-top:4px;">PNG, JPG, or PDF image — replaces current version</div>
+            <input type="file" id="occ_form_file" accept="image/png,image/jpeg,image/jpg,application/pdf" style="display:none;" onchange="uploadOccupiedForm(this)">
+          </div>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+            <label style="font-size:12px;color:var(--navy);font-weight:600;white-space:nowrap;">Version / Label:</label>
+            <input type="text" id="occ_form_version" placeholder="e.g. Rev 3 — Jan 2025" style="flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:3px;">
+            <button class="bs gd" onclick="saveOccFormLabel()" style="font-size:11px;">Save Label</button>
           </div>
         </div>
 
@@ -1975,6 +1962,58 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
     <div class="mf">
       <button class="bs ol" onclick="closeM('mwoedit')">Cancel</button>
       <button class="bl gd" onclick="saveWoEdit()">&#10003; Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- OCCUPIED UNIT FORM MODAL -->
+<div class="mb" id="mocc" onclick="if(event.target===this)closeM('mocc')">
+  <div class="modal" style="max-width:600px;">
+    <div class="mh">
+      <div>
+        <h3>&#128196; Occupied Unit Authorization Form</h3>
+        <div style="font-size:12px;color:var(--gray);margin-top:2px;">Print, sign, and return to your Preferred Flooring coordinator</div>
+      </div>
+      <button class="mx" onclick="closeM('mocc')">&#10005;</button>
+    </div>
+    <div class="mbody" id="occform_body" style="font-family:Georgia,serif;">
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="font-size:18px;font-weight:700;color:var(--navy);letter-spacing:1px;">PREFERRED FLOORING</div>
+        <div style="font-size:13px;color:var(--gray);margin-top:2px;">Occupied Unit Authorization Form</div>
+        <div id="occform_rev" style="font-size:11px;color:var(--gray);margin-top:2px;"></div>
+        <div style="border-bottom:2px solid var(--navy);margin-top:10px;"></div>
+      </div>
+      <div id="occform_upload_preview" style="display:none;margin-bottom:16px;text-align:center;">
+        <img id="occform_img" style="max-width:100%;border:1px solid var(--border);border-radius:4px;" alt="Occupied Unit Form">
+      </div>
+      <div id="occform_default">
+        <p style="font-size:13px;line-height:1.7;color:#333;">This form authorizes Preferred Flooring to perform flooring installation or repair services in an <strong>occupied residential unit</strong>. The resident or authorized property representative must complete and sign this form before a confirmed installation date will be scheduled.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;">
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Property Name</div><div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_prop"></div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Unit Number</div><div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_unit"></div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Resident Name</div><div style="border-bottom:1px solid #ccc;min-height:28px;"></div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Phone Number</div><div style="border-bottom:1px solid #ccc;min-height:28px;"></div></div>
+        </div>
+        <div style="margin:14px 0;">
+          <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Requested Service</div>
+          <div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_svc"></div>
+        </div>
+        <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:4px;padding:12px 14px;margin:14px 0;font-size:12px;color:#78350f;line-height:1.6;">
+          <strong>Resident Responsibilities:</strong> The resident must ensure the work area is clear and accessible on the scheduled date. A responsible adult (18+) must be present during the installation. Resident understands that furniture and personal belongings must be removed from the work area prior to arrival.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Resident Signature</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Signature</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date Signed</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Date</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Property Manager Signature</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Signature</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Date</div></div>
+        </div>
+        <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--gray);border-top:1px solid var(--border);padding-top:12px;">Return completed form to your Preferred Flooring coordinator before scheduling.</div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="bs ol" onclick="closeM('mocc')">Close</button>
+      <button class="bl nv" onclick="printOccupiedForm()">&#128424; Print Form</button>
     </div>
   </div>
 </div>
@@ -3377,6 +3416,79 @@ function savePortalSettings() {
   if (notifEmail) try { localStorage.setItem('pf_notif_email', notifEmail); } catch(e){}
   try { localStorage.setItem('pf_notif', JSON.stringify(getNotifSettings())); } catch(e){}
   toast('Settings saved.');
+}
+
+function renderDocManager() {
+  var fd = getOccupiedFormData();
+  var cur = document.getElementById('occ_form_current');
+  var lbl = document.getElementById('occ_form_label');
+  var verEl = document.getElementById('occ_form_version');
+  if (fd && fd.src) {
+    if (cur) cur.style.display = 'block';
+    if (lbl) lbl.textContent = fd.label || 'No version label set';
+    if (verEl) verEl.value = fd.label || '';
+  } else {
+    if (cur) cur.style.display = 'none';
+    if (verEl) verEl.value = '';
+  }
+}
+
+function uploadOccupiedForm(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var maxMB = 8;
+  if (file.size > maxMB * 1024 * 1024) { toast('File too large — max ' + maxMB + 'MB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var fd = getOccupiedFormData() || {};
+    fd.src       = e.target.result;
+    fd.filename  = file.name;
+    fd.uploaded  = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    if (!fd.label) fd.label = '';
+    saveOccupiedFormData(fd);
+    renderDocManager();
+    renderClientDocuments();
+    toast('\u2713 Occupied Unit Form uploaded.');
+    input.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveOccFormLabel() {
+  var verEl = document.getElementById('occ_form_version');
+  var newLabel = verEl ? verEl.value.trim() : '';
+  var fd = getOccupiedFormData();
+  if (!fd) { toast('Upload a form first.'); return; }
+  fd.label = newLabel;
+  saveOccupiedFormData(fd);
+  renderDocManager();
+  toast('Label saved.');
+}
+
+function removeOccupiedForm() {
+  try { localStorage.removeItem('pf_occ_form'); } catch(e){}
+  renderDocManager();
+  renderClientDocuments();
+  toast('Occupied Unit Form removed.');
+}
+
+function renderClientDocuments() {
+  var tbody = document.getElementById('cdocs_tbody');
+  if (!tbody) return;
+  var fd = getOccupiedFormData();
+  var hasForm = fd && fd.src;
+  var updatedStr = hasForm ? (fd.uploaded || 'Recently') + (fd.label ? ' — ' + fd.label : '') : 'Jan 2025 (default)';
+  tbody.innerHTML =
+    '<tr>'+
+      '<td><strong>Occupied Unit Form</strong></td>'+
+      '<td>Required for flooring in occupied units</td>'+
+      '<td>'+updatedStr+'</td>'+
+      '<td>'+
+        (hasForm
+          ? '<button class="bs gd" onclick="openOccupiedForm()">&#128065; View &amp; Print</button>'
+          : '<button class="bs ol" onclick="openOccupiedForm()">&#128065; View Form</button>')+
+      '</td>'+
+    '</tr>';
 }
 
 function deleteGlobalScope(id) {
@@ -5048,6 +5160,7 @@ function go(id) {
   if (el) el.classList.add('on');
 }
 function cnav(pid, el) {
+  if (pid === 'cx') { setTimeout(renderClientDocuments, 50); }
   if (pid==='cd') renderClientDash();
   if (pid==='ch') renderClientHistory();
   document.querySelectorAll('#cl .ni').forEach(function(n){ n.classList.remove('on'); });
@@ -5062,7 +5175,7 @@ function anav(pid, el) {
   if (pid==='adash') { renderAdashRecent(); renderAdashStats(); }
   if (pid==='aord')  renderAdminOrders();
   if (pid==='aprops') { renderPropList(); setTimeout(filterProps, 50); }
-  if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); renderMarketSettings(); }
+  if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); renderMarketSettings(); renderDocManager(); }
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
   if (el) el.classList.add('on');
   document.querySelectorAll('#ad .panel').forEach(function(p){ p.classList.remove('on'); });
@@ -5354,10 +5467,16 @@ function saveConf() {
 }
 
 // ── FORM HELPERS ──
+function getOccupiedFormData() {
+  try { var s = localStorage.getItem('pf_occ_form'); return s ? JSON.parse(s) : null; } catch(e){ return null; }
+}
+function saveOccupiedFormData(obj) {
+  try { localStorage.setItem('pf_occ_form', JSON.stringify(obj)); } catch(e){}
+}
+
 function openOccupiedForm() {
-  // Pre-fill property and unit from current form state
-  var propSel = document.getElementById('cpropsel');
-  var propName = propSel ? propSel.options[propSel.selectedIndex] && propSel.options[propSel.selectedIndex].text : '';
+  var propSel  = document.getElementById('cpropsel');
+  var propName = propSel && propSel.selectedIndex >= 0 ? propSel.options[propSel.selectedIndex].text : '';
   var unitVal  = (document.getElementById('cunitinput')||{value:''}).value;
   var svcSel   = document.getElementById('csvc');
   var svcName  = svcSel ? svcSel.value : '';
@@ -5367,22 +5486,43 @@ function openOccupiedForm() {
   if (pEl) pEl.textContent = propName || '';
   if (uEl) uEl.textContent = unitVal  || '';
   if (sEl) sEl.textContent = svcName  || '';
-  // Show modal
-  var m = document.getElementById('mocc');
-  if (m) { m.style.display = 'flex'; setTimeout(function(){ m.classList.add('op'); }, 10); }
+
+  // Show uploaded form image if available, otherwise show default template
+  var fd = getOccupiedFormData();
+  var uploadPreview = document.getElementById('occform_upload_preview');
+  var defaultForm   = document.getElementById('occform_default');
+  var imgEl         = document.getElementById('occform_img');
+  var revEl         = document.getElementById('occform_rev');
+  if (fd && fd.src) {
+    if (uploadPreview) uploadPreview.style.display = 'block';
+    if (defaultForm)   defaultForm.style.display   = 'none';
+    if (imgEl)         imgEl.src = fd.src;
+    if (revEl)         revEl.textContent = fd.label ? 'Version: ' + fd.label : '';
+  } else {
+    if (uploadPreview) uploadPreview.style.display = 'none';
+    if (defaultForm)   defaultForm.style.display   = 'block';
+    if (revEl)         revEl.textContent = '';
+  }
+  openM('mocc');
 }
 
 function printOccupiedForm() {
-  var body = document.getElementById('occform_body');
-  if (!body) return;
-  var w = window.open('', '_blank', 'width=700,height=900');
-  w.document.write('<html><head><title>Occupied Unit Authorization Form</title>');
-  w.document.write('<style>body{font-family:Georgia,serif;padding:40px;max-width:640px;margin:0 auto;color:#1c1c2e;}');
-  w.document.write('*{box-sizing:border-box;} @media print{button{display:none!important;}}</style></head><body>');
-  w.document.write(body.innerHTML);
-  w.document.write('<br><br><button onclick="window.print()" style="padding:10px 24px;background:#020a5b;color:#fff;border:none;cursor:pointer;font-size:14px;border-radius:3px;">&#128424; Print</button>');
+  var fd = getOccupiedFormData();
+  var w  = window.open('', '_blank', 'width=750,height=950');
+  if (!w) { toast('Pop-up blocked — please allow pop-ups to print.'); return; }
+  w.document.write('<!DOCTYPE html><html><head><title>Occupied Unit Authorization Form</title>');
+  w.document.write('<style>body{font-family:Georgia,serif;padding:32px;max-width:680px;margin:0 auto;color:#1c1c2e;}img{max-width:100%;}');
+  w.document.write('@media print{.noprint{display:none!important;}}</style></head><body>');
+  if (fd && fd.src) {
+    w.document.write('<img src="'+fd.src+'" alt="Occupied Unit Form">');
+  } else {
+    var body = document.getElementById('occform_body');
+    if (body) w.document.write(body.innerHTML);
+  }
+  w.document.write('<br><br><button class="noprint" onclick="window.print()" style="padding:10px 24px;background:#020a5b;color:#fff;border:none;cursor:pointer;font-size:14px;border-radius:3px;">&#128424; Print</button>');
   w.document.write('</body></html>');
   w.document.close();
+  setTimeout(function(){ w.focus(); }, 200);
 }
 
 function onSvcChange(val) {
