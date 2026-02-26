@@ -85,6 +85,11 @@ button,input,select,textarea{font-family:'Outfit',sans-serif;cursor:pointer;}
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;}
 .sc{background:var(--white);padding:24px;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);display:flex;align-items:center;gap:16px;}
+.sc-link{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s;user-select:none;}
+.sc-link:hover{border-color:var(--navy);box-shadow:0 6px 18px rgba(2,10,91,.13);transform:translateY(-2px);}
+.sc-link:active{transform:translateY(0);}
+.sc-urgent .snum{color:#b91c1c;}
+.sc-urgent{border-color:#fca5a5 !important;background:#fff5f5;}
 .si{width:48px;height:48px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
 .si.g{background:rgba(200,149,42,.1);}.si.n{background:rgba(2,10,91,.08);}.si.gr{background:#f0fdf4;}.si.rd{background:#fef2f2;}
 .snum{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--navy);line-height:1;}
@@ -820,10 +825,22 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <!-- ADMIN DASHBOARD -->
       <div class="panel on" id="adash">
         <div class="stats">
-          <div class="sc"><div class="si g">&#9783;</div><div><div class="snum">47</div><div class="slbl">Orders This Month</div></div></div>
-          <div class="sc"><div class="si rd">&#9888;</div><div><div class="snum">4</div><div class="slbl">Awaiting Confirmation</div></div></div>
-          <div class="sc"><div class="si n">&#127968;</div><div><div class="snum">8</div><div class="slbl">Active Properties</div></div></div>
-          <div class="sc"><div class="si gr">&#128101;</div><div><div class="snum">36</div><div class="slbl">Client Logins</div></div></div>
+          <div class="sc sc-link" onclick="dashStatClick('month')" title="View all orders this month">
+            <div class="si g">&#9783;</div>
+            <div><div class="snum" id="stat_month">—</div><div class="slbl">Orders This Month</div></div>
+          </div>
+          <div class="sc sc-link" onclick="dashStatClick('awaiting')" title="View orders awaiting confirmation">
+            <div class="si rd">&#9888;</div>
+            <div><div class="snum" id="stat_await">—</div><div class="slbl">Awaiting Confirmation</div></div>
+          </div>
+          <div class="sc sc-link" onclick="dashStatClick('properties')" title="View active properties">
+            <div class="si n">&#127968;</div>
+            <div><div class="snum" id="stat_props">—</div><div class="slbl">Active Properties</div></div>
+          </div>
+          <div class="sc sc-link" onclick="dashStatClick('clients')" title="View client logins">
+            <div class="si gr">&#128101;</div>
+            <div><div class="snum" id="stat_clients">—</div><div class="slbl">Client Logins</div></div>
+          </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
           <h2 style="margin:0;" id="adash_table_title">New Orders — Action Required</h2>
@@ -4074,6 +4091,89 @@ function renderAdminOrders() {
 
 var _dashTab = 'recent'; // default tab
 
+function renderAdashStats() {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth();
+  // Orders this month (by effective date in current month)
+  var monthCount = 0;
+  Object.keys(orders).forEach(function(id) {
+    var o = orders[id];
+    if (o.status === 'vd') return;
+    var eff = resolveOrderDate(o);
+    if (eff) {
+      var parts = eff.split('-');
+      if (parseInt(parts[0]) === y && parseInt(parts[1])-1 === m) monthCount++;
+    }
+  });
+  // Awaiting confirmation (requested status)
+  var awaitCount = Object.keys(orders).filter(function(id){ return orders[id].status === 'requested'; }).length;
+  // Active properties
+  var propCount = getProps().filter(function(pr){ return pr.status === 'active' && !pr.deletedAt; }).length;
+  // Active client logins
+  var clientCount = getUsers().filter(function(u){ return u.status === 'active'; }).length;
+
+  var se = document.getElementById('stat_month');   if (se) se.textContent = monthCount;
+  var sa = document.getElementById('stat_await');   if (sa) sa.textContent = awaitCount;
+  var sp = document.getElementById('stat_props');   if (sp) sp.textContent = propCount;
+  var sc = document.getElementById('stat_clients'); if (sc) sc.textContent = clientCount;
+
+  // Pulse the awaiting card red if > 0
+  var awaitCard = sa ? sa.closest('.sc') : null;
+  if (awaitCard) awaitCard.classList.toggle('sc-urgent', awaitCount > 0);
+}
+
+function dashStatClick(type) {
+  var navEl;
+  if (type === 'month') {
+    // Navigate to All Orders, set filter to current month YTD-style using custom date
+    navEl = document.querySelector('#ad .ni[onclick*="aord"]');
+    anav('aord', navEl);
+    // Set date range to this month
+    var now = new Date();
+    var y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
+    var from = y+'-'+m+'-01';
+    var lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    var to   = y+'-'+m+'-'+String(lastDay).padStart(2,'0');
+    var drEl = document.getElementById('aord_date_range');
+    if (drEl) { drEl.value = 'custom'; onDateRangeChange(); }
+    setTimeout(function(){
+      var fromEl = document.getElementById('aord_date_from');
+      var toEl   = document.getElementById('aord_date_to');
+      if (fromEl) fromEl.value = from;
+      if (toEl)   toEl.value   = to;
+      // Clear status filter to show all (excluding voided)
+      var stEl = document.getElementById('aord_status'); if (stEl) stEl.value = '';
+      renderAdminOrders();
+    }, 50);
+  } else if (type === 'awaiting') {
+    // Navigate to All Orders, filter to requested status
+    navEl = document.querySelector('#ad .ni[onclick*="aord"]');
+    anav('aord', navEl);
+    setTimeout(function(){
+      var stEl = document.getElementById('aord_status'); if (stEl) stEl.value = 'requested';
+      var drEl = document.getElementById('aord_date_range'); if (drEl) drEl.value = '';
+      var cdEl = document.getElementById('aord_custom_dates'); if (cdEl) cdEl.style.display = 'none';
+      renderAdminOrders();
+    }, 50);
+  } else if (type === 'properties') {
+    // Navigate to Properties panel
+    navEl = document.querySelector('#ad .ni[onclick*="aprops"]');
+    anav('aprops', navEl);
+    setTimeout(function(){
+      var stEl = document.getElementById('pstatus'); if (stEl) stEl.value = 'active';
+      filterProps();
+    }, 50);
+  } else if (type === 'clients') {
+    // Navigate to Client Logins
+    navEl = document.querySelector('#ad .ni[onclick*="ausers"]');
+    anav('ausers', navEl);
+    setTimeout(function(){
+      var stEl = document.getElementById('ucl_status'); if (stEl) stEl.value = 'active';
+      renderUserTable();
+    }, 50);
+  }
+}
+
 function switchDashTab(tab) {
   _dashTab = tab;
   document.getElementById('tab_recent').classList.toggle('on', tab === 'recent');
@@ -4427,6 +4527,7 @@ function doLogin() {
       // Activate dashboard tab and render it
       var dashNavEl = document.querySelector('#ad .ni[onclick*="adash"]');
       anav('adash', dashNavEl);
+      renderAdashStats();
       return;
     }
   }
@@ -4759,7 +4860,7 @@ function cnav(pid, el) {
   document.getElementById('ctitle').textContent = titles[pid] || pid;
 }
 function anav(pid, el) {
-  if (pid==='adash') renderAdashRecent();
+  if (pid==='adash') { renderAdashRecent(); renderAdashStats(); }
   if (pid==='aord')  renderAdminOrders();
   if (pid==='aprops') { renderPropList(); setTimeout(filterProps, 50); }
   if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); renderMarketSettings(); }
