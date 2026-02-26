@@ -561,10 +561,11 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
     <h1>Welcome Back</h1>
     <p class="sub">Sign in to your Protective Flooring portal</p>
     <div id="lerr" class="lerr">Incorrect email or password. Please try again.</div>
-    <div class="fg"><label>Email Address</label><input type="email" id="lemail" value="manager@cherrycreek.com"></div>
-    <div class="fg"><label>Password</label><input type="password" id="lpw" value="Cherry2025!"></div>
+    <div class="fg"><label>Email Address</label><input type="email" id="lemail" placeholder="you@example.com" autocomplete="username"></div>
+    <div class="fg"><label>Password</label><input type="password" id="lpw" placeholder="Password" autocomplete="current-password"></div>
     <button class="btn-pri" onclick="doLogin()" style="margin-top:6px;">Sign In</button>
     <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray);">Need access? <a href="#" style="color:var(--gold);font-weight:600;" onclick="toast('Contact info@protectiveflooring.com to request an account.')">Contact us</a></div>
+    <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--gray);"><a href="#" style="color:var(--gray);text-decoration:underline;" onclick="resetPortalData();return false;">Reset portal data</a> &mdash; clears saved changes and restores defaults</div>
   </div>
 </div>
 
@@ -2160,7 +2161,33 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
 </div>
 
-<script>// ── DATA ──
+<script>
+
+// ── DATA VERSION GUARD ───────────────────────────────────────────────────────
+var PORTAL_DATA_VERSION = '2026-02-v1';
+(function() {
+  try {
+    var stored = localStorage.getItem('pf_data_version');
+    if (stored !== PORTAL_DATA_VERSION) {
+      // Version mismatch — wipe stale data keys so defaults load fresh
+      ['pf_team','pf_users','pf_props','pf_orders','pf_markets','pf_service_types'].forEach(function(k){
+        localStorage.removeItem(k);
+      });
+      localStorage.setItem('pf_data_version', PORTAL_DATA_VERSION);
+    }
+  } catch(e) {}
+})();
+
+function resetPortalData() {
+  if (!confirm('This will clear all saved portal data and restore factory defaults.\nAll custom orders, properties, and user changes will be lost.\n\nContinue?')) return;
+  try {
+    ['pf_team','pf_users','pf_props','pf_orders','pf_markets','pf_service_types',
+     'pf_occ_form','pf_data_version'].forEach(function(k){ localStorage.removeItem(k); });
+  } catch(e) {}
+  location.reload();
+}
+// ─────────────────────────────────────────────────────────────────────────────
+// ── DATA ──
 
 // ── MARKETS ──
 var DEFAULT_MARKETS = [
