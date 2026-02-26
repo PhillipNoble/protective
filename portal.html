@@ -2192,7 +2192,7 @@ function filterProps() {
   var counts = {};
   var all = 0;
   document.querySelectorAll('#proplist .pr-card').forEach(function(card) {
-    var hub=card.dataset.hub||'', nameCity=(card.dataset.name||'')+' '+(card.dataset.city||'')+' '+(card.dataset.zip||'');
+    var hub=card.dataset.hub||'', nameCity=(card.dataset.name||'')+' '+(card.dataset.city||'')+' '+(card.dataset.zip||'')+' '+(card.dataset.mgmt||'');
     var status=card.dataset.status||'';
     var matchHub = curHub==='all'||hub===curHub;
     var matchQ = !q || nameCity.indexOf(q)>=0;
@@ -2316,6 +2316,7 @@ function renderPropList() {
     card.dataset.name = prop.name.toLowerCase();
     card.dataset.city = (prop.city||'').toLowerCase();
     card.dataset.zip  = (prop.zip||'').toLowerCase();
+    card.dataset.mgmt = (prop.mgmt||'').toLowerCase();
     card.dataset.status = prop.status || 'active';
     card.innerHTML =
       '<div class="pr-header" onclick="openEditProp(\''+prop.id+'\');event.stopPropagation();" style="cursor:pointer;">'
@@ -2478,33 +2479,103 @@ function deleteProperty() {
 function importFromUrl() {
   var url = (document.getElementById('madd_url').value||'').trim();
   if (!url) { toast('Please enter a URL first.'); return; }
-  // Extract property name from URL path segments
-  var name = '';
+
+  var name = '', last = '', parts = [];
+  var stateAbbrs = ['tn','ms','al','ar','ky','ga','fl','sc','nc','va','tx','ok','mo'];
+
+  // Always pre-fill website field
+  document.getElementById('madd_web').value = url;
+
+  // Parse what we can from the URL itself
   try {
     var u = new URL(url);
-    // Take the last meaningful path segment, clean hyphens
-    var segs = u.pathname.split('/').filter(function(s){return s.length>2;});
-    if (segs.length) {
-      var last = segs[segs.length-1].replace(/-/g,' ').replace(/\.html$/,'');
-      name = last.split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+    // Hostname can give us the property name: e.g. "riverside-apartments.com"
+    var host = u.hostname.replace(/^www\./, '').split('.')[0];
+    var segs  = u.pathname.split('/').filter(function(s){ return s.length > 2; });
+    // Prefer path segment over hostname if available
+    var raw = segs.length ? segs[segs.length-1] : host;
+    last = raw.replace(/-/g,' ').replace(/_/g,' ').replace(/\.html?$/,'').trim();
+    parts = last.split(' ');
+
+    // Detect state abbreviation in slug to extract city
+    var stateIdx = -1;
+    for (var si=0; si<parts.length; si++) {
+      if (stateAbbrs.indexOf(parts[si].toLowerCase()) >= 0) { stateIdx = si; break; }
     }
-    // Pre-fill website
-    document.getElementById('madd_web').value = url;
-    // Try to detect city from path (common URL pattern: property-name-city-state)
-    var parts = last ? last.split(' ') : [];
-    var stateAbbrs = ['tn','ms','al','ar','ky','ga'];
-    var stateIdx = parts.findIndex(function(p){ return stateAbbrs.indexOf(p.toLowerCase())>=0; });
     if (stateIdx > 0) {
-      var city = parts.slice(stateIdx-1, stateIdx).join(' ');
-      var state = parts[stateIdx].toUpperCase();
-      if (city) document.getElementById('madd_city').value = city.charAt(0).toUpperCase()+city.slice(1);
-      if (state) document.getElementById('madd_state').value = state;
-      // Remove city+state from name
-      name = parts.slice(0, stateIdx-1).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+      var cityPart  = parts[stateIdx-1];
+      var statePart = parts[stateIdx].toUpperCase();
+      if (cityPart) document.getElementById('madd_city').value = cityPart.charAt(0).toUpperCase()+cityPart.slice(1);
+      document.getElementById('madd_state').value = statePart;
+      name = parts.slice(0, stateIdx-1).map(function(w){ return w.charAt(0).toUpperCase()+w.slice(1); }).join(' ');
+    } else {
+      name = parts.map(function(w){ return w.charAt(0).toUpperCase()+w.slice(1); }).join(' ');
     }
+    // Try to get zip/city from query string (?zip=38118)
+    var qzip = u.searchParams.get('zip')||u.searchParams.get('postal');
+    if (qzip) document.getElementById('madd_zip').value = qzip;
   } catch(e) {}
+
   if (name) document.getElementById('madd_name').value = name;
-  toast('Auto-filled from URL. Please review and complete the form.');
+
+  // Attempt live fetch (will succeed only if network is available)
+  var btn = document.querySelector('[onclick="importFromUrl()"]');
+  if (btn) { btn.textContent = 'Importing…'; btn.disabled = true; }
+
+  var cleanup = function(msg) {
+    if (btn) { btn.textContent = 'Import'; btn.disabled = false; }
+    toast(msg);
+  };
+
+  fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url))
+    .then(function(r){ return r.ok ? r.json() : Promise.reject('Network error'); })
+    .then(function(data) {
+      var html = data.contents || '';
+      var get = function(patterns) {
+        for (var pi=0; pi<patterns.length; pi++) {
+          var m = html.match(patterns[pi]);
+          if (m && m[1] && m[1].trim()) return m[1].replace(/<[^>]+>/g,'').trim();
+        }
+        return '';
+      };
+      // Try to extract address
+      var addr = get([
+        /itemprop="streetAddress"[^>]*>([^<]+)</i,
+        /class="[^"]*address[^"]*"[^>]*>([^<]{6,80})</i,
+        /"streetAddress"\s*:\s*"([^"]+)"/i
+      ]);
+      var city = get([
+        /itemprop="addressLocality"[^>]*>([^<]+)</i,
+        /"addressLocality"\s*:\s*"([^"]+)"/i
+      ]);
+      var state = get([
+        /itemprop="addressRegion"[^>]*>([^<]+)</i,
+        /"addressRegion"\s*:\s*"([^"]+)"/i
+      ]);
+      var zip = get([
+        /itemprop="postalCode"[^>]*>([^<]+)</i,
+        /"postalCode"\s*:\s*"([^"]+)"/i
+      ]);
+      var phone = get([
+        /href="tel:([^"]+)"/i,
+        /itemprop="telephone"[^>]*>([^<]+)</i
+      ]);
+      var pname = get([
+        /<h1[^>]*>([^<]{4,80})</i,
+        /<title>([^<|–-]{4,60})/i
+      ]);
+      if (addr)  document.getElementById('madd_addr').value  = addr;
+      if (city)  document.getElementById('madd_city').value  = city;
+      if (state) document.getElementById('madd_state').value = state.toUpperCase().slice(0,2);
+      if (zip)   document.getElementById('madd_zip').value   = zip;
+      if (phone) document.getElementById('madd_phone').value = phone;
+      if (pname) document.getElementById('madd_name').value  = pname;
+      cleanup('Imported from URL — please review and complete the form.');
+    })
+    .catch(function() {
+      // Network unavailable — URL-parsed fields already filled above
+      cleanup(name ? 'Network unavailable — partial info filled from URL. Please complete the form.' : 'Could not fetch page. Please fill in the form manually.');
+    });
 }
 
 // Rebuild legacy fpByProp/fpDetails when properties change
