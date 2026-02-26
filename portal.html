@@ -817,9 +817,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div class="panel" id="cx">
         <div class="shd"><h2>Documents &amp; Forms</h2></div>
         <div class="tw"><table><thead><tr><th>Document</th><th>Description</th><th>Updated</th><th></th></tr></thead><tbody id="cdocs_tbody">
-          <tr><td><strong>Occupied Unit Form</strong></td><td>Required for flooring in occupied units</td><td>Jan 2025</td><td><button class="bs ol" onclick="openOccupiedForm()">&#128065; View Form</button> Download</button></td></tr>
-          <tr><td><strong>Flooring Care Guide</strong></td><td>Maintenance instructions for residents</td><td>Dec 2024</td><td><button class="bs ol" onclick="toast('Download ready.')">&#8681; Download</button></td></tr>
-          <tr><td><strong>Pet Damage Checklist</strong></td><td>Pre-order assessment guide</td><td>Nov 2024</td><td><button class="bs ol" onclick="toast('Download ready.')">&#8681; Download</button></td></tr>
+          <!-- populated by renderClientDocuments() -->
         </tbody></table></div>
       </div>
 
@@ -3478,18 +3476,68 @@ function renderClientDocuments() {
   if (!tbody) return;
   var fd = getOccupiedFormData();
   var hasForm = fd && fd.src;
-  var updatedStr = hasForm ? (fd.uploaded || 'Recently') + (fd.label ? ' — ' + fd.label : '') : 'Jan 2025 (default)';
+  var updatedStr = hasForm
+    ? (fd.uploaded || 'Recently') + (fd.label ? ' — ' + fd.label : '')
+    : 'Default template';
+
   tbody.innerHTML =
-    '<tr>'+
-      '<td><strong>Occupied Unit Form</strong></td>'+
-      '<td>Required for flooring in occupied units</td>'+
-      '<td>'+updatedStr+'</td>'+
-      '<td>'+
-        (hasForm
-          ? '<button class="bs gd" onclick="openOccupiedForm()">&#128065; View &amp; Print</button>'
-          : '<button class="bs ol" onclick="openOccupiedForm()">&#128065; View Form</button>')+
-      '</td>'+
+    '<tr>' +
+      '<td><strong>Occupied Unit Authorization Form</strong></td>' +
+      '<td style="color:var(--gray);font-size:13px;">Required for flooring in occupied units</td>' +
+      '<td style="font-size:12px;color:var(--gray);">' + updatedStr + '</td>' +
+      '<td>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">' +
+          '<button class="bs ' + (hasForm ? 'gd' : 'ol') + '" onclick="openOccupiedForm()" style="font-size:11px;">' +
+            '&#128065; View &amp; Print' +
+          '</button>' +
+          '<label class="bs nv" style="font-size:11px;cursor:pointer;margin:0;" title="Upload a new version of this form">' +
+            '&#128228; ' + (hasForm ? 'Replace' : 'Upload') +
+            '<input type="file" accept="image/png,image/jpeg,image/jpg,application/pdf" ' +
+              'style="display:none;" onchange="clientUploadOccForm(this)">' +
+          '</label>' +
+          (hasForm ? '<button class="bs dn" onclick="clientRemoveOccForm()" style="font-size:11px;" title="Remove uploaded form">&#128465;</button>' : '') +
+        '</div>' +
+      '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td><strong>Flooring Care Guide</strong></td>' +
+      '<td style="color:var(--gray);font-size:13px;">Maintenance instructions for residents</td>' +
+      '<td style="font-size:12px;color:var(--gray);">Dec 2024</td>' +
+      '<td><button class="bs ol" onclick="toast(&quot;Available in live version.&quot;)" style="font-size:11px;">&#8681; Download</button></td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td><strong>Pet Damage Checklist</strong></td>' +
+      '<td style="color:var(--gray);font-size:13px;">Pre-order assessment guide</td>' +
+      '<td style="font-size:12px;color:var(--gray);">Nov 2024</td>' +
+      '<td><button class="bs ol" onclick="toast(&quot;Available in live version.&quot;)" style="font-size:11px;">&#8681; Download</button></td>' +
     '</tr>';
+}
+
+function clientUploadOccForm(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 8 * 1024 * 1024) { toast('File too large — max 8MB.'); input.value=''; return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var fd = getOccupiedFormData() || {};
+    fd.src      = e.target.result;
+    fd.filename = file.name;
+    fd.uploaded = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    saveOccupiedFormData(fd);
+    renderClientDocuments();
+    renderDocManager(); // sync admin settings panel if open
+    toast('✓ Form uploaded successfully.');
+    input.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clientRemoveOccForm() {
+  if (!confirm('Remove the uploaded form? The built-in default template will be used instead.')) return;
+  try { localStorage.removeItem('pf_occ_form'); } catch(e) {}
+  renderClientDocuments();
+  renderDocManager();
+  toast('Form removed.');
 }
 
 function deleteGlobalScope(id) {
