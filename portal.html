@@ -734,7 +734,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <h2>Order History</h2>
           <span id="ch_count" style="font-size:13px;color:var(--gray);font-weight:400;margin-left:8px;"></span>
         </div>
-        <div class="fb" style="flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <div class="fb" style="flex-wrap:wrap;gap:8px;margin-bottom:8px;">
           <div class="sw" style="min-width:200px;flex:1;">
             <span class="si2">&#128269;</span>
             <input type="text" id="ch_search" placeholder="Search orders, units, services..." oninput="renderClientHistory()">
@@ -751,23 +751,42 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <select class="fs" id="ch_hub_filter" onchange="renderClientHistory()">
             <option value="">All Hubs</option>
           </select>
+          <select class="fs" id="ch_date_range" onchange="onChDateRangeChange()" title="Filter by date">
+            <option value="">All Dates</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="last_week">Last Week</option>
+            <option value="last_month">Last Month</option>
+            <option value="last_quarter">Last Quarter</option>
+            <option value="qtd">Quarter to Date</option>
+            <option value="last_year">Last Year</option>
+            <option value="ytd">Year to Date</option>
+            <option value="custom">Custom Date Range...</option>
+          </select>
           <select class="fs" id="ch_sort" onchange="renderClientHistory()">
             <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
             <option value="date">By Install Date</option>
             <option value="property">By Property</option>
             <option value="status">By Status</option>
             <option value="service">By Service</option>
           </select>
         </div>
-        <div class="tw"><table>
+        <div id="ch_custom_dates" style="display:none;align-items:center;gap:6px;margin-bottom:8px;">
+          <input type="date" id="ch_date_from" class="fs" style="width:140px;" onchange="renderClientHistory()" title="From date">
+          <span style="font-size:12px;color:var(--gray);">to</span>
+          <input type="date" id="ch_date_to" class="fs" style="width:140px;" onchange="renderClientHistory()" title="To date">
+        </div>
+        <div class="tw"><table id="ch_tbl">
           <thead><tr>
-            <th>Work Order</th>
-            <th>Property</th>
-            <th>Unit</th>
-            <th>Service</th>
-            <th>Requested</th>
-            <th>Hub</th>
-            <th>Status</th>
+            <th class="sortable" onclick="chSortByCol(0,'text')" data-col="0">Work Order <span class="sort-icon">⇅</span></th>
+            <th class="sortable" onclick="chSortByCol(1,'text')" data-col="1">Property <span class="sort-icon">⇅</span></th>
+            <th class="sortable" onclick="chSortByCol(2,'text')" data-col="2">Unit <span class="sort-icon">⇅</span></th>
+            <th class="sortable" onclick="chSortByCol(3,'text')" data-col="3">Service <span class="sort-icon">⇅</span></th>
+            <th class="sortable" onclick="chSortByCol(4,'date')" data-col="4" id="ch_date_th">Date <span class="sort-icon">⇅</span></th>
+            <th class="sortable" onclick="chSortByCol(5,'text')" data-col="5">Hub <span class="sort-icon">⇅</span></th>
+            <th class="sortable" onclick="chSortByCol(6,'text')" data-col="6">Status <span class="sort-icon">⇅</span></th>
             <th></th>
           </tr></thead>
           <tbody id="ch_tbody"></tbody>
@@ -4396,6 +4415,31 @@ function renderClientDash() {
   tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">No orders yet. <a href="#" onclick="cnav(\'co\',document.querySelector(\'#cl .ni[onclick*=&quot;co&quot;]\'))">Submit your first order.</a></td></tr>';
 }
 
+function onChDateRangeChange() {
+  var val = (document.getElementById('ch_date_range')||{value:''}).value;
+  var cd  = document.getElementById('ch_custom_dates');
+  if (cd) cd.style.display = val === 'custom' ? 'flex' : 'none';
+  renderClientHistory();
+}
+
+var _chSortState = {col:-1, dir:'asc', type:'text'};
+
+function chSortByCol(col, type) {
+  if (_chSortState.col === col) {
+    _chSortState.dir = _chSortState.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    _chSortState.col  = col;
+    _chSortState.dir  = 'asc';
+    _chSortState.type = type;
+  }
+  var tbl = document.getElementById('ch_tbl');
+  if (tbl) tbl.querySelectorAll('th.sortable').forEach(function(th, i) {
+    th.classList.remove('sort-asc','sort-desc');
+    if (i === col) th.classList.add(_chSortState.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+  });
+  renderClientHistory();
+}
+
 function renderClientHistory() {
   var tbody = document.getElementById('ch_tbody');
   if (!tbody || !currentUser) return;
@@ -4404,12 +4448,22 @@ function renderClientHistory() {
   var allPN = getActiveProps().map(function(pr){ return pr.name; });
   var isAdm = userProps.length === 0 || userProps.length >= allPN.length - 1;
 
-  // Filters
-  var chQ   = (document.getElementById('ch_search')||{value:''}).value.trim().toLowerCase();
-  var chSt  = (document.getElementById('ch_status_filter')||{value:''}).value;
-  var chPr  = (document.getElementById('ch_prop_filter')||{value:''}).value;
-  var chHub = (document.getElementById('ch_hub_filter')||{value:''}).value;
-  var chSrt = (document.getElementById('ch_sort')||{value:'newest'}).value;
+  var chQ      = (document.getElementById('ch_search')       ||{value:''}).value.trim().toLowerCase();
+  var chSt     = (document.getElementById('ch_status_filter')||{value:''}).value;
+  var chPr     = (document.getElementById('ch_prop_filter')  ||{value:''}).value;
+  var chHub    = (document.getElementById('ch_hub_filter')   ||{value:''}).value;
+  var chSrt    = (document.getElementById('ch_sort')         ||{value:'newest'}).value;
+  var chDR     = (document.getElementById('ch_date_range')   ||{value:''}).value;
+  var chBounds = null;
+  if (chDR) {
+    if (chDR === 'custom') {
+      var from = (document.getElementById('ch_date_from')||{value:''}).value;
+      var to   = (document.getElementById('ch_date_to')  ||{value:''}).value;
+      if (from || to) chBounds = [from||'0000-01-01', to||'9999-12-31'];
+    } else {
+      chBounds = dateRangeBounds(chDR);
+    }
+  }
 
   var ids = Object.keys(orders).filter(function(id){
     var o = orders[id];
@@ -4421,22 +4475,43 @@ function renderClientHistory() {
       var hay = (o.num+' '+o.property+' '+o.unit+' '+svcDisplay(o)+' '+(o.plan||'')).toLowerCase();
       if (hay.indexOf(chQ) === -1) return false;
     }
+    if (chBounds) {
+      var eff = resolveOrderDate(o);
+      if (!eff || eff < chBounds[0] || eff > chBounds[1]) return false;
+    }
     return true;
   });
 
   ids.sort(function(a,b){
     var oa=orders[a], ob=orders[b];
+    if (_chSortState.col >= 0) {
+      var fieldMap = {0:'num',1:'property',2:'unit',3:'service'};
+      var f = fieldMap[_chSortState.col];
+      if (_chSortState.col === 4) {
+        var da = resolveOrderDate(oa), db = resolveOrderDate(ob);
+        return _chSortState.dir==='asc' ? da.localeCompare(db) : db.localeCompare(da);
+      }
+      if (_chSortState.col === 5) {
+        var ha=(oa.hub||'').toLowerCase(), hb=(ob.hub||'').toLowerCase();
+        return _chSortState.dir==='asc' ? ha.localeCompare(hb) : hb.localeCompare(ha);
+      }
+      if (_chSortState.col === 6) {
+        var sa2=oa.status||'', sb2=ob.status||'';
+        return _chSortState.dir==='asc' ? sa2.localeCompare(sb2) : sb2.localeCompare(sa2);
+      }
+      if (f) {
+        var fa=(oa[f]||'').toLowerCase(), fb=(ob[f]||'').toLowerCase();
+        return _chSortState.dir==='asc' ? fa.localeCompare(fb) : fb.localeCompare(fa);
+      }
+    }
     if (chSrt==='property') return (oa.property||'').localeCompare(ob.property||'');
     if (chSrt==='status')   return (oa.status||'').localeCompare(ob.status||'');
     if (chSrt==='service')  return (oa.service||'').localeCompare(ob.service||'');
-    if (chSrt==='date')     return (oa.reqDate||'').localeCompare(ob.reqDate||'');
-    // newest first (timestamp keys first)
-    var aTs=a.indexOf('WO-')===0, bTs=b.indexOf('WO-')===0;
-    if (aTs && !bTs) return -1; if (!aTs && bTs) return 1;
-    return b > a ? 1 : -1;
+    if (chSrt==='date')     return resolveOrderDate(oa).localeCompare(resolveOrderDate(ob));
+    if (chSrt==='oldest')   return resolveOrderDate(oa).localeCompare(resolveOrderDate(ob));
+    return b.localeCompare(a);
   });
 
-  // Populate property dropdown (always refresh)
   var propSel = document.getElementById('ch_prop_filter');
   if (propSel) {
     var curVal = propSel.value;
@@ -4453,21 +4528,31 @@ function renderClientHistory() {
 
   var html = '';
   ids.forEach(function(id) {
-    var o = orders[id];
-    html += '<tr onclick="oworder(\''+id+'\')">'+
-      '<td><strong>#'+o.num+'</strong></td>'+
-      '<td>'+o.property+'</td>'+
-      '<td>'+o.unit+'</td>'+
-      '<td>'+svcDisplay(o)+'</td>'+
-      '<td>'+fmtDate(o.reqDate)+'</td>'+
-      '<td>'+(hubBadgeHtml(o.hub))+'</td>'+
-      '<td>'+statusBadge(o.status)+'</td>'+
-      '<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'+
-      '</tr>';
+    var o   = orders[id];
+    var eff = resolveOrderDate(o);
+    var rowId = id;
+    html += "<tr onclick=\"oworder('"+rowId+"')\">" +
+      "<td><strong>#"+o.num+"</strong></td>" +
+      "<td>"+o.property+"</td>" +
+      "<td>"+o.unit+"</td>" +
+      "<td>"+svcDisplay(o)+"</td>" +
+      "<td>"+fmtDate(eff)+"</td>" +
+      "<td>"+hubBadgeHtml(o.hub)+"</td>" +
+      "<td>"+statusBadge(o.status)+"</td>" +
+      "<td><button class=\"bs ol\" onclick=\"event.stopPropagation();oworder('"+rowId+"')\">View / Print</button></td>" +
+      "</tr>";
   });
   var countEl = document.getElementById('ch_count');
-  if (countEl) countEl.textContent = ids.length + ' order' + (ids.length===1?'':'s');
+  if (countEl) countEl.textContent = ids.length + ' order'+(ids.length===1?'':'s');
   tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px;">No orders found.</td></tr>';
+
+  var tbl = document.getElementById('ch_tbl');
+  if (tbl && _chSortState.col >= 0) {
+    tbl.querySelectorAll('th.sortable').forEach(function(th, i) {
+      th.classList.remove('sort-asc','sort-desc');
+      if (i === _chSortState.col) th.classList.add(_chSortState.dir==='asc' ? 'sort-asc' : 'sort-desc');
+    });
+  }
 }
 
 function refreshAllOrderViews() {
