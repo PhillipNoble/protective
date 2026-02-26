@@ -588,32 +588,67 @@ footer{
 
 
 /* ── ABOUT US SECTION ── */
-.about-section{background:#fff;padding:100px 60px;position:relative;overflow:hidden;}
-.about-section::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy),var(--gold));}
-.about-inner{max-width:1080px;margin:0 auto;}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:56px;}
-@media(max-width:900px){.about-grid{grid-template-columns:1fr;gap:48px;}}
-.about-img-stack{position:relative;height:480px;}
-.about-img-main{position:absolute;top:0;left:0;width:78%;height:380px;object-fit:cover;border-radius:2px;box-shadow:0 20px 60px rgba(2,10,91,.15);}
-.about-img-accent{position:absolute;bottom:0;right:0;width:55%;height:260px;object-fit:cover;border-radius:2px;box-shadow:0 12px 40px rgba(2,10,91,.2);border:4px solid #fff;}
-.about-year-badge{position:absolute;top:20px;right:20px;background:var(--gold);color:var(--navy);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:8px 14px;border-radius:2px;z-index:2;}
-.about-text h2{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:700;color:var(--navy);line-height:1.15;margin-bottom:20px;}
-.about-text h2 em{color:var(--gold);font-style:italic;}
-.about-lead{font-size:17px;color:#444;line-height:1.7;margin-bottom:28px;}
-.about-body{font-size:15px;color:var(--gray);line-height:1.75;margin-bottom:36px;}
-.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-bottom:36px;}
-.about-stat{padding:20px 16px;text-align:center;border-right:1px solid var(--border);}
-.about-stat:last-child{border-right:none;}
-.about-stat-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--navy);line-height:1;}
-.about-stat-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:4px;}
-.about-cta{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;padding:14px 28px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .2s;}
-.about-cta:hover{background:var(--gold);color:var(--navy);}
-.about-values{margin-top:80px;padding-top:64px;border-top:1px solid var(--border);}
-.about-values-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:32px;margin-top:40px;}
-.about-value-card{display:flex;flex-direction:column;gap:10px;}
-.about-value-icon{font-size:28px;line-height:1;}
-.about-value-title{font-size:14px;font-weight:700;color:var(--navy);letter-spacing:.3px;}
-.about-value-text{font-size:13px;color:var(--gray);line-height:1.6;}
+.about-section{background:var(--navy-dk);padding:0;position:relative;overflow:hidden;}
+
+/* Hero banner */
+.ab-hero{position:relative;height:min(60vh,520px);display:flex;align-items:flex-end;overflow:hidden;}
+.ab-hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80');background-size:cover;background-position:center 30%;filter:brightness(.45);}
+.ab-hero-grain{position:absolute;inset:0;opacity:.35;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");background-size:200px;}
+.ab-hero-content{position:relative;z-index:2;padding:0 80px 64px;max-width:1200px;width:100%;}
+.ab-overline{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.ab-hero-h{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,7vw,88px);font-weight:700;color:#fff;line-height:.95;letter-spacing:-1px;}
+.ab-hero-h em{color:var(--gold);font-style:italic;display:block;}
+@media(max-width:700px){.ab-hero-content{padding:0 28px 48px;}}
+
+/* Stats bar */
+.ab-stats-bar{display:grid;grid-template-columns:repeat(3,1fr);background:var(--gold);}
+.ab-sbar-item{padding:28px 40px;border-right:1px solid rgba(2,10,91,.2);display:flex;flex-direction:column;gap:4px;}
+.ab-sbar-item:last-child{border-right:none;}
+.ab-sbar-num{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;color:var(--navy-dk);line-height:1;}
+.ab-sbar-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(2,10,91,.65);}
+@media(max-width:600px){.ab-stats-bar{grid-template-columns:1fr;} .ab-sbar-item{border-right:none;border-bottom:1px solid rgba(2,10,91,.2);}}
+
+/* Story block */
+.ab-story{display:grid;grid-template-columns:1fr 1fr;min-height:580px;}
+@media(max-width:900px){.ab-story{grid-template-columns:1fr;}}
+.ab-story-img{position:relative;overflow:hidden;min-height:400px;}
+.ab-story-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.8) saturate(.9);}
+.ab-story-img-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(2,10,91,.6) 0%,transparent 60%);}
+.ab-story-year{position:absolute;bottom:40px;left:40px;z-index:2;}
+.ab-story-year-num{font-family:'Cormorant Garamond',serif;font-size:96px;font-weight:700;color:rgba(255,255,255,.15);line-height:1;letter-spacing:-4px;}
+.ab-story-year-label{font-size:10px;font-weight:700;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-top:-8px;}
+.ab-story-text{background:#fff;padding:72px 64px;display:flex;flex-direction:column;justify-content:center;}
+@media(max-width:700px){.ab-story-text{padding:48px 28px;}}
+.ab-story-h{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3.5vw,42px);font-weight:700;color:var(--navy);line-height:1.15;margin-bottom:24px;}
+.ab-story-h em{color:var(--gold);font-style:italic;}
+.ab-lead{font-size:17px;color:#333;line-height:1.75;font-weight:400;margin-bottom:20px;}
+.ab-body{font-size:15px;color:var(--gray);line-height:1.8;margin-bottom:36px;}
+
+/* Horizontal rule with label */
+.ab-rule{display:flex;align-items:center;gap:16px;margin-bottom:32px;}
+.ab-rule::before,.ab-rule::after{content:'';flex:1;height:1px;background:var(--border);}
+.ab-rule span{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);white-space:nowrap;}
+
+.ab-cta{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;padding:15px 32px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:all .2s;}
+.ab-cta:hover{background:var(--gold);color:var(--navy);}
+
+/* Values dark panel */
+.ab-values{background:var(--navy-dk);padding:88px 80px;position:relative;overflow:hidden;}
+.ab-values::before{content:'1976';position:absolute;right:-20px;top:50%;transform:translateY(-50%);font-family:'Cormorant Garamond',serif;font-size:260px;font-weight:700;color:rgba(255,255,255,.03);line-height:1;letter-spacing:-8px;pointer-events:none;user-select:none;}
+@media(max-width:700px){.ab-values{padding:64px 28px;}}
+.ab-values-inner{max-width:1080px;margin:0 auto;}
+.ab-values-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:64px;gap:40px;flex-wrap:wrap;}
+.ab-values-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,52px);font-weight:700;color:#fff;line-height:1.1;}
+.ab-values-title em{color:var(--gold);font-style:italic;}
+.ab-values-sub{max-width:360px;font-size:14px;color:rgba(255,255,255,.45);line-height:1.7;}
+.ab-vals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;}
+@media(max-width:700px){.ab-vals-grid{grid-template-columns:1fr;}}
+.ab-val{background:rgba(255,255,255,.04);padding:40px 44px;position:relative;border:1px solid rgba(255,255,255,.06);transition:background .3s;}
+.ab-val:hover{background:rgba(200,149,42,.07);}
+.ab-val-num{font-family:'Cormorant Garamond',serif;font-size:60px;font-weight:700;color:rgba(200,149,42,.2);line-height:1;margin-bottom:12px;}
+.ab-val-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
+.ab-val-text{font-size:14px;color:rgba(255,255,255,.5);line-height:1.7;}
+.ab-val-line{width:32px;height:2px;background:var(--gold);margin-bottom:20px;}
 </style>
 </head>
 <body>
@@ -841,61 +876,89 @@ footer{
 
 <!-- ABOUT US -->
 <section id="about" class="about-section">
-  <div class="about-inner">
-    <div class="section-eyebrow reveal">Our Story</div>
-    <div class="about-grid">
-      <div class="about-img-stack reveal">
-        <img class="about-img-main" src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80" alt="Protective Flooring crew at work">
-        <img class="about-img-accent" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Flooring installation detail">
-        <div class="about-year-badge">Est. 1976</div>
-      </div>
-      <div class="about-text reveal reveal-delay-1">
-        <h2>Family-Owned.<br><em>Flooring Done Right.</em></h2>
-        <p class="about-lead">For nearly 50 years, Protective Services Company has been the flooring partner that Mid-South property managers trust when it matters most.</p>
-        <p class="about-body">Founded in Memphis in 1976, we started as a small crew with a simple promise: show up, do the work right, and make the call when something goes sideways. That promise hasn't changed. What has changed is our reach — today we operate across Memphis and Nashville, serving apartment communities, senior living facilities, student housing, and commercial properties throughout the region.<br><br>We're not a franchise. We're not a national chain. We're the company that answers the phone, knows your properties by name, and has the crews, materials, and systems to keep your unit turns moving on schedule.</p>
-        <div class="about-stats">
-          <div class="about-stat">
-            <div class="about-stat-num">50+</div>
-            <div class="about-stat-lbl">Years in Business</div>
-          </div>
-          <div class="about-stat">
-            <div class="about-stat-num">500+</div>
-            <div class="about-stat-lbl">Units / Month</div>
-          </div>
-          <div class="about-stat">
-            <div class="about-stat-num">2</div>
-            <div class="about-stat-lbl">Regional Hubs</div>
-          </div>
-        </div>
-        <a href="#contact" class="about-cta">Work With Us &#8599;</a>
+
+  <!-- HERO BANNER -->
+  <div class="ab-hero">
+    <div class="ab-hero-bg"></div>
+    <div class="ab-hero-grain"></div>
+    <div class="ab-hero-content reveal">
+      <div class="ab-overline">Our Story &mdash; Est. 1976</div>
+      <h2 class="ab-hero-h">Family-Owned.<em>Flooring Done Right.</em></h2>
+    </div>
+  </div>
+
+  <!-- GOLD STATS BAR -->
+  <div class="ab-stats-bar">
+    <div class="ab-sbar-item reveal">
+      <div class="ab-sbar-num">50+</div>
+      <div class="ab-sbar-lbl">Years in Business</div>
+    </div>
+    <div class="ab-sbar-item reveal reveal-delay-1">
+      <div class="ab-sbar-num">500+</div>
+      <div class="ab-sbar-lbl">Units Per Month</div>
+    </div>
+    <div class="ab-sbar-item reveal reveal-delay-2">
+      <div class="ab-sbar-num">2</div>
+      <div class="ab-sbar-lbl">Regional Hubs</div>
+    </div>
+  </div>
+
+  <!-- STORY SPLIT -->
+  <div class="ab-story">
+    <div class="ab-story-img">
+      <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=900&q=80" alt="Flooring installation">
+      <div class="ab-story-img-overlay"></div>
+      <div class="ab-story-year">
+        <div class="ab-story-year-num">1976</div>
+        <div class="ab-story-year-label">Memphis, Tennessee</div>
       </div>
     </div>
-    <div class="about-values reveal">
-      <div class="section-eyebrow">What We Stand On</div>
-      <div class="about-values-grid">
-        <div class="about-value-card">
-          <div class="about-value-icon">&#128222;</div>
-          <div class="about-value-title">We Answer the Phone</div>
-          <div class="about-value-text">Same-day response on every request. Real people, not ticketing systems.</div>
+    <div class="ab-story-text reveal">
+      <div class="ab-overline" style="color:var(--gold);margin-bottom:20px;">The Company Behind the Work</div>
+      <h3 class="ab-story-h">We're Not a Franchise.<br><em>We're the Real Thing.</em></h3>
+      <p class="ab-lead">For nearly 50 years, Protective Services Company has been the flooring partner that Mid-South property managers trust when it matters most.</p>
+      <div class="ab-rule"><span>Our Promise</span></div>
+      <p class="ab-body">Founded in Memphis in 1976, we started as a small crew with a simple promise: show up, do the work right, and make the call when something goes sideways. That promise hasn't changed. What has changed is our reach &mdash; today we operate across Memphis and Nashville, serving apartment communities, senior living facilities, student housing, and commercial properties throughout the region.<br><br>We're not a franchise. We're not a national chain. We're the company that answers the phone, knows your properties by name, and has the crews, materials, and systems to keep your unit turns moving on schedule.</p>
+      <a href="#contact" class="ab-cta">Work With Us &#8599;</a>
+    </div>
+  </div>
+
+  <!-- VALUES DARK PANEL -->
+  <div class="ab-values">
+    <div class="ab-values-inner">
+      <div class="ab-values-hd reveal">
+        <div class="ab-values-title">What We<br><em>Stand On</em></div>
+        <div class="ab-values-sub">Four principles that have defined every job we've done since the day we opened our doors in 1976.</div>
+      </div>
+      <div class="ab-vals-grid">
+        <div class="ab-val reveal">
+          <div class="ab-val-num">01</div>
+          <div class="ab-val-line"></div>
+          <div class="ab-val-title">We Answer the Phone</div>
+          <div class="ab-val-text">Same-day response on every request. Real people, not ticketing systems.</div>
         </div>
-        <div class="about-value-card">
-          <div class="about-value-icon">&#128337;</div>
-          <div class="about-value-title">We Respect the Schedule</div>
-          <div class="about-value-text">Vacancy costs money. We show up on time, every time, and work until it's done.</div>
+        <div class="ab-val reveal reveal-delay-1">
+          <div class="ab-val-num">02</div>
+          <div class="ab-val-line"></div>
+          <div class="ab-val-title">We Respect the Schedule</div>
+          <div class="ab-val-text">Vacancy costs money. We show up on time, every time, and work until it&rsquo;s done.</div>
         </div>
-        <div class="about-value-card">
-          <div class="about-value-icon">&#9989;</div>
-          <div class="about-value-title">We Stand on Our Work</div>
-          <div class="about-value-text">If something isn't right, we make it right. No runaround, no excuses.</div>
+        <div class="ab-val reveal reveal-delay-2">
+          <div class="ab-val-num">03</div>
+          <div class="ab-val-line"></div>
+          <div class="ab-val-title">We Stand on Our Work</div>
+          <div class="ab-val-text">If something isn&rsquo;t right, we make it right. No runaround, no excuses.</div>
         </div>
-        <div class="about-value-card">
-          <div class="about-value-icon">&#129309;</div>
-          <div class="about-value-title">We're a Long-Term Partner</div>
-          <div class="about-value-text">We don't chase one-off jobs. We build relationships with property teams that last decades.</div>
+        <div class="ab-val reveal reveal-delay-3">
+          <div class="ab-val-num">04</div>
+          <div class="ab-val-line"></div>
+          <div class="ab-val-title">We&rsquo;re a Long-Term Partner</div>
+          <div class="ab-val-text">We don&rsquo;t chase one-off jobs. We build relationships with property teams that last decades.</div>
         </div>
       </div>
     </div>
   </div>
+
 </section>
 
 <!-- MARKETS -->
