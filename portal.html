@@ -813,7 +813,7 @@ table.fpt tr:hover td{background:var(--cream);}
           </div>
         </div>
         <div class="tw" style="margin-bottom:28px;" id="adash_recent_wrap"><table>
-          <thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Requested</th><th>Occupancy</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>Work Order</th><th>Property</th><th>Hub</th><th>Unit</th><th>Service</th><th>Requested</th><th>Install Date</th><th>Status</th><th>Action</th></tr></thead>
           <tbody id="adash_recent_tbody"></tbody>
         </table></div>
         <div class="tw" style="margin-bottom:28px;display:none;" id="adash_today_wrap"><table>
@@ -3757,7 +3757,7 @@ function renderAdashRecent() {
       '<td>'+o.unit+'</td>'+
       '<td>'+svcDisplay(o)+'</td>'+
       '<td>'+fmtDate(o.reqDate)+'</td>'+
-      '<td>'+o.occ+'</td>'+
+      '<td>'+(o.confDate && o.confDate!=='Pending' ? fmtDate(o.confDate) : '<span style="color:var(--gray);font-size:11px;">Pending</span>')+'</td>'+
       '<td>'+statusBadge(o.status)+'</td>'+
       '<td>'+orderActionBtns(id,o)+'</td>'+
       '</tr>';
