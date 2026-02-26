@@ -523,6 +523,7 @@ th.sortable::after{content:' \2B83';opacity:.3;font-size:9px;margin-left:3px;}
 th.sort-asc::after{content:' \2191';opacity:1;color:var(--gold);}
 th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -837,8 +838,20 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <!-- ADMIN ALL ORDERS -->
       <div class="panel" id="aord">
         <div class="shd" style="margin-bottom:16px;">
-          <h2>All Orders</h2>
-          <span id="aord_count" style="font-size:13px;color:var(--gray);font-weight:400;margin-left:8px;"></span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <h2 style="margin:0;">All Orders</h2>
+            <span id="aord_count" style="font-size:13px;color:var(--gray);font-weight:400;"></span>
+          </div>
+          <div class="exp-wrap" id="expWrap">
+            <button class="exp-btn" onclick="toggleExpMenu(event)">&#8681; Export <span class="exp-arrow">&#9660;</span></button>
+            <div class="exp-menu" id="expMenu">
+              <div class="exp-item" onclick="exportAordCsv()"><span class="exp-item-icon">&#128196;</span><span class="exp-item-label">CSV</span><span class="exp-item-ext">.csv</span></div>
+              <div class="exp-item" onclick="exportAordXlsx()"><span class="exp-item-icon">&#128202;</span><span class="exp-item-label">Excel</span><span class="exp-item-ext">.xlsx</span></div>
+              <div class="exp-item" onclick="exportAordJson()"><span class="exp-item-icon">&#128196;</span><span class="exp-item-label">JSON</span><span class="exp-item-ext">.json</span></div>
+              <div class="exp-item" onclick="exportAordPrint()"><span class="exp-item-icon">&#128424;</span><span class="exp-item-label">Print / PDF</span><span class="exp-item-ext">.pdf</span></div>
+              <div class="exp-item" onclick="exportAordTsv()"><span class="exp-item-icon">&#128196;</span><span class="exp-item-label">Tab-Separated</span><span class="exp-item-ext">.tsv</span></div>
+            </div>
+          </div>
         </div>
         <div class="fb" style="flex-wrap:wrap;gap:8px;margin-bottom:12px;">
           <div class="sw" style="min-width:200px;flex:1;">
@@ -858,9 +871,13 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <select class="fs" id="aord_hub" onchange="renderAdminOrders()">
             <option value="">All Hubs</option>
           </select>
+          <select class="fs" id="aord_date_field" onchange="renderAdminOrders()" title="Date column to filter/sort">
+            <option value="req">Requested Date</option>
+            <option value="conf">Confirmed Date</option>
+          </select>
           <select class="fs" id="aord_sort" onchange="renderAdminOrders()">
             <option value="newest">Newest First</option>
-            <option value="date">By Install Date</option>
+            <option value="date">By Date</option>
             <option value="property">By Property</option>
             <option value="status">By Status</option>
             <option value="service">By Service</option>
@@ -869,7 +886,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="tw"><table id="aord_tbl">
           <thead><tr>
             <th class="sortable" onclick="sortTable('aord_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('aord_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('aord_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('aord_tbl',3,'str')">Unit</th>
-            <th class="sortable" onclick="sortTable('aord_tbl',4,'str')">Service</th><th class="sortable" onclick="sortTable('aord_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('aord_tbl',6,'str')">Status</th><th>Actions</th>
+            <th class="sortable" onclick="sortTable('aord_tbl',4,'str')">Service</th><th class="sortable" id="aord_date_th" onclick="sortTable('aord_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('aord_tbl',6,'str')">Status</th><th>Actions</th>
           </tr></thead>
           <tbody id="aord_tbody"></tbody>
         </table></div>
@@ -3651,7 +3668,12 @@ function renderAdminOrders() {
     if (srt==='property') return (oa.property||'').localeCompare(ob.property||'');
     if (srt==='status')   return (oa.status||'').localeCompare(ob.status||'');
     if (srt==='service')  return (oa.service||'').localeCompare(ob.service||'');
-    if (srt==='date')     return (oa.reqDate||'').localeCompare(ob.reqDate||'');
+    if (srt==='date') {
+      var df = (document.getElementById('aord_date_field')||{value:'req'}).value;
+      var da = df==='conf' ? (oa.confDate||'') : (oa.reqDate||'');
+      var db = df==='conf' ? (ob.confDate||'') : (ob.reqDate||'');
+      return da.localeCompare(db);
+    }
     // newest: timestamp-keyed orders first
     var aTs=a.indexOf('WO-')===0, bTs=b.indexOf('WO-')===0;
     if (aTs && !bTs) return -1; if (!aTs && bTs) return 1;
@@ -3660,6 +3682,12 @@ function renderAdminOrders() {
 
   var countEl = document.getElementById('aord_count');
   if (countEl) countEl.textContent = ids.length + ' order' + (ids.length===1?'':'s');
+
+  // Update date column header label
+  var _dfEl = document.getElementById('aord_date_field');
+  var _dfVal = _dfEl ? _dfEl.value : 'req';
+  var _dateTh = document.getElementById('aord_date_th');
+  if (_dateTh) _dateTh.textContent = _dfVal==='conf' ? 'Confirmed Date' : 'Requested Date';
 
   var rows = '';
   ids.forEach(function(id){
@@ -3671,6 +3699,8 @@ function renderAdminOrders() {
     var view = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
     var conf = o.status==='requested'
       ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">Confirm</button>' : '';
+    var complete = o.status==='scheduled'
+      ? ' <button class="bs gn" onclick="event.stopPropagation();markOrderComplete(\''+id+'\')">&#10003; Complete</button>' : '';
     var vd   = (o.status!=='vd'&&o.status!=='completed')
       ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
     rows += '<tr onclick="oworder(\''+id+'\')">'
@@ -3679,9 +3709,12 @@ function renderAdminOrders() {
       +'<td>'+hubBadge+'</td>'
       +'<td>'+o.unit+'</td>'
       +'<td>'+svcDisplay(o)+'</td>'
-      +'<td>'+fmtDate(o.reqDate)+'</td>'
+      +(function(){
+        var df=(document.getElementById('aord_date_field')||{value:'req'}).value;
+        return '<td>'+(df==='conf'?fmtDate(o.confDate||'Pending'):fmtDate(o.reqDate))+'</td>';
+      }())
       +'<td>'+sb+'</td>'
-      +'<td><div style="display:flex;gap:4px;">'+view+conf+vd+'</div></td>'
+      +'<td><div style="display:flex;gap:4px;">'+view+conf+complete+vd+'</div></td>'
       +'</tr>';
   });
   tbody.innerHTML = rows || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:32px;">No orders found.</td></tr>';
@@ -4388,13 +4421,13 @@ function anav(pid, el) {
 // ── ORDERS DATA ──
 // ── ORDER STORE ──
 var ORDER_SEED = {
-  'CC-001':{num:'WO-CC-001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'February 20, 2025',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  'CC-002':{num:'WO-CC-002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 18, 2025',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2025',email:'manager@cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'No Preference',photos:true},
-  'CC-003':{num:'WO-CC-003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'February 10, 2025',confDate:'February 10, 2025',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2025',email:'manager@cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  '2411':{num:'WO-2411',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'February 28, 2025',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2025',email:'rmoore@riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2414':{num:'WO-2414',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'March 3, 2025',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2025',email:'shill@parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2413':{num:'WO-2413',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'February 26, 2025',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2025',email:'rmoore@riverside.com',notes:'',timeWindow:'No Preference',photos:false},
-  '2410':{num:'WO-2410',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 24, 2025',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2025',email:'kdavis@arborridge.com',notes:'',timeWindow:'No Preference',photos:false}
+  'CC-001':{num:'NA0001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'February 20, 2025',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  'CC-002':{num:'NA0002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 18, 2025',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2025',email:'manager@cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'No Preference',photos:true},
+  'CC-003':{num:'NA0003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'February 10, 2025',confDate:'February 10, 2025',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2025',email:'manager@cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  '2411':{num:'ME0001',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'February 28, 2025',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2025',email:'rmoore@riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2414':{num:'ME0002',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'March 3, 2025',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2025',email:'shill@parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2413':{num:'ME0003',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'February 26, 2025',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2025',email:'rmoore@riverside.com',notes:'',timeWindow:'No Preference',photos:false},
+  '2410':{num:'NA0004',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 24, 2025',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2025',email:'kdavis@arborridge.com',notes:'',timeWindow:'No Preference',photos:false}
 };
 
 function saveOrders() {
@@ -4796,6 +4829,22 @@ document.querySelectorAll('.uprop-item').forEach(function(item) {
 });
 
 // ── SUBMIT ──
+
+// ── Work Order Number Generator ──
+// Format: ME0001 (Memphis) or NA0001 (Nashville)
+function nextWoNum(hub) {
+  var prefix = (hub && hub.toLowerCase().indexOf('nash') >= 0) ? 'NA' : 'ME';
+  var max = 0;
+  Object.keys(orders).forEach(function(id) {
+    var num = (orders[id].num || '').toString();
+    if (num.indexOf(prefix) === 0) {
+      var n = parseInt(num.slice(2), 10);
+      if (!isNaN(n) && n > max) max = n;
+    }
+  });
+  return prefix + String(max + 1).padStart(4, '0');
+}
+
 function submitOrder() {
   // ── Collect values ──
   var propSel   = document.getElementById('cpropsel');
@@ -4845,17 +4894,20 @@ function submitOrder() {
   var today    = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   var reqDate  = dateVal ? new Date(dateVal + 'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : today;
 
-  var woId  = 'WO-' + Date.now();
-  var woNum = 'WO-' + Math.floor(Math.random()*9000+1000);
+  // Determine hub for this order to get correct prefix
+  var _woHub = (function(){
+    var _pr = null;
+    getActiveProps().forEach(function(pr){ if(pr.name===propName) _pr=pr; });
+    if (!_pr) return 'Memphis';
+    var _m = getMarket(_pr.hub); return _m ? _m.label : (_pr.hub.charAt(0).toUpperCase()+_pr.hub.slice(1));
+  })();
+  var woNum = nextWoNum(_woHub);
+  var woId  = woNum;
 
   orders[woId] = {
     num:           woNum,
     property:      propName,
-    hub:           (function(){
-      var _pr = null;
-      getActiveProps().forEach(function(pr){ if(pr.name===propName) _pr=pr; });
-      if (!_pr) return 'Memphis'; var _m=getMarket(_pr.hub); return _m?_m.label:(_pr.hub.charAt(0).toUpperCase()+_pr.hub.slice(1));
-    })(),
+    hub:           _woHub,
     unit:          unitVal,
     plan:          planName,
     sqft:          '',
@@ -5484,6 +5536,138 @@ document.addEventListener('DOMContentLoaded', function() {
   SVC_LIST = loadServices().map(function(s){ return s.name; });
 });
 
+
+// ── ALL ORDERS EXPORT ──
+
+// Close export menu when clicking outside
+document.addEventListener('click', function(e){
+  var wrap = document.getElementById('expWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    var menu = document.getElementById('expMenu');
+    if (menu) menu.classList.remove('open');
+  }
+});
+
+function toggleExpMenu(e) {
+  e.stopPropagation();
+  document.getElementById('expMenu').classList.toggle('open');
+}
+
+// Collect currently visible (filtered) order data from the DOM table
+function getFilteredAordRows() {
+  var headers = ['Work Order','Property','Hub','Unit','Service','Date','Status'];
+  var rows = [];
+  var tbody = document.getElementById('aord_tbody');
+  if (!tbody) return {headers: headers, rows: rows};
+  Array.prototype.forEach.call(tbody.querySelectorAll('tr'), function(tr) {
+    var cells = tr.querySelectorAll('td');
+    if (cells.length < 7) return;
+    rows.push([
+      cells[0].textContent.trim(),
+      cells[1].textContent.trim(),
+      cells[2].textContent.trim(),
+      cells[3].textContent.trim(),
+      cells[4].textContent.trim(),
+      cells[5].textContent.trim(),
+      cells[6].textContent.trim()
+    ]);
+  });
+  return {headers: headers, rows: rows};
+}
+
+function triggerDownload(content, filename, mime) {
+  var blob = new Blob([content], {type: mime});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  document.getElementById('expMenu').classList.remove('open');
+}
+
+function exportFilename(ext) {
+  var d = new Date();
+  var ds = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return 'PF-Orders-'+ds+'.'+ext;
+}
+
+function exportAordCsv() {
+  var data = getFilteredAordRows();
+  var lines = [data.headers.map(function(h){ return '"'+h+'"'; }).join(',')];
+  data.rows.forEach(function(row){
+    lines.push(row.map(function(cell){ return '"'+cell.replace(/"/g,'""')+'"'; }).join(','));
+  });
+  triggerDownload(lines.join('\r\n'), exportFilename('csv'), 'text/csv;charset=utf-8;');
+}
+
+function exportAordTsv() {
+  var data = getFilteredAordRows();
+  var lines = [data.headers.join('\t')];
+  data.rows.forEach(function(row){ lines.push(row.join('\t')); });
+  triggerDownload(lines.join('\r\n'), exportFilename('tsv'), 'text/tab-separated-values;charset=utf-8;');
+}
+
+function exportAordJson() {
+  var data = getFilteredAordRows();
+  var out = data.rows.map(function(row){
+    var obj = {};
+    data.headers.forEach(function(h,i){ obj[h] = row[i] || ''; });
+    return obj;
+  });
+  triggerDownload(JSON.stringify(out, null, 2), exportFilename('json'), 'application/json');
+}
+
+function exportAordXlsx() {
+  if (typeof XLSX === 'undefined') {
+    toast('Excel export unavailable — please check your connection and try again.');
+    return;
+  }
+  var data = getFilteredAordRows();
+  var wsData = [data.headers].concat(data.rows);
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  // Column widths
+  ws['!cols'] = [12,26,12,8,28,14,14].map(function(w){ return {wch:w}; });
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+  XLSX.writeFile(wb, exportFilename('xlsx'));
+  document.getElementById('expMenu').classList.remove('open');
+}
+
+function exportAordPrint() {
+  var data = getFilteredAordRows();
+  var d = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  // Build status filter label
+  var statusEl = document.getElementById('aord_status');
+  var propEl   = document.getElementById('aord_prop');
+  var hubEl    = document.getElementById('aord_hub');
+  var statusLbl = statusEl && statusEl.value ? statusEl.options[statusEl.selectedIndex].text : 'All Statuses';
+  var propLbl   = propEl   && propEl.value   ? propEl.options[propEl.selectedIndex].text     : 'All Properties';
+  var hubLbl    = hubEl    && hubEl.value     ? hubEl.options[hubEl.selectedIndex].text       : 'All Hubs';
+  var rowsHtml = data.rows.map(function(row, i){
+    return '<tr style="background:'+(i%2===0?'#fff':'#f8f7f4')+'">'
+      + row.map(function(cell){ return '<td style="padding:7px 10px;border-bottom:1px solid #e2dfd8;font-size:11px;">' + cell + '</td>'; }).join('')
+      + '</tr>';
+  }).join('');
+  var html = '<!DOCTYPE html><html><head><title>Protective Flooring — All Orders</title>'
+    + '<style>body{font-family:Arial,sans-serif;margin:32px;color:#1c1c2e;}'
+    + 'h1{font-size:18px;margin:0 0 4px;}p{font-size:11px;color:#64748b;margin:0 0 16px;}'
+    + 'table{width:100%;border-collapse:collapse;}th{background:#020A5B;color:#fff;padding:8px 10px;font-size:11px;text-align:left;}'
+    + '.filters{display:flex;gap:16px;margin-bottom:14px;font-size:11px;color:#64748b;padding:8px 12px;background:#f8f7f4;border:1px solid #ddd9d0;border-radius:3px;}'
+    + '.filters strong{color:#1c1c2e;}'
+    + '</style></head><body>'
+    + '<h1>&#9632; Protective Flooring — Work Orders</h1>'
+    + '<p>Exported ' + d + ' &nbsp;·&nbsp; ' + data.rows.length + ' orders</p>'
+    + '<div class="filters"><span>Status: <strong>'+statusLbl+'</strong></span><span>Property: <strong>'+propLbl+'</strong></span><span>Hub: <strong>'+hubLbl+'</strong></span></div>'
+    + '<table><thead><tr>'
+    + data.headers.map(function(h){ return '<th>'+h+'</th>'; }).join('')
+    + '</tr></thead><tbody>'+rowsHtml+'</tbody></table>'
+    + '</body></html>';
+  var win = window.open('','_blank','width=900,height=700');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function(){ win.print(); }, 400);
+  document.getElementById('expMenu').classList.remove('open');
+}
 </script>
 </body>
 </html>
