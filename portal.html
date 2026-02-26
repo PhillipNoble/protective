@@ -508,6 +508,20 @@ table.fpt tr:hover td{background:var(--cream);}
 .perm-row.locked{opacity:.45;pointer-events:none;}
 .perm-note{font-size:11px;color:var(--gray);font-style:italic;padding:6px 14px 8px;}
 .role-defaults-hint{font-size:11px;background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;border-radius:3px;padding:7px 12px;margin-top:12px;display:flex;align-items:flex-start;gap:6px;}
+
+/* ── SORTABLE TABLE HEADERS ── */
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+th.sortable:hover{background:rgba(2,10,91,.06);}
+th.sortable::after{content:' ⇅';opacity:.35;font-size:10px;}
+th.sort-asc::after{content:' ↑';opacity:1;color:var(--gold);}
+th.sort-desc::after{content:' ↓';opacity:1;color:var(--gold);}
+
+/* ── SORTABLE TABLE HEADERS ── */
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+th.sortable:hover{background:rgba(2,10,91,.08);}
+th.sortable::after{content:' \2B83';opacity:.3;font-size:9px;margin-left:3px;}
+th.sort-asc::after{content:' \2191';opacity:1;color:var(--gold);}
+th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 </style>
 </head>
 <body>
@@ -812,12 +826,12 @@ table.fpt tr:hover td{background:var(--cream);}
             <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*=&quot;co&quot;]'));},150);">&#128221; Place New Order</button>
           </div>
         </div>
-        <div class="tw" style="margin-bottom:28px;" id="adash_recent_wrap"><table>
-          <thead><tr><th>Work Order</th><th>Property</th><th>Hub</th><th>Unit</th><th>Service</th><th>Requested</th><th>Install Date</th><th>Status</th><th>Action</th></tr></thead>
+        <div class="tw" style="margin-bottom:28px;" id="adash_recent_wrap"><table id="adash_recent_tbl">
+          <thead><tr><th class="sortable" onclick="sortTable('adash_recent_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_recent_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('adash_recent_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('adash_recent_tbl',3,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_recent_tbl',4,'str')">Service</th><th class="sortable" onclick="sortTable('adash_recent_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_recent_tbl',6,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_recent_tbl',7,'str')">Status</th><th>Action</th></tr></thead>
           <tbody id="adash_recent_tbody"></tbody>
         </table></div>
-        <div class="tw" style="margin-bottom:28px;display:none;" id="adash_today_wrap"><table>
-          <thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Requested Install</th><th>Occupancy</th><th>Status</th><th>Action</th></tr></thead>
+        <div class="tw" style="margin-bottom:28px;display:none;" id="adash_today_wrap"><table id="adash_today_tbl">
+          <thead><tr><th class="sortable" onclick="sortTable('adash_today_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_today_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('adash_today_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('adash_today_tbl',3,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_today_tbl',4,'str')">Service</th><th class="sortable" onclick="sortTable('adash_today_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_today_tbl',6,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_today_tbl',7,'str')">Status</th><th>Action</th></tr></thead>
           <tbody id="adash_today_tbody"></tbody>
         </table></div>
       </div>
@@ -855,10 +869,10 @@ table.fpt tr:hover td{background:var(--cream);}
             <option value="service">By Service</option>
           </select>
         </div>
-        <div class="tw"><table>
+        <div class="tw"><table id="aord_tbl"
           <thead><tr>
-            <th>Work Order</th><th>Property</th><th>Hub</th><th>Unit</th>
-            <th>Service</th><th>Requested</th><th>Status</th><th>Actions</th>
+            <th class="sortable" onclick="sortTable('aord_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('aord_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('aord_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('aord_tbl',3,'str')">Unit</th>
+            <th class="sortable" onclick="sortTable('aord_tbl',4,'str')">Service</th><th class="sortable" onclick="sortTable('aord_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('aord_tbl',6,'str')">Status</th><th>Actions</th>
           </tr></thead>
           <tbody id="aord_tbody"></tbody>
         </table></div>
@@ -3698,20 +3712,91 @@ function todayStr() {
 }
 
 function fmtDate(d) {
-  if (!d) return '—';
-  // e.g. "February 20, 2025" → "Feb 20"
+  if (!d || d === 'Pending') return '—';
+  // ISO format: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var parts = d.split('-');
+    return months[parseInt(parts[1],10)-1] + ' ' + parseInt(parts[2],10);
+  }
+  // Legacy long form: "February 20, 2025"
   var parts = d.replace(',','').split(' ');
   if (parts.length >= 2) return parts[0].slice(0,3) + ' ' + parts[1];
   return d;
+}
+
+// Mark order complete
+
+// ── SORTABLE TABLES ──
+var _sortState = {}; // {tableId: {col, dir}}
+
+function sortTable(tableId, colIdx, type) {
+  var state = _sortState[tableId] || {col:-1, dir:'asc'};
+  var dir = (state.col === colIdx && state.dir === 'asc') ? 'desc' : 'asc';
+  _sortState[tableId] = {col: colIdx, dir: dir};
+
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var tbody = table.querySelector('tbody');
+  if (!tbody) return;
+
+  // Update header classes
+  table.querySelectorAll('th.sortable').forEach(function(th, i) {
+    th.classList.remove('sort-asc','sort-desc');
+    if (i === colIdx) th.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
+  });
+
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  rows.sort(function(a, b) {
+    var ac = a.cells[colIdx], bc = b.cells[colIdx];
+    if (!ac || !bc) return 0;
+    var av = ac.textContent.trim().replace(/^#/,'');
+    var bv = bc.textContent.trim().replace(/^#/,'');
+    var cmp = 0;
+    if (type === 'num') {
+      cmp = (parseFloat(av)||0) - (parseFloat(bv)||0);
+    } else if (type === 'date') {
+      // Handle "Pending", "—", month-day formats
+      var monthMap = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+      var parseD = function(s) {
+        if (!s || s==='—' || s==='Pending') return 0;
+        var m = s.match(/^(\w{3})\s+(\d+)/);
+        return m ? monthMap[m[1]]*100 + parseInt(m[2]) : 0;
+      };
+      cmp = parseD(av) - parseD(bv);
+    } else {
+      cmp = av.toLowerCase().localeCompare(bv.toLowerCase());
+    }
+    return dir === 'asc' ? cmp : -cmp;
+  });
+  rows.forEach(function(r){ tbody.appendChild(r); });
+}
+
+function markOrderComplete(id) {
+  var o = orders[id]; if (!o) return;
+  if (!confirm('Mark work order #'+o.num+' as Completed?')) return;
+  o.status = 'completed';
+  if (!o.log) o.log = [];
+  o.log.push({
+    ts: cstNow(),
+    by: (window.currentTeamUser && window.currentTeamUser.name) || 'Admin',
+    reason: 'Completed',
+    changes: [{field:'Status', from:'Scheduled', to:'Completed'}]
+  });
+  saveOrders();
+  refreshAllOrderViews();
+  toast('Work order #'+o.num+' marked complete.');
 }
 
 function orderActionBtns(id, o) {
   var view = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
   var conf = o.status==='requested'
     ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">Confirm</button>' : '';
+  var complete = o.status==='scheduled'
+    ? ' <button class="bs gn" onclick="event.stopPropagation();markOrderComplete(\''+id+'\')">&#10003; Complete</button>' : '';
   var vd   = (o.status!=='vd' && o.status!=='completed')
     ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
-  return '<div style="display:flex;gap:5px;">'+view+conf+vd+'</div>';
+  return '<div style="display:flex;gap:5px;">'+view+conf+complete+vd+'</div>';
 }
 
 function statusBadge(status) {
@@ -3774,7 +3859,7 @@ function renderAdashToday() {
   var html = '';
   Object.keys(orders).forEach(function(id) {
     var o = orders[id];
-    if (o.reqDate !== today) return;
+    if (o.confDate !== today) return;
     if (o.status === 'vd' || o.status === 'completed') return;
     if (adashHub && (o.hub||'') !== adashHub) return;
     var hub = hubBadgeHtml(o.hub);
@@ -3784,8 +3869,8 @@ function renderAdashToday() {
       '<td>'+hub+'</td>'+
       '<td>'+o.unit+'</td>'+
       '<td>'+svcDisplay(o)+'</td>'+
-      '<td>'+o.reqDate+'</td>'+
-      '<td>'+o.occ+'</td>'+
+      '<td>'+fmtDate(o.reqDate)+'</td>'+
+      '<td>'+fmtDate(o.confDate)+'</td>'+
       '<td>'+statusBadge(o.status)+'</td>'+
       '<td>'+orderActionBtns(id,o)+'</td>'+
       '</tr>';
@@ -4286,10 +4371,10 @@ function anav(pid, el) {
 // ── ORDERS DATA ──
 // ── ORDER STORE ──
 var ORDER_SEED = {
-  'CC-001':{num:'WO-CC-001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'February 20, 2025',confDate:'February 25, 2025',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  'CC-001':{num:'WO-CC-001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'February 20, 2025',confDate:'2026-02-26',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
   'CC-002':{num:'WO-CC-002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 18, 2025',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2025',email:'manager@cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'No Preference',photos:true},
   'CC-003':{num:'WO-CC-003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'February 10, 2025',confDate:'February 10, 2025',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2025',email:'manager@cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  '2411':{num:'WO-2411',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'February 28, 2025',confDate:'February 28, 2025',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2025',email:'rmoore@riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2411':{num:'WO-2411',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'February 28, 2025',confDate:'2026-02-26',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2025',email:'rmoore@riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
   '2414':{num:'WO-2414',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'March 3, 2025',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2025',email:'shill@parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
   '2413':{num:'WO-2413',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'February 26, 2025',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2025',email:'rmoore@riverside.com',notes:'',timeWindow:'No Preference',photos:false},
   '2410':{num:'WO-2410',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 24, 2025',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2025',email:'kdavis@arborridge.com',notes:'',timeWindow:'No Preference',photos:false}
@@ -4484,7 +4569,11 @@ function openConfirm(id) {
   if(o) document.getElementById('confinfo').textContent='#'+o.num+' — '+o.property+', Unit '+o.unit+' — '+o.service;
   document.getElementById('mconf').dataset.confId = id;
   var dateEl = document.getElementById('conf_date_input');
-  if (dateEl) dateEl.value = '';
+  if (dateEl) {
+    // Auto-populate with requested install date; user can change if needed
+    var reqIso = o.reqDate ? (o.reqDate.match(/^\d{4}-\d{2}-\d{2}$/) ? o.reqDate : displayToIso(o.reqDate)) : '';
+    dateEl.value = reqIso || '';
+  }
   var notesEl = document.getElementById('conf_notes_input');
   if (notesEl) notesEl.value = '';
   document.getElementById('conf_err').style.display='none';
@@ -4515,7 +4604,11 @@ function saveConf() {
   closeM('mconf');
   oworder(id);
   refreshAllOrderViews();
-  toast('Order #'+o.num+' confirmed for '+confDateStr+'.');
+  var dispDate = (function(iso){
+    var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var pt=iso.split('-'); return mn[parseInt(pt[1],10)-1]+' '+parseInt(pt[2],10)+', '+pt[0];
+  })(confDateStr);
+  toast('Order #'+o.num+' confirmed for '+dispDate+'.');
 }
 
 // ── FORM HELPERS ──
