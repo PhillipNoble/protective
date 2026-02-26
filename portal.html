@@ -642,19 +642,16 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div class="panel" id="co">
         <div class="fc">
           <h3>&#127968; Property &amp; Unit</h3>
-          <div class="fg" style="margin-bottom:12px;"><label>Property *</label>
-            <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
-              <option value="">-- Select Property --</option>
-            </select>
-          </div>
-          <div class="fg" style="margin-bottom:16px;"><label>Unit Number *</label>
-            <input type="text" id="cunitinput" placeholder="e.g. 214">
-          </div>
-          <div class="form-row">
-            <div class="fg"><label>Floor Plan *</label>
-              <select id="cplan" onchange="onPlanChange(this.value)">
-                <option value="">-- Select Floor Plan --</option>
-              </select>
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="fg">
+              <div class="fg" style="margin-bottom:12px;"><label>Property *</label>
+                <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
+                  <option value="">-- Select Property --</option>
+                </select>
+              </div>
+              <div class="fg" style="margin-bottom:0;"><label>Unit Number *</label>
+                <input type="text" id="cunitinput" placeholder="e.g. 214">
+              </div>
             </div>
             <div class="fg"><label>Occupancy *</label>
               <div class="rg" style="margin-top:4px;">
@@ -662,6 +659,14 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
                 <div class="ro" onclick="selRadio(this,'occ')"><div class="ri">&#128101;</div><div class="rl">Occupied</div></div>
               </div>
             </div>
+          </div>
+          <div class="form-row" style="margin-top:0;">
+            <div class="fg"><label>Floor Plan *</label>
+              <select id="cplan" onchange="onPlanChange(this.value)">
+                <option value="">-- Select Floor Plan --</option>
+              </select>
+            </div>
+            <div class="fg" style="visibility:hidden;"></div>
           </div>
           <div id="fppreview" style="display:none;margin-top:16px;">
             <div style="background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;">
@@ -5161,6 +5166,14 @@ function go(id) {
 }
 function cnav(pid, el) {
   if (pid === 'cx') { setTimeout(renderClientDocuments, 50); }
+  if (pid === 'co') {
+    // Default install date to tomorrow if blank
+    var dateEl = document.getElementById('cinstdate');
+    if (dateEl && !dateEl.value) {
+      var tmr = new Date(); tmr.setDate(tmr.getDate()+1);
+      dateEl.value = tmr.getFullYear()+'-'+String(tmr.getMonth()+1).padStart(2,'0')+'-'+String(tmr.getDate()).padStart(2,'0');
+    }
+  }
   if (pid==='cd') renderClientDash();
   if (pid==='ch') renderClientHistory();
   document.querySelectorAll('#cl .ni').forEach(function(n){ n.classList.remove('on'); });
