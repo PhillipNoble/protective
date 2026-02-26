@@ -884,18 +884,24 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <select class="fs" id="aord_hub" onchange="renderAdminOrders()">
             <option value="">All Hubs</option>
           </select>
-          <select class="fs" id="aord_date_range" onchange="renderAdminOrders()" title="Filter by date">
+          <select class="fs" id="aord_date_range" onchange="onDateRangeChange()" title="Filter by date">
             <option value="">All Dates</option>
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
             <option value="tomorrow">Tomorrow</option>
-            <option value="last7">Last 7 Days</option>
             <option value="last_week">Last Week</option>
             <option value="last_month">Last Month</option>
             <option value="last_quarter">Last Quarter</option>
+            <option value="qtd">Quarter to Date</option>
             <option value="last_year">Last Year</option>
             <option value="ytd">Year to Date</option>
+            <option value="custom">Custom Date Range...</option>
           </select>
+          <div id="aord_custom_dates" style="display:none;align-items:center;gap:6px;">
+            <input type="date" id="aord_date_from" class="fs" style="width:130px;" onchange="renderAdminOrders()" title="From date">
+            <span style="font-size:12px;color:var(--gray);">to</span>
+            <input type="date" id="aord_date_to" class="fs" style="width:130px;" onchange="renderAdminOrders()" title="To date">
+          </div>
           <select class="fs" id="aord_sort" onchange="renderAdminOrders()">
             <option value="newest">Newest First</option>
             <option value="date">By Date</option>
@@ -3784,7 +3790,6 @@ function dateRangeBounds(range) {
   if (range === 'today')     return [iso(today), iso(today)];
   if (range === 'yesterday') { var y1=new Date(y,m,d-1); return [iso(y1),iso(y1)]; }
   if (range === 'tomorrow')  { var t1=new Date(y,m,d+1); return [iso(t1),iso(t1)]; }
-  if (range === 'last7')     { var l7=new Date(y,m,d-6); return [iso(l7),iso(today)]; }
   if (range === 'last_week') {
     var dow=now.getDay();
     return [iso(new Date(y,m,d-dow-7)), iso(new Date(y,m,d-dow-1))];
@@ -3797,9 +3802,28 @@ function dateRangeBounds(range) {
     if (q===0) return [iso(new Date(y-1,9,1)), iso(new Date(y-1,12,0))];
     return [iso(new Date(y,(q-1)*3,1)), iso(new Date(y,q*3,0))];
   }
+  if (range === 'qtd') {
+    // Quarter to date: start of current quarter through today
+    var cq = Math.floor(m/3);
+    return [iso(new Date(y, cq*3, 1)), iso(today)];
+  }
   if (range === 'last_year') return [iso(new Date(y-1,0,1)), iso(new Date(y-1,11,31))];
   if (range === 'ytd')       return [iso(new Date(y,0,1)), iso(today)];
+  if (range === 'custom') {
+    var from = (document.getElementById('aord_date_from')||{value:''}).value;
+    var to   = (document.getElementById('aord_date_to')||{value:''}).value;
+    if (!from && !to) return null;
+    return [from || '0000-01-01', to || '9999-12-31'];
+  }
   return null;
+}
+
+// Show/hide custom date inputs when "Custom" is selected
+function onDateRangeChange() {
+  var val = (document.getElementById('aord_date_range')||{value:''}).value;
+  var customDiv = document.getElementById('aord_custom_dates');
+  if (customDiv) customDiv.style.display = (val === 'custom') ? 'flex' : 'none';
+  renderAdminOrders();
 }
 
 function renderAdminOrders() {
