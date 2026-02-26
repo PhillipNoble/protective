@@ -642,14 +642,14 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div class="panel" id="co">
         <div class="fc">
           <h3>&#127968; Property &amp; Unit</h3>
-          <div class="form-row" style="margin-bottom:0;">
+          <div class="form-row" style="margin-bottom:16px;">
             <div class="fg">
               <div class="fg" style="margin-bottom:12px;"><label>Property *</label>
                 <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
                   <option value="">-- Select Property --</option>
                 </select>
               </div>
-              <div class="fg" style="margin-bottom:0;"><label>Unit Number *</label>
+              <div class="fg"><label>Unit Number *</label>
                 <input type="text" id="cunitinput" placeholder="e.g. 214">
               </div>
             </div>
@@ -660,7 +660,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               </div>
             </div>
           </div>
-          <div class="form-row" style="margin-top:0;">
+          <div class="form-row" style="margin-bottom:16px;">
             <div class="fg"><label>Floor Plan *</label>
               <select id="cplan" onchange="onPlanChange(this.value)">
                 <option value="">-- Select Floor Plan --</option>
@@ -688,7 +688,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <div style="display:flex;align-items:flex-start;gap:10px;">
               <span style="font-size:18px;line-height:1;">&#9888;</span>
               <div style="flex:1;">
-                <strong style="color:#b45309;font-size:13px;">Occupied Unit — Additional Step Required</strong>
+                <strong style="color:#b45309;font-size:13px;">Occupied Unit &#8212; Additional Step Required</strong>
                 <p style="font-size:12px;color:#92400e;margin-top:5px;line-height:1.5;">An <strong>Occupied Unit Authorization Form</strong> must be completed and returned to our office <em>before</em> an install date can be confirmed. Please print, sign, and return the form prior to scheduling.</p>
                 <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
                   <button class="bs nv" onclick="openOccupiedForm()" style="font-size:11px;">&#128196; View &amp; Print Form</button>
@@ -697,12 +697,9 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               </div>
             </div>
           </div>
-
-          
         </div>
         <div class="fc">
           <h3>&#129520; Service &amp; Scope <span style="font-size:13px;font-weight:400;color:var(--gray);">(Additional Services)</span></h3>
-          <!-- presetzone merged into fppreview above -->
           <div class="fg" style="margin-bottom:20px;"><label>Flooring Service <span style="font-size:11px;font-weight:400;color:var(--gray);">(required if no scope selected)</span></label>
             <select id="csvc" onchange="onSvcChange(this.value)"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select>
           </div>
@@ -725,7 +722,6 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <div class="so" onclick="togScope(this)"><div class="ck"></div>Entire Unit</div>
             </div>
           </div>
-          </div><!-- /scopegrid_wrap -->
           <div class="fg" style="margin-top:18px;"><label>Notes / Special Instructions</label><textarea id="cnotes" placeholder="Describe damage, access instructions, or anything the crew should know..."></textarea></div>
         </div>
         <div class="fc">
@@ -745,7 +741,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         </div>
       </div>
 
-      <!-- ORDER HISTORY -->
+            <!-- ORDER HISTORY -->
       <div class="panel" id="ch">
         <div class="shd" style="margin-bottom:16px;">
           <h2>Order History</h2>
