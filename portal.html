@@ -522,6 +522,20 @@ th.sortable:hover{background:rgba(2,10,91,.08);}
 th.sortable::after{content:' \2B83';opacity:.3;font-size:9px;margin-left:3px;}
 th.sort-asc::after{content:' \2191';opacity:1;color:var(--gold);}
 th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
+
+/* ── EXPORT DROPDOWN ── */
+.exp-wrap{position:relative;display:inline-block;flex-shrink:0;}
+.exp-btn{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:none;padding:0 14px;height:34px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:var(--r);white-space:nowrap;font-family:inherit;}
+.exp-btn:hover{background:#010840;}
+.exp-btn .caret{font-size:8px;opacity:.75;margin-left:2px;}
+.exp-menu{display:none;position:absolute;right:0;top:calc(100% + 5px);background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:0 6px 20px rgba(2,10,91,.13);min-width:190px;z-index:999;overflow:hidden;}
+.exp-menu.open{display:block;}
+.exp-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;font-weight:500;color:var(--text,#1c1c2e);cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;}
+.exp-item:last-child{border-bottom:none;}
+.exp-item:hover{background:var(--cream,#F8F5EF);}
+.exp-item-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.exp-item-label{flex:1;}
+.exp-item-ext{font-size:10px;font-weight:700;color:var(--gray);letter-spacing:.5px;opacity:.7;}
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -724,7 +738,6 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="">All Statuses</option>
             <option value="requested">Requested</option>
             <option value="scheduled">Scheduled</option>
-            <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
           </select>
           <select class="fs" id="ch_prop_filter" onchange="renderClientHistory()">
@@ -865,7 +878,6 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="">All Statuses</option>
             <option value="requested">Requested</option>
             <option value="scheduled">Scheduled</option>
-            <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
           </select>
           <select class="fs" id="aord_hub" onchange="renderAdminOrders()">
@@ -1022,22 +1034,76 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="ms" style="margin-bottom:28px;">
           <div class="mst">&#9993; Email Notifications</div>
           <p style="font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.6;">
-            Control where order notifications and scheduling confirmations are sent.
+            Configure who receives an email notification at each stage of a work order's lifecycle.
+            The <strong>Company Email</strong> below receives all internal notifications.
           </p>
-          <div class="form-row">
-            <div class="fg">
-              <label>Order Request Notification Email</label>
-              <input type="email" id="set_notif_email" value="info@protectiveflooring.com" placeholder="info@protectiveflooring.com">
+
+          <div class="fg" style="max-width:420px;margin-bottom:20px;">
+            <label>Company Notification Email</label>
+            <input type="email" id="set_notif_email" value="info@protectiveflooring.com" placeholder="info@protectiveflooring.com">
+          </div>
+
+          <div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:8px;">
+            <!-- Header row -->
+            <div style="display:grid;grid-template-columns:1fr 140px 140px;background:var(--navy);color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+              <div style="padding:10px 16px;">Work Order Stage</div>
+              <div style="padding:10px 12px;text-align:center;border-left:1px solid rgba(255,255,255,.15);">Notify Client</div>
+              <div style="padding:10px 12px;text-align:center;border-left:1px solid rgba(255,255,255,.15);">Notify Company</div>
             </div>
-            <div class="fg">
-              <label>Scheduling Confirmation Recipient</label>
-              <select id="set_conf_recip">
-                <option value="both">Client + Internal Team</option>
-                <option value="client">Client Only</option>
-                <option value="internal">Internal Team Only</option>
-              </select>
+            <!-- Requested -->
+            <div style="display:grid;grid-template-columns:1fr 140px 140px;border-bottom:1px solid var(--border);background:#fff;">
+              <div style="padding:14px 16px;">
+                <div style="font-size:13px;font-weight:600;color:var(--navy);">&#128221; Order Requested</div>
+                <div style="font-size:11px;color:var(--gray);margin-top:2px;">Client submits a new work order</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_req_client" checked><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_req_company" checked><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
+            </div>
+            <!-- Confirmed / Scheduled -->
+            <div style="display:grid;grid-template-columns:1fr 140px 140px;border-bottom:1px solid var(--border);background:var(--cream);">
+              <div style="padding:14px 16px;">
+                <div style="font-size:13px;font-weight:600;color:var(--navy);">&#9989; Order Confirmed &amp; Scheduled</div>
+                <div style="font-size:11px;color:var(--gray);margin-top:2px;">Admin confirms install date</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_conf_client" checked><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_conf_company"><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
+            </div>
+            <!-- Completed -->
+            <div style="display:grid;grid-template-columns:1fr 140px 140px;border-bottom:1px solid var(--border);background:#fff;">
+              <div style="padding:14px 16px;">
+                <div style="font-size:13px;font-weight:600;color:var(--navy);">&#10003; Installation Completed</div>
+                <div style="font-size:11px;color:var(--gray);margin-top:2px;">Work order marked complete</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_comp_client"><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_comp_company"><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
+            </div>
+            <!-- Voided -->
+            <div style="display:grid;grid-template-columns:1fr 140px 140px;background:var(--cream);">
+              <div style="padding:14px 16px;">
+                <div style="font-size:13px;font-weight:600;color:var(--navy);">&#128683; Order Voided / Cancelled</div>
+                <div style="font-size:11px;color:var(--gray);margin-top:2px;">Work order cancelled with reason</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_void_client" checked><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);">
+                <label class="notif-toggle"><input type="checkbox" id="notif_void_company"><span class="nt-track"><span class="nt-thumb"></span></span></label>
+              </div>
             </div>
           </div>
+          <div style="font-size:11px;color:var(--gray);margin-top:8px;">&#8505; Notifications are logged per order. Actual email delivery requires backend integration.</div>
         </div>
 
         <!-- ── COMPANY INFO ── -->
@@ -1114,6 +1180,8 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="bs gn" onclick="printWorkOrder()">&#128424; Print / Save PDF</button>
         <button class="bs ol" id="phbtn" onclick="togPhotos()">Include Photos</button>
+        <button class="bs gd" id="confirmbtn" onclick="openConfirm(this.dataset.woid)" style="display:none;">&#10003; Confirm</button>
+        <button class="bs gn" id="completebtn" onclick="markOrderComplete(this.dataset.woid)" style="display:none;">&#10003; Complete</button>
         <button class="bs nv" id="editwobtn" onclick="openWoEdit(this.dataset.woid)" style="display:none;">&#9998; Edit Order</button>
         <button class="bs ol" id="logbtn" onclick="exportWoLog(this.dataset.woid)" style="display:none;">&#128220; Export Log</button>
         <button class="bs dn" id="voidbtn" onclick="openVoidOrder(this.dataset.woid)" style="display:none;">&#128683; Cancel / Void</button>
@@ -1695,7 +1763,6 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <select id="woedit_status">
               <option value="requested">Requested</option>
               <option value="scheduled">Scheduled</option>
-              <option value="in-progress">In Progress</option>
               <option value="completed">Completed</option>
             </select></div>
         </div>
@@ -3029,10 +3096,39 @@ function addGlobalScope() {
   toast('Scope added to global library.');
 }
 
+function loadNotifSettings() {
+  try {
+    var s = localStorage.getItem('pf_notif');
+    return s ? JSON.parse(s) : {
+      req_client:true, req_company:true,
+      conf_client:true, conf_company:false,
+      comp_client:false, comp_company:false,
+      void_client:true, void_company:false
+    };
+  } catch(e) {
+    return {req_client:true,req_company:true,conf_client:true,conf_company:false,comp_client:false,comp_company:false,void_client:true,void_company:false};
+  }
+}
+function applyNotifSettings() {
+  var ns = loadNotifSettings();
+  Object.keys(ns).forEach(function(k){
+    var el = document.getElementById('notif_'+k);
+    if (el) el.checked = ns[k];
+  });
+}
+function getNotifSettings() {
+  var keys = ['req_client','req_company','conf_client','conf_company','comp_client','comp_company','void_client','void_company'];
+  var out = {};
+  keys.forEach(function(k){
+    var el = document.getElementById('notif_'+k);
+    out[k] = el ? el.checked : false;
+  });
+  return out;
+}
 function savePortalSettings() {
-  // Save notification email to localStorage for use in work orders
   var notifEmail = (document.getElementById('set_notif_email')||{value:''}).value.trim();
   if (notifEmail) try { localStorage.setItem('pf_notif_email', notifEmail); } catch(e){}
+  try { localStorage.setItem('pf_notif', JSON.stringify(getNotifSettings())); } catch(e){}
   toast('Settings saved.');
 }
 
@@ -3697,12 +3793,12 @@ function renderAdminOrders() {
     var voidNote = o.status==='vd'
       ? '<div style="font-size:11px;color:#7f1d1d;margin-top:2px;">'+( o.voidReason||'')+'</div>' : '';
     var view = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
-    var conf = o.status==='requested'
-      ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">Confirm</button>' : '';
+    var conf     = o.status==='requested'
+      ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button>' : '';
     var complete = o.status==='scheduled'
       ? ' <button class="bs gn" onclick="event.stopPropagation();markOrderComplete(\''+id+'\')">&#10003; Complete</button>' : '';
-    var vd   = (o.status!=='vd'&&o.status!=='completed')
-      ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
+    var vd       = (o.status==='completed' || o.status==='requested' || o.status==='scheduled')
+      ? (o.status!=='vd' ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '') : '';
     rows += '<tr onclick="oworder(\''+id+'\')">'
       +'<td><strong>#'+o.num+'</strong>'+voidNote+'</td>'
       +'<td>'+o.property+'</td>'
@@ -3845,16 +3941,21 @@ function markOrderComplete(id) {
   saveOrders();
   refreshAllOrderViews();
   toast('Work order #'+o.num+' marked complete.');
+  // Refresh WO detail if open
+  var mwo = document.getElementById('mwo');
+  if (mwo && mwo.classList.contains('open')) { oworder(id); }
 }
 
 function orderActionBtns(id, o) {
-  var view = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
-  var conf = o.status==='requested'
-    ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">Confirm</button>' : '';
+  var view     = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
+  var conf     = o.status==='requested'
+    ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button>' : '';
   var complete = o.status==='scheduled'
     ? ' <button class="bs gn" onclick="event.stopPropagation();markOrderComplete(\''+id+'\')">&#10003; Complete</button>' : '';
-  var vd   = (o.status!=='vd' && o.status!=='completed')
-    ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
+  var vd       = (o.status==='completed')
+    ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>'
+    : (o.status!=='vd' && o.status!=='requested' && o.status!=='scheduled' ? ''
+      : (o.status!=='vd' ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : ''));
   return '<div style="display:flex;gap:5px;">'+view+conf+complete+vd+'</div>';
 }
 
@@ -3876,10 +3977,10 @@ function renderAdashRecent() {
     return true;
   });
 
-  // Sort: requested first, then scheduled, then in-progress; newest within each group
+  // Sort: requested first, then scheduled; newest within each group
   allIds.sort(function(a, b) {
     var sa = orders[a].status, sb = orders[b].status;
-    var rank = {requested:0,'in-progress':1,scheduled:2};
+    var rank = {requested:0,scheduled:1};
     var ra = rank[sa] !== undefined ? rank[sa] : 3;
     var rb = rank[sb] !== undefined ? rank[sb] : 3;
     if (ra !== rb) return ra - rb;
@@ -4469,7 +4570,7 @@ function loadOrders() {
 }
 
 var orders = loadOrders();
-var slab = {'vd':'Void',requested:'Requested',scheduled:'Scheduled','in-progress':'In Progress',completed:'Completed'};
+var slab = {'vd':'Void',requested:'Requested',scheduled:'Scheduled',completed:'Completed'};
 
 // ── WORK ORDER PRINT ──
 var photosOn = true;
@@ -4483,7 +4584,7 @@ function oworder(id) {
   var tl = [
     {d:'dn',t:'Order Submitted',s:o.submittedDate+' -- Confirmation sent to '+o.email},
     o.confDate!=='Pending' ? {d:'dn',t:'Date Confirmed',s:'Scheduling confirmation sent'} : {d:'ac',t:'Awaiting Date Confirmation',s:'Pending -- action required'},
-    {d:(o.status==='in-progress'||o.status==='completed'?'dn':'pd'),t:'Installation Scheduled',s:o.confDate!=='Pending'?o.confDate:'Pending'},
+    {d:(o.status==='completed'?'dn':'pd'),t:'Installation Scheduled',s:o.confDate!=='Pending'?o.confDate:'Pending'},
     {d:o.status==='completed'?'dn':'pd',t:'Installation Complete',s:o.status==='completed'?'Completed':'Pending'}
   ];
   var tlh = tl.map(function(t){
@@ -4543,7 +4644,13 @@ function oworder(id) {
   var voidBtn = document.getElementById('voidbtn');
   var editBtn = document.getElementById('editwobtn');
   var logBtn  = document.getElementById('logbtn');
-  if (voidBtn) voidBtn.style.display = (isAdminView && o.status !== 'vd' && o.status !== 'completed') ? 'inline-flex' : 'none';
+  var confirmBtn  = document.getElementById('confirmbtn');
+  var completeBtn = document.getElementById('completebtn');
+  if (confirmBtn)  confirmBtn.style.display  = (isAdminView && o.status === 'requested') ? 'inline-flex' : 'none';
+  if (confirmBtn)  confirmBtn.dataset.woid    = id;
+  if (completeBtn) completeBtn.style.display  = (isAdminView && o.status === 'scheduled') ? 'inline-flex' : 'none';
+  if (completeBtn) completeBtn.dataset.woid   = id;
+  if (voidBtn) voidBtn.style.display = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
   if (editBtn) editBtn.style.display  = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
   if (logBtn)  logBtn.style.display   = (isAdminView && o.log && o.log.length) ? 'inline-flex' : 'none';
   openM('mwo');
@@ -5530,10 +5637,9 @@ function toast(msg) {
 
 document.addEventListener('DOMContentLoaded', function() {
   populateAllHubDropdowns();
-  // Sync seed orders into localStorage if this is a fresh load
   if (!localStorage.getItem('pf_orders')) { saveOrders(); }
-  // Sync SVC_LIST from stored services on every load
   SVC_LIST = loadServices().map(function(s){ return s.name; });
+  applyNotifSettings();
 });
 
 
