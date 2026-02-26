@@ -4443,7 +4443,28 @@ function chSortByCol(col, type) {
 function renderClientHistory() {
   var tbody = document.getElementById('ch_tbody');
   if (!tbody || !currentUser) return;
-  populateHubKeySelect('ch_hub_filter', (document.getElementById('ch_hub_filter')||{value:''}).value, 'All Hubs');
+  // Populate hub filter restricted to user's hubs
+  var chHubSel = document.getElementById('ch_hub_filter');
+  if (chHubSel) {
+    var curHubVal = chHubSel.value;
+    var userHubs  = (currentUser._hubs && currentUser._hubs.length) ? currentUser._hubs : null;
+    if (!userHubs || userHubs.length > 1) {
+      // Multiple hubs or admin: show all hubs dropdown
+      populateHubKeySelect('ch_hub_filter', curHubVal, 'All Hubs');
+    } else {
+      // Single hub: lock it, no dropdown needed
+      chHubSel.innerHTML = '';
+      var hubOpt = document.createElement('option');
+      hubOpt.value = userHubs[0];
+      hubOpt.textContent = userHubs[0].charAt(0).toUpperCase()+userHubs[0].slice(1);
+      chHubSel.appendChild(hubOpt);
+      chHubSel.value = userHubs[0];
+      chHubSel.disabled = true;
+      chHubSel.title = 'Your properties are all in this location';
+    }
+    // Re-enable if multi-hub
+    if (!userHubs || userHubs.length > 1) chHubSel.disabled = false;
+  }
   var userProps = currentUser.props || [];
   var allPN = getActiveProps().map(function(pr){ return pr.name; });
   var isAdm = userProps.length === 0 || userProps.length >= allPN.length - 1;
@@ -4514,16 +4535,30 @@ function renderClientHistory() {
 
   var propSel = document.getElementById('ch_prop_filter');
   if (propSel) {
-    var curVal = propSel.value;
-    propSel.innerHTML = '<option value="">All Properties</option>';
-    var seen = {};
-    Object.keys(orders).forEach(function(id){ seen[orders[id].property] = 1; });
-    Object.keys(seen).sort().forEach(function(pn){
-      var opt = document.createElement('option');
-      opt.value = pn; opt.textContent = pn;
-      propSel.appendChild(opt);
-    });
-    propSel.value = curVal;
+    var curVal2 = propSel.value;
+    if (userProps.length === 1) {
+      // Single property: lock dropdown to that property, no "All Properties" option
+      propSel.innerHTML = '';
+      var spOpt = document.createElement('option');
+      spOpt.value = userProps[0]; spOpt.textContent = userProps[0];
+      propSel.appendChild(spOpt);
+      propSel.value = userProps[0];
+      propSel.disabled = true;
+      propSel.title = 'You only have access to this property';
+    } else {
+      propSel.disabled = false;
+      propSel.innerHTML = '<option value="">All Properties</option>';
+      // Only show properties this user has access to
+      var propSet = isAdm
+        ? (function(){ var s={}; Object.keys(orders).forEach(function(id){ s[orders[id].property]=1; }); return Object.keys(s).sort(); }())
+        : userProps.slice().sort();
+      propSet.forEach(function(pn){
+        var opt = document.createElement('option');
+        opt.value = pn; opt.textContent = pn;
+        propSel.appendChild(opt);
+      });
+      propSel.value = curVal2;
+    }
   }
 
   var html = '';
@@ -4738,24 +4773,45 @@ function loadClientPortal(user) {
   document.getElementById('cname').textContent = user.name;
   var propLabel = user.props.length > 1 ? user.props.length + ' Properties' : user.props[0];
   document.getElementById('cprop').textContent = propLabel;
-  document.getElementById('ctopprop').textContent = '📍 ' + propLabel;
+  document.getElementById('ctopprop').textContent = '\uD83D\uDCCD ' + propLabel;
 
-  // Populate property dropdown in order form
-  var sel = document.getElementById('cpropsel');
-  sel.innerHTML = '<option value="">-- Select Property --</option>';
+  // Determine which hubs this user has access to based on their properties
+  var allActive = getActiveProps();
+  var userHubs = [];
   user.props.forEach(function(pname) {
-    var opt = document.createElement('option');
-    opt.textContent = pname;
-    // find real prop.id from store
-    var pid = '';
-    getActiveProps().forEach(function(pr){ if(pr.name===pname) pid=pr.id; });
-    opt.value = pid;
-    sel.appendChild(opt);
+    allActive.forEach(function(pr) {
+      if (pr.name === pname) {
+        var h = (pr.hub || '').toLowerCase();
+        if (h && userHubs.indexOf(h) === -1) userHubs.push(h);
+      }
+    });
   });
-  // If only one property, auto-select it
+  // Store on user object for use in filters
+  currentUser._hubs = userHubs;
+
+  // Populate property dropdown in order form - user's props only
+  var sel = document.getElementById('cpropsel');
   if (user.props.length === 1) {
-    sel.selectedIndex = 1;
+    // Single property: show it as the only option, auto-selected
+    sel.innerHTML = '';
+    var onlyOpt = document.createElement('option');
+    var onlyPid = '';
+    allActive.forEach(function(pr){ if(pr.name===user.props[0]) onlyPid=pr.id; });
+    onlyOpt.value = onlyPid;
+    onlyOpt.textContent = user.props[0];
+    sel.appendChild(onlyOpt);
+    sel.selectedIndex = 0;
     updatePropFloorPlans(sel.value);
+  } else {
+    sel.innerHTML = '<option value="">-- Select Property --</option>';
+    user.props.forEach(function(pname) {
+      var opt = document.createElement('option');
+      opt.textContent = pname;
+      var pid = '';
+      allActive.forEach(function(pr){ if(pr.name===pname) pid=pr.id; });
+      opt.value = pid;
+      sel.appendChild(opt);
+    });
   }
 
   // Populate floor plans page
