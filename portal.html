@@ -792,6 +792,15 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="status">By Status</option>
             <option value="service">By Service</option>
           </select>
+          <div class="exp-wrap" id="chExpWrap">
+            <button class="exp-btn" onclick="toggleChExpMenu(event)">&#8681; Export <span class="exp-arrow">&#9660;</span></button>
+            <div class="exp-menu" id="chExpMenu">
+              <div class="exp-item" onclick="exportChCsv()"><span class="exp-item-icon">&#128196;</span><span class="exp-item-label">CSV</span><span class="exp-item-ext">.csv</span></div>
+              <div class="exp-item" onclick="exportChXlsx()"><span class="exp-item-icon">&#128202;</span><span class="exp-item-label">Excel</span><span class="exp-item-ext">.xlsx</span></div>
+              <div class="exp-item" onclick="exportChJson()"><span class="exp-item-icon">&#128196;</span><span class="exp-item-label">JSON</span><span class="exp-item-ext">.json</span></div>
+              <div class="exp-item" onclick="exportChPrint()"><span class="exp-item-icon">&#128424;</span><span class="exp-item-label">Print / PDF</span><span class="exp-item-ext"></span></div>
+            </div>
+          </div>
         </div>
         <div id="ch_custom_dates" style="display:none;align-items:center;gap:6px;margin-bottom:8px;">
           <input type="date" id="ch_date_from" class="fs" style="width:140px;" onchange="renderClientHistory()" title="From date">
@@ -6711,6 +6720,128 @@ function exportAordPrint() {
   setTimeout(function(){ win.print(); }, 400);
   document.getElementById('expMenu').classList.remove('open');
 }
+// ── CLIENT HISTORY EXPORT ────────────────────────────────────────────────────
+function toggleChExpMenu(e) {
+  e.stopPropagation();
+  document.getElementById('chExpMenu').classList.toggle('open');
+}
+
+function getFilteredChRows() {
+  var headers = ['Work Order','Property','Unit','Service','Date','Hub','Status'];
+  var rows = [];
+  var tbody = document.querySelector('#ch_tbl tbody');
+  if (!tbody) return {headers: headers, rows: rows};
+  Array.prototype.forEach.call(tbody.querySelectorAll('tr'), function(tr) {
+    var cells = tr.querySelectorAll('td');
+    if (cells.length < 6) return;
+    rows.push([
+      cells[0].textContent.trim(),
+      cells[1].textContent.trim(),
+      cells[2].textContent.trim(),
+      cells[3].textContent.trim(),
+      cells[4].textContent.trim(),
+      cells[5].textContent.trim(),
+      cells[6] ? cells[6].textContent.trim() : ''
+    ]);
+  });
+  return {headers: headers, rows: rows};
+}
+
+function chExportFilename(ext) {
+  return 'order-history-' + new Date().toISOString().slice(0,10) + '.' + ext;
+}
+
+function exportChCsv() {
+  var data = getFilteredChRows();
+  var lines = [data.headers.map(function(h){ return '"'+h+'"'; }).join(',')];
+  data.rows.forEach(function(row){
+    lines.push(row.map(function(cell){ return '"'+cell.replace(/"/g,'""')+'"'; }).join(','));
+  });
+  triggerDownload(lines.join('\r\n'), chExportFilename('csv'), 'text/csv;charset=utf-8;');
+  document.getElementById('chExpMenu').classList.remove('open');
+}
+
+function exportChXlsx() {
+  if (typeof XLSX === 'undefined') {
+    toast('Excel export unavailable — please check your connection and try again.');
+    return;
+  }
+  var data = getFilteredChRows();
+  var wsData = [data.headers].concat(data.rows);
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [12,26,10,28,14,14,14].map(function(w){ return {wch:w}; });
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Order History');
+  XLSX.writeFile(wb, chExportFilename('xlsx'));
+  document.getElementById('chExpMenu').classList.remove('open');
+}
+
+function exportChJson() {
+  var data = getFilteredChRows();
+  var out = data.rows.map(function(row){
+    var obj = {};
+    data.headers.forEach(function(h,i){ obj[h] = row[i] || ''; });
+    return obj;
+  });
+  triggerDownload(JSON.stringify(out, null, 2), chExportFilename('json'), 'application/json');
+  document.getElementById('chExpMenu').classList.remove('open');
+}
+
+function exportChPrint() {
+  var data = getFilteredChRows();
+  var d = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var statusEl = document.getElementById('ch_status_filter');
+  var propEl   = document.getElementById('ch_prop_filter');
+  var hubEl    = document.getElementById('ch_hub_filter');
+  var drEl     = document.getElementById('ch_date_range');
+  var statusLbl = statusEl && statusEl.value ? statusEl.options[statusEl.selectedIndex].text : 'All Statuses';
+  var propLbl   = propEl   && propEl.value   ? propEl.options[propEl.selectedIndex].text     : 'All Properties';
+  var hubLbl    = hubEl    && hubEl.value     ? hubEl.options[hubEl.selectedIndex].text       : 'All Hubs';
+  var dateLbl   = drEl     && drEl.value      ? drEl.options[drEl.selectedIndex].text         : 'All Dates';
+  var rowsHtml = data.rows.map(function(row, i){
+    return '<tr style="background:'+(i%2===0?'#fff':'#f8f7f4')+'">'+
+      row.map(function(cell){ return '<td style="padding:7px 10px;border-bottom:1px solid #e2dfd8;font-size:11px;">' + cell + '</td>'; }).join('')+
+      '</tr>';
+  }).join('');
+  var html = '<!DOCTYPE html><html><head><title>Protective Flooring — Order History</title>'
+    + '<style>body{font-family:Arial,sans-serif;margin:32px;color:#1c1c2e;}'
+    + 'h1{font-size:18px;margin:0 0 4px;}p{font-size:11px;color:#64748b;margin:0 0 16px;}'
+    + 'table{width:100%;border-collapse:collapse;}th{background:#020A5B;color:#fff;padding:8px 10px;font-size:11px;text-align:left;}'
+    + '.filters{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-size:11px;color:#64748b;padding:8px 12px;background:#f8f7f4;border:1px solid #ddd9d0;border-radius:3px;}'
+    + '.filters strong{color:#1c1c2e;}'
+    + '@media print{.noprint{display:none;}}'
+    + '</style></head><body>'
+    + '<h1>&#9632; Protective Flooring — Order History</h1>'
+    + '<p>Exported ' + d + ' &nbsp;·&nbsp; ' + data.rows.length + ' orders</p>'
+    + '<div class="filters">'
+    + '<span>Status: <strong>'+statusLbl+'</strong></span>'
+    + '<span>Property: <strong>'+propLbl+'</strong></span>'
+    + '<span>Hub: <strong>'+hubLbl+'</strong></span>'
+    + '<span>Date: <strong>'+dateLbl+'</strong></span>'
+    + '</div>'
+    + '<table><thead><tr>'
+    + data.headers.map(function(h){ return '<th>'+h+'</th>'; }).join('')
+    + '</tr></thead><tbody>'+rowsHtml+'</tbody></table>'
+    + '</body></html>';
+  var win = window.open('','_blank','width=900,height=700');
+  if (!win) { toast('Pop-up blocked — please allow pop-ups to print.'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function(){ win.print(); }, 400);
+  document.getElementById('chExpMenu').classList.remove('open');
+}
+
+// Close chExpMenu when clicking outside
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('chExpWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    var m = document.getElementById('chExpMenu');
+    if (m) m.classList.remove('open');
+  }
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 </script>
 </body>
 </html>
