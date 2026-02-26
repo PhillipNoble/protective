@@ -3794,18 +3794,32 @@ function confirmVoidOrder() {
 // ── Resolve the effective date for an order (ISO string or '')
 // Priority: confDate (if ISO) → reqDate (if ISO) → parsed legacy
 function resolveOrderDate(o) {
-  var iso = /^\d{4}-\d{2}-\d{2}$/;
-  if (o.confDate && iso.test(o.confDate)) return o.confDate;
-  if (o.reqDate  && iso.test(o.reqDate))  return o.reqDate;
-  var tryParse = function(d) {
-    if (!d || d === 'Pending') return '';
-    var parsed = new Date(d);
+  // Normalise any date string to YYYY-MM-DD for reliable ISO comparison
+  var toIso = function(d) {
+    if (!d || d === 'Pending' || d === '__TODAY__') return '';
+    // Already ISO
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+    // Long-form: "February 20, 2025" or "Feb 20, 2025"
+    var longMonth = {January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',
+      July:'07',August:'08',September:'09',October:'10',November:'11',December:'12',
+      Jan:'01',Feb:'02',Mar:'03',Apr:'04',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+    var lm = d.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+    if (lm) {
+      var mo = longMonth[lm[1]];
+      if (mo) return lm[3]+'-'+mo+'-'+String(lm[2]).padStart(2,'0');
+    }
+    // MM/DD/YYYY
+    var slash = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (slash) return slash[3]+'-'+String(slash[1]).padStart(2,'0')+'-'+String(slash[2]).padStart(2,'0');
+    // Fallback: let JS parse it but use noon UTC to avoid timezone shift
+    var parsed = new Date(d + (d.indexOf(':') === -1 ? 'T12:00:00' : ''));
     if (!isNaN(parsed)) {
       return parsed.getFullYear()+'-'+String(parsed.getMonth()+1).padStart(2,'0')+'-'+String(parsed.getDate()).padStart(2,'0');
     }
     return '';
   };
-  return tryParse(o.confDate) || tryParse(o.reqDate) || '';
+  // Priority: confirmed ISO date → requested date (any format)
+  return toIso(o.confDate) || toIso(o.reqDate) || '';
 }
 
 // ── Compute [startISO, endISO] for a date range key
@@ -4679,13 +4693,13 @@ function anav(pid, el) {
 // ── ORDERS DATA ──
 // ── ORDER STORE ──
 var ORDER_SEED = {
-  'CC-001':{num:'NA0001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'February 20, 2025',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  'CC-002':{num:'NA0002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 18, 2025',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2025',email:'manager@cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'No Preference',photos:true},
-  'CC-003':{num:'NA0003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'February 10, 2025',confDate:'February 10, 2025',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2025',email:'manager@cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  '2411':{num:'ME0001',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'February 28, 2025',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2025',email:'rmoore@riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2414':{num:'ME0002',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'March 3, 2025',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2025',email:'shill@parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2413':{num:'ME0003',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'February 26, 2025',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2025',email:'rmoore@riverside.com',notes:'',timeWindow:'No Preference',photos:false},
-  '2410':{num:'NA0004',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'February 24, 2025',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2025',email:'kdavis@arborridge.com',notes:'',timeWindow:'No Preference',photos:false}
+  'CC-001':{num:'NA0001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'2025-02-20',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  'CC-002':{num:'NA0002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2025-02-18',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2025',email:'manager@cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'No Preference',photos:true},
+  'CC-003':{num:'NA0003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'2025-02-10',confDate:'February 10, 2025',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2025',email:'manager@cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  '2411':{num:'ME0001',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'2025-02-28',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2025',email:'rmoore@riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2414':{num:'ME0002',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'2025-03-03',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2025',email:'shill@parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2413':{num:'ME0003',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'2025-02-26',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2025',email:'rmoore@riverside.com',notes:'',timeWindow:'No Preference',photos:false},
+  '2410':{num:'NA0004',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2025-02-24',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2025',email:'kdavis@arborridge.com',notes:'',timeWindow:'No Preference',photos:false}
 };
 
 function saveOrders() {
@@ -4718,6 +4732,13 @@ function loadOrders() {
         if (freshSeed[k] && freshSeed[k].confDate) {
           merged[k].confDate = freshSeed[k].confDate;
           merged[k].status   = freshSeed[k].status;
+        }
+        // Migrate long-form reqDate to ISO for date filter compatibility
+        if (merged[k].reqDate && !/^\d{4}-\d{2}-\d{2}$/.test(merged[k].reqDate)) {
+          var _lm = {January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',
+            July:'07',August:'08',September:'09',October:'10',November:'11',December:'12'};
+          var _m = (merged[k].reqDate+'').match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+          if (_m && _lm[_m[1]]) merged[k].reqDate = _m[3]+'-'+_lm[_m[1]]+'-'+String(_m[2]).padStart(2,'0');
         }
       });
       return merged;
@@ -5156,7 +5177,9 @@ function submitOrder() {
   var propName = propSel.options[propSel.selectedIndex].text;
   var planName = planSel.options[planSel.selectedIndex].text;
   var today    = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  var reqDate  = dateVal ? new Date(dateVal + 'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : today;
+  // Store reqDate as ISO YYYY-MM-DD for consistent date filtering
+  var _rdParsed = dateVal ? new Date(dateVal + 'T12:00:00') : new Date();
+  var reqDate = _rdParsed.getFullYear()+'-'+String(_rdParsed.getMonth()+1).padStart(2,'0')+'-'+String(_rdParsed.getDate()).padStart(2,'0');
 
   // Determine hub for this order to get correct prefix
   var _woHub = (function(){
