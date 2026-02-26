@@ -611,8 +611,8 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div class="ni" onclick="cnav('co',this)"><span class="ic">&#43;</span> Place Order Request</div>
       <div class="ni" onclick="cnav('ch',this)"><span class="ic">&#9783;</span> Order History</div>
       <div class="nlabel">Property</div>
-      <div class="ni" onclick="cnav('cf',this)"><span class="ic">&#127760;</span> Floor Plans</div>
       <div class="ni" onclick="cnav('cx',this)"><span class="ic">&#128196;</span> Documents</div>
+      <div class="ni" onclick="cnav('cs',this)"><span class="ic">&#9881;</span> Settings</div>
     </nav>
     <div class="sbot">
     <button class="lo" id="adminBackBtnSidebar" onclick="goBackToAdmin()" style="display:none;background:rgba(200,149,42,.15);color:var(--gold);border-color:rgba(200,149,42,.3);margin-bottom:8px;width:100%;justify-content:center;">&#9756; View Admin Panel</button>
@@ -823,7 +823,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       </div>
 
       <!-- FLOOR PLANS -->
-      <div class="panel" id="cf">
+      <div class="panel" id="cf" style="display:none!important;">
         <div class="shd"><h2>Floor Plans</h2><div id="cfproptitle" style="font-size:14px;color:var(--gray);font-weight:400;"></div></div>
         <div id="cfgrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;"></div>
       </div>
@@ -835,6 +835,86 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <!-- populated by renderClientDocuments() -->
         </tbody></table></div>
       </div>
+
+      <!-- CLIENT SETTINGS -->
+      <div class="panel" id="cs">
+        <div class="shd" style="margin-bottom:24px;">
+          <h2>Account Settings</h2>
+          <span style="font-size:13px;color:var(--gray);font-weight:400;">Manage your login credentials</span>
+        </div>
+
+        <!-- Change Password -->
+        <div class="fc" style="max-width:480px;">
+          <h3 style="margin-bottom:4px;">&#128274; Change Password</h3>
+          <p style="font-size:13px;color:var(--gray);margin:0 0 18px;">Choose a strong password you don't use elsewhere.</p>
+          <div id="cs_pw_msg" style="display:none;padding:10px 14px;border-radius:3px;font-size:13px;margin-bottom:14px;"></div>
+          <div class="fg" style="margin-bottom:12px;">
+            <label>Current Password</label>
+            <input type="password" id="cs_cur_pw" placeholder="Enter current password" autocomplete="current-password">
+          </div>
+          <div class="fg" style="margin-bottom:12px;">
+            <label>New Password</label>
+            <input type="password" id="cs_new_pw" placeholder="At least 8 characters" autocomplete="new-password" oninput="csCheckPwStrength(this.value)">
+            <div id="cs_pw_strength" style="margin-top:6px;height:4px;border-radius:2px;background:var(--lg);overflow:hidden;">
+              <div id="cs_pw_bar" style="height:100%;width:0;border-radius:2px;transition:width .3s,background .3s;"></div>
+            </div>
+            <div id="cs_pw_hint" style="font-size:11px;color:var(--gray);margin-top:4px;"></div>
+          </div>
+          <div class="fg" style="margin-bottom:20px;">
+            <label>Confirm New Password</label>
+            <input type="password" id="cs_conf_pw" placeholder="Re-enter new password" autocomplete="new-password">
+          </div>
+          <div class="fa" style="justify-content:flex-start;">
+            <button class="bl gd" onclick="csChangePw()" style="min-width:160px;">&#10003; Update Password</button>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:32px 0;max-width:480px;"></div>
+
+        <!-- Account Info -->
+        <div class="fc" style="max-width:480px;">
+          <h3 style="margin-bottom:4px;">&#128100; Account Info</h3>
+          <p style="font-size:13px;color:var(--gray);margin:0 0 18px;">Your account details on file. Contact your coordinator to update your name or email.</p>
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;display:grid;gap:12px;">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);width:80px;flex-shrink:0;">Name</div>
+              <div id="cs_info_name" style="font-size:14px;color:var(--text);font-weight:500;"></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);width:80px;flex-shrink:0;">Email</div>
+              <div id="cs_info_email" style="font-size:14px;color:var(--text);font-weight:500;"></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);width:80px;flex-shrink:0;">Properties</div>
+              <div id="cs_info_props" style="font-size:14px;color:var(--text);font-weight:500;"></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);width:80px;flex-shrink:0;">Last Login</div>
+              <div id="cs_info_login" style="font-size:13px;color:var(--gray);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:32px 0;max-width:480px;"></div>
+
+        <!-- Reset Password -->
+        <div class="fc" style="max-width:480px;">
+          <h3 style="margin-bottom:4px;">&#128257; Reset to Temporary Password</h3>
+          <p style="font-size:13px;color:var(--gray);margin:0 0 18px;">Forgot your current password? Reset it to a one-time temporary password, then log back in and change it.</p>
+          <div id="cs_reset_msg" style="display:none;padding:10px 14px;border-radius:3px;font-size:13px;margin-bottom:14px;"></div>
+          <div class="fa" style="justify-content:flex-start;">
+            <button class="bl ol" onclick="csShowResetConfirm()" style="min-width:200px;">&#128257; Reset My Password</button>
+          </div>
+          <div id="cs_reset_confirm" style="display:none;margin-top:16px;padding:14px;background:#fffbeb;border:1px solid #fde68a;border-radius:3px;">
+            <p style="font-size:13px;color:#92400e;margin:0 0 12px;">&#9888; This will replace your current password with a temporary one. You'll need to change it after logging back in.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="bl dn" onclick="csDoReset()">Yes, Reset My Password</button>
+              <button class="bl ol" onclick="csHideResetConfirm()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
     </div><!-- /content -->
   </div><!-- /main -->
@@ -5225,6 +5305,8 @@ function go(id) {
 }
 function cnav(pid, el) {
   if (pid === 'cx') { setTimeout(renderClientDocuments, 50); }
+  if (pid === 'cs') { setTimeout(renderClientSettings, 50); }
+  if (pid === 'cs') { setTimeout(renderClientSettings, 50); }
   if (pid === 'co') {
     // Default install date to tomorrow if blank
     var dateEl = document.getElementById('cinstdate');
@@ -5240,7 +5322,7 @@ function cnav(pid, el) {
   document.querySelectorAll('#cl .panel').forEach(function(p){ p.classList.remove('on'); });
   var t = document.getElementById(pid);
   if (t) t.classList.add('on');
-  var titles = {cd:'Dashboard',co:'Place Order Request',ch:'Order History',cf:'Floor Plans',cx:'Documents'};
+  var titles = {cd:'Dashboard',co:'Place Order Request',ch:'Order History',cf:'Floor Plans',cx:'Documents',cs:'Account Settings'};
   document.getElementById('ctitle').textContent = titles[pid] || pid;
 }
 function anav(pid, el) {
@@ -6840,6 +6922,137 @@ document.addEventListener('click', function(e) {
     if (m) m.classList.remove('open');
   }
 });
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── CLIENT ACCOUNT SETTINGS ──────────────────────────────────────────────────
+function renderClientSettings() {
+  if (!currentUser) return;
+  var u = currentUser;
+  var nameEl  = document.getElementById('cs_info_name');
+  var emailEl = document.getElementById('cs_info_email');
+  var propsEl = document.getElementById('cs_info_props');
+  var loginEl = document.getElementById('cs_info_login');
+  if (nameEl)  nameEl.textContent  = u.name  || '—';
+  if (emailEl) emailEl.textContent = u.email || '—';
+  if (propsEl) propsEl.textContent = (u.props || []).join(', ') || '—';
+  if (loginEl) loginEl.textContent = u.lastLogin || 'Not recorded';
+  // Clear form
+  ['cs_cur_pw','cs_new_pw','cs_conf_pw'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  csMsg('cs_pw_msg','','');
+  csMsg('cs_reset_msg','','');
+  csHideResetConfirm();
+  var bar = document.getElementById('cs_pw_bar');
+  var hint = document.getElementById('cs_pw_hint');
+  if (bar) { bar.style.width='0'; bar.style.background=''; }
+  if (hint) hint.textContent = '';
+}
+
+function csMsg(elId, text, type) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  if (!text) { el.style.display='none'; el.textContent=''; return; }
+  el.textContent = text;
+  el.style.display = 'block';
+  if (type === 'ok') {
+    el.style.background='#ecfdf5'; el.style.border='1px solid #6ee7b7'; el.style.color='#065f46';
+  } else {
+    el.style.background='#fef2f2'; el.style.border='1px solid #fca5a5'; el.style.color='#991b1b';
+  }
+}
+
+function csCheckPwStrength(val) {
+  var bar  = document.getElementById('cs_pw_bar');
+  var hint = document.getElementById('cs_pw_hint');
+  if (!bar || !hint) return;
+  var score = 0;
+  if (val.length >= 8)  score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  var colors = ['#ef4444','#f97316','#eab308','#22c55e'];
+  var labels = ['Weak','Fair','Good','Strong'];
+  var widths = ['25%','50%','75%','100%'];
+  if (val.length === 0) { bar.style.width='0'; hint.textContent=''; return; }
+  var idx = Math.max(0, score - 1);
+  bar.style.width  = widths[idx];
+  bar.style.background = colors[idx];
+  hint.textContent = labels[idx];
+  hint.style.color = colors[idx];
+}
+
+function csChangePw() {
+  if (!currentUser) return;
+  var cur  = document.getElementById('cs_cur_pw').value;
+  var nw   = document.getElementById('cs_new_pw').value;
+  var conf = document.getElementById('cs_conf_pw').value;
+
+  csMsg('cs_pw_msg','','');
+
+  if (!cur)  { csMsg('cs_pw_msg','Please enter your current password.','err'); return; }
+  if (!nw)   { csMsg('cs_pw_msg','Please enter a new password.','err'); return; }
+  if (nw.length < 8) { csMsg('cs_pw_msg','New password must be at least 8 characters.','err'); return; }
+  if (nw !== conf)   { csMsg('cs_pw_msg','Passwords do not match.','err'); return; }
+
+  // Verify current password against stored record
+  var clients = getUsers();
+  var idx = -1;
+  for (var i = 0; i < clients.length; i++) {
+    if (clients[i].email.toLowerCase() === currentUser.email.toLowerCase()) { idx = i; break; }
+  }
+  if (idx === -1) { csMsg('cs_pw_msg','Account not found. Please log out and try again.','err'); return; }
+  if (clients[idx].password !== cur) {
+    csMsg('cs_pw_msg','Current password is incorrect.','err');
+    document.getElementById('cs_cur_pw').value = '';
+    return;
+  }
+
+  // Save new password
+  clients[idx].password = nw;
+  currentUser.password  = nw;
+  saveUsers(clients);
+
+  // Clear fields
+  ['cs_cur_pw','cs_new_pw','cs_conf_pw'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var bar  = document.getElementById('cs_pw_bar');
+  var hint = document.getElementById('cs_pw_hint');
+  if (bar)  { bar.style.width='0'; }
+  if (hint) hint.textContent = '';
+  csMsg('cs_pw_msg','\u2713 Password updated successfully. Use your new password next time you log in.','ok');
+}
+
+function csShowResetConfirm() {
+  var el = document.getElementById('cs_reset_confirm');
+  if (el) el.style.display = 'block';
+  csMsg('cs_reset_msg','','');
+}
+function csHideResetConfirm() {
+  var el = document.getElementById('cs_reset_confirm');
+  if (el) el.style.display = 'none';
+}
+
+function csDoReset() {
+  if (!currentUser) return;
+  // Generate a simple readable temp password: TempXXXX (4 random digits)
+  var tmp = 'Temp' + Math.floor(1000 + Math.random() * 9000);
+  var clients = getUsers();
+  var idx = -1;
+  for (var i = 0; i < clients.length; i++) {
+    if (clients[i].email.toLowerCase() === currentUser.email.toLowerCase()) { idx = i; break; }
+  }
+  if (idx === -1) { csMsg('cs_reset_msg','Account not found.','err'); return; }
+  clients[idx].password = tmp;
+  currentUser.password  = tmp;
+  saveUsers(clients);
+  csHideResetConfirm();
+  csMsg('cs_reset_msg',
+    '\u2713 Password reset. Your temporary password is: ' + tmp +
+    '  \u2014  Please change it immediately after logging out and back in.',
+    'ok');
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 </script>
