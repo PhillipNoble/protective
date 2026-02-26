@@ -1778,6 +1778,20 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <option value="inactive">Inactive / Suspended</option>
         </select>
       </div>
+      <div class="ms" style="margin-bottom:16px;">
+        <div class="mst">Assigned Properties</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+          <div class="sw" style="flex:1;">
+            <span class="si2">&#128269;</span>
+            <input type="text" id="eu_prop_search" placeholder="Search properties..." oninput="applyEditUserPropFilters()">
+          </div>
+          <select class="fs" id="eu_prop_hub" onchange="applyEditUserPropFilters()">
+            <option value="all">All Hubs</option>
+          </select>
+        </div>
+        <div id="euproplist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:8px;"></div>
+        <div id="eu_prop_count" style="font-size:11px;color:var(--gray);margin-top:6px;"></div>
+      </div>
       <div id="eu_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
     </div>
     <div class="mf">
@@ -5094,6 +5108,53 @@ function applyUserPropFilters() {
 }
 
 function filterUserProps(hub) { applyUserPropFilters(); }
+
+function buildEditUserPropList(checkedProps) {
+  var container = document.getElementById('euproplist');
+  if (!container) return;
+  var props = getActiveProps();
+  container.innerHTML = '';
+  if (!props.length) {
+    container.innerHTML = '<div style="padding:12px;color:var(--gray);font-size:13px;grid-column:1/-1;">No active properties found.</div>';
+    return;
+  }
+  props.forEach(function(pr) {
+    var isChecked = checkedProps && checkedProps.indexOf(pr.name) >= 0;
+    var hub = (pr.hub || 'memphis').toLowerCase();
+    var hubLabel = hub === 'nashville' ? 'Nashville' : 'Memphis';
+    var lbl = document.createElement('label');
+    lbl.className = 'uprop-item';
+    lbl.setAttribute('data-hub', hub);
+    lbl.setAttribute('data-name', pr.name.toLowerCase());
+    lbl.innerHTML = '<input type="checkbox" name="euprop" value="' + pr.name + '"' + (isChecked ? ' checked' : '') + '>'
+      + '<div><div style="font-size:13px;font-weight:600;color:var(--navy);">' + pr.name + '</div>'
+      + '<div style="font-size:11px;color:var(--gray);">' + hubLabel + '</div></div>';
+    lbl.querySelector('input').addEventListener('change', function(){ applyEditUserPropFilters(); });
+    container.appendChild(lbl);
+  });
+  // Populate hub dropdown
+  populateAllMarketsSelect('eu_prop_hub', 'all');
+  applyEditUserPropFilters();
+}
+
+function applyEditUserPropFilters() {
+  var container = document.getElementById('euproplist');
+  if (!container) return;
+  var hub = (document.getElementById('eu_prop_hub')||{value:'all'}).value;
+  var q   = ((document.getElementById('eu_prop_search')||{value:''}).value||'').toLowerCase().trim();
+  var items = container.querySelectorAll('.uprop-item');
+  var vis = 0;
+  items.forEach(function(lbl) {
+    var matchHub  = hub === 'all' || lbl.getAttribute('data-hub') === hub;
+    var matchName = !q || lbl.getAttribute('data-name').indexOf(q) >= 0;
+    var show = matchHub && matchName;
+    lbl.style.display = show ? '' : 'none';
+    if (show) vis++;
+  });
+  var checked = container.querySelectorAll('input[name="euprop"]:checked').length;
+  var countEl = document.getElementById('eu_prop_count');
+  if (countEl) countEl.textContent = checked + ' propert' + (checked===1?'y':'ies') + ' selected';
+}
 function filterUserPropSearch(val) { applyUserPropFilters(); }
 
 function updatePropCount(containerId) {
@@ -5807,6 +5868,9 @@ function openEditUser(uid) {
   document.getElementById('eu_role').value = u.role || 'Property Manager';
   document.getElementById('eu_status').value = u.status || 'active';
   document.getElementById('eu_err').style.display = 'none';
+  var searchEl = document.getElementById('eu_prop_search');
+  if (searchEl) searchEl.value = '';
+  buildEditUserPropList(u.props || []);
   openM('medit');
 }
 
@@ -5831,9 +5895,23 @@ function saveEditUser() {
       clients[i].name     = first + ' ' + last;
       clients[i].initials = (first[0] + last[0]).toUpperCase();
       clients[i].email    = email;
-      clients[i].role     = document.getElementById('eu_role').value;
-      clients[i].status   = document.getElementById('eu_status').value;
+      clients[i].role   = document.getElementById('eu_role').value;
+      clients[i].status = document.getElementById('eu_status').value;
       if (pw) clients[i].password = pw;
+      // Collect selected properties
+      var selProps = [];
+      document.querySelectorAll('#euproplist input[name="euprop"]:checked').forEach(function(cb){ selProps.push(cb.value); });
+      if (selProps.length > 0) {
+        clients[i].props = selProps;
+        // Recalculate hub from assigned properties
+        var allProps = getActiveProps();
+        var hasNash = false, hasMem = false;
+        selProps.forEach(function(pname){
+          var pr = allProps.find(function(x){ return x.name === pname; });
+          if (pr && (pr.hub||'').toLowerCase() === 'nashville') hasNash = true; else hasMem = true;
+        });
+        clients[i].hub = hasNash && hasMem ? 'both' : hasNash ? 'nashville' : 'memphis';
+      }
       break;
     }
   }
