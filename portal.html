@@ -70,14 +70,14 @@ button,input,select,textarea{font-family:'Outfit',sans-serif;cursor:pointer;}
 
 /* MAIN */
 .main{margin-left:var(--sw);flex:1;min-height:100vh;display:flex;flex-direction:column;}
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 36px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50;box-shadow:0 1px 12px rgba(2,10,91,.05);}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50;box-shadow:0 1px 12px rgba(2,10,91,.05);}
 .tbtitle{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--navy);}
 .tbr{display:flex;align-items:center;gap:16px;}
 .tprop{background:var(--navy-lt);border:1px solid rgba(2,10,91,.12);padding:7px 14px;border-radius:var(--r);font-size:12px;font-weight:600;color:var(--navy);}
 .abadge{background:rgba(200,149,42,.15);border:1px solid rgba(200,149,42,.3);color:var(--gold);padding:5px 12px;border-radius:var(--r);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
 .nbtn{width:36px;height:36px;border-radius:50%;background:var(--lg);border:none;font-size:16px;display:flex;align-items:center;justify-content:center;position:relative;}
 .ndot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--white);}
-.content{flex:1;padding:36px;}
+.content{flex:1;padding:28px 24px;}
 .panel{display:none;}
 .panel.on{display:block;animation:pi .3s ease;}
 @keyframes pi{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
@@ -112,11 +112,11 @@ button,input,select,textarea{font-family:'Outfit',sans-serif;cursor:pointer;}
 .bl.ol{background:transparent;border:1px solid var(--border);color:var(--gray);}.bl.ol:hover{border-color:var(--navy);color:var(--navy);}
 
 /* TABLE */
-.tw{background:var(--white);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;box-shadow:var(--sh);}
+.tw{background:var(--white);border-radius:var(--r);border:1px solid var(--border);overflow-x:auto;overflow-y:visible;box-shadow:var(--sh);}
 table{width:100%;border-collapse:collapse;}
 thead{background:var(--cream);}
-th{padding:12px 18px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gray);border-bottom:1px solid var(--border);}
-td{padding:14px 18px;font-size:13px;color:var(--text);border-bottom:1px solid var(--lg);vertical-align:middle;}
+th{padding:10px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gray);border-bottom:1px solid var(--border);}
+td{padding:10px 10px;font-size:13px;color:var(--text);border-bottom:1px solid var(--lg);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:var(--navy-lt);cursor:pointer;}
 
@@ -541,6 +541,12 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 .exp-item-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
 .exp-item-label{flex:1;}
 .exp-item-ext{font-size:10px;font-weight:700;color:var(--gray);letter-spacing:.5px;opacity:.7;}
+
+/* Dashboard table compact */
+#adash_recent_tbl td, #adash_today_tbl td { white-space: nowrap; }
+#adash_recent_tbl td:nth-child(2), #adash_today_tbl td:nth-child(2) { white-space: normal; min-width: 120px; max-width: 160px; }
+#adash_recent_tbl td:nth-child(4), #adash_today_tbl td:nth-child(4) { white-space: normal; min-width: 100px; }
+#adash_recent_tbl th, #adash_today_tbl th { white-space: nowrap; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -873,25 +879,25 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <div><div class="snum" id="stat_clients">—</div><div class="slbl">Client Logins</div></div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
           <h2 style="margin:0;" id="adash_table_title">New Orders — Action Required</h2>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <select class="fs" id="adash_hub" onchange="switchDashTab(_dashTab)" style="min-width:130px;">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <select class="fs" id="adash_hub" onchange="switchDashTab(_dashTab)" style="min-width:120px;">
               <option value="">All Hubs</option>
             </select>
             <div style="display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
               <button id="tab_recent" class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
               <button id="tab_today"  class="tab-toggle"    onclick="switchDashTab('today')">Today's Installs</button>
             </div>
-            <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*=&quot;co&quot;]'));},150);">&#128221; Place New Order</button>
+            <button class="bs gd" style="white-space:nowrap;" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*=&quot;co&quot;]'));},150);">&#128221; New Order</button>
           </div>
         </div>
         <div class="tw" style="margin-bottom:28px;" id="adash_recent_wrap"><table id="adash_recent_tbl">
-          <thead><tr><th class="sortable" onclick="sortTable('adash_recent_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_recent_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('adash_recent_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('adash_recent_tbl',3,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_recent_tbl',4,'str')">Service</th><th class="sortable" onclick="sortTable('adash_recent_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_recent_tbl',6,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_recent_tbl',7,'str')">Status</th><th>Action</th></tr></thead>
+          <thead><tr><th class="sortable" onclick="sortTable('adash_recent_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_recent_tbl',1,'str')">Property / Hub</th><th class="sortable" onclick="sortTable('adash_recent_tbl',2,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_recent_tbl',3,'str')">Service</th><th class="sortable" onclick="sortTable('adash_recent_tbl',4,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_recent_tbl',5,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_recent_tbl',6,'str')">Status</th><th>Action</th></tr></thead>
           <tbody id="adash_recent_tbody"></tbody>
         </table></div>
         <div class="tw" style="margin-bottom:28px;display:none;" id="adash_today_wrap"><table id="adash_today_tbl">
-          <thead><tr><th class="sortable" onclick="sortTable('adash_today_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_today_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('adash_today_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('adash_today_tbl',3,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_today_tbl',4,'str')">Service</th><th class="sortable" onclick="sortTable('adash_today_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_today_tbl',6,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_today_tbl',7,'str')">Status</th><th>Action</th></tr></thead>
+          <thead><tr><th class="sortable" onclick="sortTable('adash_today_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_today_tbl',1,'str')">Property / Hub</th><th class="sortable" onclick="sortTable('adash_today_tbl',2,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_today_tbl',3,'str')">Service</th><th class="sortable" onclick="sortTable('adash_today_tbl',4,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_today_tbl',5,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_today_tbl',6,'str')">Status</th><th>Action</th></tr></thead>
           <tbody id="adash_today_tbody"></tbody>
         </table></div>
       </div>
@@ -4510,16 +4516,18 @@ function markOrderComplete(id) {
 }
 
 function orderActionBtns(id, o) {
-  var view     = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
-  var conf     = o.status==='requested'
-    ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button>' : '';
-  var complete = o.status==='scheduled'
-    ? ' <button class="bs gn" onclick="event.stopPropagation();markOrderComplete(\''+id+'\')">&#10003; Complete</button>' : '';
-  var vd       = (o.status==='completed')
-    ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>'
-    : (o.status!=='vd' && o.status!=='requested' && o.status!=='scheduled' ? ''
-      : (o.status!=='vd' ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : ''));
-  return '<div style="display:flex;gap:5px;">'+view+conf+complete+vd+'</div>';
+  var s = o.status;
+  var canVoid = (s==='requested'||s==='scheduled'||s==='completed');
+  var btnStyle = 'font-size:11px;padding:5px 9px;white-space:nowrap;';
+  var view  = '<button class="bs ol" style="'+btnStyle+'" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
+  var conf  = s==='requested'
+    ? '<button class="bs gd" style="'+btnStyle+'" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button>' : '';
+  var comp  = s==='scheduled'
+    ? '<button class="bs gn" style="'+btnStyle+'" onclick="event.stopPropagation();markOrderComplete(\''+id+'\')">&#10003; Complete</button>' : '';
+  var vd    = canVoid
+    ? '<button class="bs dn" style="'+btnStyle+'background:transparent;color:#dc2626;border-color:#fca5a5;" title="Void" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>'
+    : '';
+  return '<div style="display:flex;gap:3px;flex-wrap:nowrap;align-items:center;">'+view+conf+comp+vd+'</div>';
 }
 
 function statusBadge(status) {
@@ -4560,8 +4568,7 @@ function renderAdashRecent() {
     var hub = hubBadgeHtml(o.hub);
     html += '<tr onclick="oworder(\''+id+'\')">'+
       '<td><strong>#'+o.num+'</strong></td>'+
-      '<td>'+o.property+'</td>'+
-      '<td>'+hub+'</td>'+
+      '<td>'+o.property+'<br>'+hub+'</td>'+
       '<td>'+o.unit+'</td>'+
       '<td>'+svcDisplay(o)+'</td>'+
       '<td>'+fmtDate(o.reqDate)+'</td>'+
@@ -4570,7 +4577,7 @@ function renderAdashRecent() {
       '<td>'+orderActionBtns(id,o)+'</td>'+
       '</tr>';
   });
-  tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:24px;">No pending orders.</td></tr>';
+  tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px;">No pending orders.</td></tr>';
 }
 
 function renderAdashToday() {
@@ -4588,8 +4595,7 @@ function renderAdashToday() {
     var hub = hubBadgeHtml(o.hub);
     html += '<tr onclick="oworder(\''+id+'\')">'+
       '<td><strong>#'+o.num+'</strong></td>'+
-      '<td>'+o.property+'</td>'+
-      '<td>'+hub+'</td>'+
+      '<td>'+o.property+'<br>'+hub+'</td>'+
       '<td>'+o.unit+'</td>'+
       '<td>'+svcDisplay(o)+'</td>'+
       '<td>'+fmtDate(o.reqDate)+'</td>'+
