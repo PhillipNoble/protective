@@ -754,13 +754,14 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <select class="fs" id="ch_date_range" onchange="onChDateRangeChange()" title="Filter by date">
             <option value="">All Dates</option>
             <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
             <option value="tomorrow">Tomorrow</option>
+            <option value="yesterday">Yesterday</option>
             <option value="last_week">Last Week</option>
             <option value="last_month">Last Month</option>
             <option value="last_quarter">Last Quarter</option>
-            <option value="qtd">Quarter to Date</option>
             <option value="last_year">Last Year</option>
+            <option value="mtd">Month to Date</option>
+            <option value="qtd">Quarter to Date</option>
             <option value="ytd">Year to Date</option>
             <option value="custom">Custom Date Range...</option>
           </select>
@@ -923,13 +924,14 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <select class="fs" id="aord_date_range" onchange="onDateRangeChange()" title="Filter by date">
             <option value="">All Dates</option>
             <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
             <option value="tomorrow">Tomorrow</option>
+            <option value="yesterday">Yesterday</option>
             <option value="last_week">Last Week</option>
             <option value="last_month">Last Month</option>
             <option value="last_quarter">Last Quarter</option>
-            <option value="qtd">Quarter to Date</option>
             <option value="last_year">Last Year</option>
+            <option value="mtd">Month to Date</option>
+            <option value="qtd">Quarter to Date</option>
             <option value="ytd">Year to Date</option>
             <option value="custom">Custom Date Range...</option>
           </select>
@@ -3972,6 +3974,7 @@ function dateRangeBounds(range) {
     return [iso(new Date(y, cq*3, 1)), iso(today)];
   }
   if (range === 'last_year') return [iso(new Date(y-1,0,1)), iso(new Date(y-1,11,31))];
+  if (range === 'mtd')       return [iso(new Date(y,m,1)), iso(today)];
   if (range === 'ytd')       return [iso(new Date(y,0,1)), iso(today)];
   if (range === 'custom') {
     var from = (document.getElementById('aord_date_from')||{value:''}).value;
