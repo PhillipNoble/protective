@@ -650,7 +650,6 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
                 <div style="flex:1;min-width:180px;">
                   <div style="font-size:15px;font-weight:700;color:var(--navy);" id="fpcardname"></div>
                   <div style="font-size:12px;color:var(--gray);margin-top:2px;" id="fpcardsqft"></div>
-                  <div style="margin-top:8px;" id="fpcardrooms"></div>
                   <div style="margin-top:4px;" id="fpcardimg-btn"></div>
                 </div>
               </div>
@@ -726,7 +725,6 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="scheduled">Scheduled</option>
             <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
-            <option value="vd">Void</option>
           </select>
           <select class="fs" id="ch_prop_filter" onchange="renderClientHistory()">
             <option value="">All Properties</option>
@@ -856,7 +854,6 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="scheduled">Scheduled</option>
             <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
-            <option value="vd">Void</option>
           </select>
           <select class="fs" id="aord_hub" onchange="renderAdminOrders()">
             <option value="">All Hubs</option>
@@ -4299,15 +4296,6 @@ function onPlanChange(fpId) {
   document.getElementById('fpcardname').textContent = name + ((fp && fp.renovated) ? ' ★ Renovated' : '');
   document.getElementById('fpcardsqft').textContent = meta;
 
-  // Rooms
-  var roomsEl = document.getElementById('fpcardrooms');
-  if (rooms.length) {
-    roomsEl.innerHTML = rooms.map(function(r){
-      return '<span class="chip" style="font-size:11px;padding:2px 8px;">' + r + '</span>';
-    }).join('');
-  } else {
-    roomsEl.innerHTML = '';
-  }
 
   // Floor plan image
   var imgEl    = document.getElementById('fpcardimg');
