@@ -950,7 +950,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </select>
           <select class="fs" id="ucl_status" onchange="renderUserTable()">
             <option value="">All Statuses</option>
-            <option value="active">Active</option>
+            <option value="active" selected>Active</option>
             <option value="inactive">Inactive</option>
           </select>
           <select class="fs" id="ucl_sort" onchange="renderUserTable()">
@@ -5697,16 +5697,16 @@ function renderUserTable() {
     var days = daysSince(u.lastLoginISO);
     var loginCell;
     if (!u.lastLogin) {
-      loginCell = '<span style="color:var(--gray);font-size:12px;">Never</span>';
+      loginCell = '<span style="color:var(--gray);font-size:12px;" title="Gray — No login on record. Client has never accessed the portal.">Never</span>';
     } else {
-      var daysLabel, daysColor;
-      if (days === 0)       { daysLabel = 'today';          daysColor = '#15803d'; }
-      else if (days === 1)  { daysLabel = '1 day ago';      daysColor = '#15803d'; }
-      else if (days <= 7)   { daysLabel = days+' days ago'; daysColor = '#b45309'; }
-      else if (days <= 30)  { daysLabel = days+' days ago'; daysColor = '#b45309'; }
-      else                  { daysLabel = days+' days ago'; daysColor = '#b91c1c'; }
+      var daysLabel, daysColor, daysTitle;
+      if (days === 0)       { daysLabel = 'today';          daysColor = '#15803d'; daysTitle = 'Green — Logged in today. Client is actively using the portal.'; }
+      else if (days === 1)  { daysLabel = '1 day ago';      daysColor = '#15803d'; daysTitle = 'Green — Logged in yesterday. Client is recently active.'; }
+      else if (days <= 7)   { daysLabel = days+' days ago'; daysColor = '#b45309'; daysTitle = 'Amber — Last login was '+days+' days ago. Client activity is slowing — consider a follow-up.'; }
+      else if (days <= 30)  { daysLabel = days+' days ago'; daysColor = '#b45309'; daysTitle = 'Amber — Last login was '+days+' days ago. Client has not logged in recently.'; }
+      else                  { daysLabel = days+' days ago'; daysColor = '#b91c1c'; daysTitle = 'Red — Last login was '+days+' days ago. Client is inactive — follow up recommended.'; }
       loginCell = '<div style="font-size:12px;color:var(--text);">' + u.lastLogin + '</div>'
-        + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;">('+daysLabel+')</div>';
+        + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;cursor:default;" title="'+daysTitle+'">('+daysLabel+')</div>';
     }
     return '<tr>'
       + '<td><strong>' + u.name + '</strong></td>'
