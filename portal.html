@@ -642,13 +642,13 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div class="panel" id="co">
         <div class="fc">
           <h3>&#127968; Property &amp; Unit</h3>
-          <div class="form-row" style="margin-bottom:16px;">
-            <div class="fg"><label>Property *</label>
-              <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
-                <option value="">-- Select Property --</option>
-              </select>
-            </div>
-            <div class="fg"><label>Unit Number *</label><input type="text" id="cunitinput" placeholder="e.g. 214"></div>
+          <div class="fg" style="margin-bottom:12px;"><label>Property *</label>
+            <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
+              <option value="">-- Select Property --</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom:16px;"><label>Unit Number *</label>
+            <input type="text" id="cunitinput" placeholder="e.g. 214">
           </div>
           <div class="form-row">
             <div class="fg"><label>Floor Plan *</label>
@@ -680,17 +680,71 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             </div>
           </div>
           <div id="occnotice" style="display:none;background:#fffbeb;border:1px solid #fde68a;padding:14px 16px;border-radius:3px;margin-top:12px;">
-            <strong style="color:#b45309;">&#9888; Occupied Unit</strong>
-            <p style="font-size:13px;color:#92400e;margin-top:4px;">Please download the Occupied Unit Form before scheduling. <a href="#" style="color:#b45309;font-weight:700;">&#8681; Download PDF</a></p>
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <span style="font-size:18px;line-height:1;">&#9888;</span>
+              <div style="flex:1;">
+                <strong style="color:#b45309;font-size:13px;">Occupied Unit — Additional Step Required</strong>
+                <p style="font-size:12px;color:#92400e;margin-top:5px;line-height:1.5;">An <strong>Occupied Unit Authorization Form</strong> must be completed and returned to our office <em>before</em> an install date can be confirmed. Please print, sign, and return the form prior to scheduling.</p>
+                <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="bs nv" onclick="openOccupiedForm()" style="font-size:11px;">&#128196; View &amp; Print Form</button>
+                  <span style="font-size:11px;color:#92400e;align-self:center;">&#8594; Return signed copy to your Preferred Flooring coordinator</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- OCCUPIED UNIT FORM MODAL -->
+          <div class="mb" id="mocc" style="display:none;z-index:3000;">
+            <div class="modal" style="max-width:600px;">
+              <div class="mh">
+                <div>
+                  <h3>&#128196; Occupied Unit Authorization Form</h3>
+                  <div style="font-size:12px;color:var(--gray);margin-top:2px;">Print, sign, and return to your Preferred Flooring coordinator</div>
+                </div>
+                <button class="mx" onclick="closeM('mocc')">&#10005;</button>
+              </div>
+              <div class="mbody" id="occform_body" style="font-family:Georgia,serif;">
+                <div style="text-align:center;margin-bottom:18px;">
+                  <div style="font-size:18px;font-weight:700;color:var(--navy);letter-spacing:1px;">PREFERRED FLOORING</div>
+                  <div style="font-size:13px;color:var(--gray);margin-top:2px;">Occupied Unit Authorization Form</div>
+                  <div style="border-bottom:2px solid var(--navy);margin-top:10px;"></div>
+                </div>
+                <p style="font-size:13px;line-height:1.7;color:#333;">This form authorizes Preferred Flooring to perform flooring installation or repair services in an <strong>occupied residential unit</strong>. The resident or authorized property representative must complete and sign this form before a confirmed installation date will be scheduled.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;">
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Property Name</div><div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_prop"></div></div>
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Unit Number</div><div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_unit"></div></div>
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Resident Name</div><div style="border-bottom:1px solid #ccc;min-height:28px;"></div></div>
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Phone Number</div><div style="border-bottom:1px solid #ccc;min-height:28px;"></div></div>
+                </div>
+                <div style="margin:14px 0;">
+                  <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Requested Service</div>
+                  <div style="border-bottom:1px solid #ccc;min-height:28px;padding-bottom:4px;" id="occf_svc"></div>
+                </div>
+                <div style="background:#fef9f0;border:1px solid #fde68a;border-radius:4px;padding:12px 14px;margin:14px 0;font-size:12px;color:#78350f;line-height:1.6;">
+                  <strong>Resident Responsibilities:</strong> The resident must ensure the work area is clear and accessible on the scheduled date. A responsible adult (18+) must be present during the installation. Resident understands that furniture and personal belongings must be removed from the work area prior to arrival.
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Resident Signature</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Signature</div></div>
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date Signed</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Date</div></div>
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Property Manager Signature</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Signature</div></div>
+                  <div><div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Date</div><div style="border-bottom:2px solid #333;min-height:36px;"></div><div style="font-size:10px;color:var(--gray);margin-top:3px;">Date</div></div>
+                </div>
+                <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--gray);border-top:1px solid var(--border);padding-top:12px;">Return completed form to your Preferred Flooring coordinator before scheduling. Questions? Call your hub office.</div>
+              </div>
+              <div class="mf">
+                <button class="bs ol" onclick="closeM('mocc')">Close</button>
+                <button class="bl nv" onclick="printOccupiedForm()">&#128424; Print Form</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="fc">
-          <h3>&#129520; Service &amp; Scope</h3>
+          <h3>&#129520; Service &amp; Scope <span style="font-size:13px;font-weight:400;color:var(--gray);">(Additional Services)</span></h3>
           <!-- presetzone merged into fppreview above -->
           <div class="fg" style="margin-bottom:20px;"><label>Flooring Service <span style="font-size:11px;font-weight:400;color:var(--gray);">(required if no scope selected)</span></label>
-            <select id="csvc"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select>
+            <select id="csvc" onchange="onSvcChange(this.value)"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select>
           </div>
-          <div class="fg"><label>Scope of Work <span style="font-size:11px;font-weight:400;color:var(--gray);">(required if no service selected — or select presets above)</span></label>
+          <div class="fg" id="scopegrid_wrap" style="display:none;"><label>Scope of Work <span style="font-size:11px;font-weight:400;color:var(--gray);">(select all areas to be serviced)</span></label>
             <div class="sg" style="margin-top:8px;" id="scopegrid">
               <div class="so" onclick="togScope(this)"><div class="ck"></div>Living Room</div>
               <div class="so" onclick="togScope(this)"><div class="ck"></div>Master Bedroom</div>
@@ -709,6 +763,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <div class="so" onclick="togScope(this)"><div class="ck"></div>Entire Unit</div>
             </div>
           </div>
+          </div><!-- /scopegrid_wrap -->
           <div class="fg" style="margin-top:18px;"><label>Notes / Special Instructions</label><textarea id="cnotes" placeholder="Describe damage, access instructions, or anything the crew should know..."></textarea></div>
         </div>
         <div class="fc">
@@ -5299,6 +5354,42 @@ function saveConf() {
 }
 
 // ── FORM HELPERS ──
+function openOccupiedForm() {
+  // Pre-fill property and unit from current form state
+  var propSel = document.getElementById('cpropsel');
+  var propName = propSel ? propSel.options[propSel.selectedIndex] && propSel.options[propSel.selectedIndex].text : '';
+  var unitVal  = (document.getElementById('cunitinput')||{value:''}).value;
+  var svcSel   = document.getElementById('csvc');
+  var svcName  = svcSel ? svcSel.value : '';
+  var pEl = document.getElementById('occf_prop');
+  var uEl = document.getElementById('occf_unit');
+  var sEl = document.getElementById('occf_svc');
+  if (pEl) pEl.textContent = propName || '';
+  if (uEl) uEl.textContent = unitVal  || '';
+  if (sEl) sEl.textContent = svcName  || '';
+  // Show modal
+  var m = document.getElementById('mocc');
+  if (m) { m.style.display = 'flex'; setTimeout(function(){ m.classList.add('op'); }, 10); }
+}
+
+function printOccupiedForm() {
+  var body = document.getElementById('occform_body');
+  if (!body) return;
+  var w = window.open('', '_blank', 'width=700,height=900');
+  w.document.write('<html><head><title>Occupied Unit Authorization Form</title>');
+  w.document.write('<style>body{font-family:Georgia,serif;padding:40px;max-width:640px;margin:0 auto;color:#1c1c2e;}');
+  w.document.write('*{box-sizing:border-box;} @media print{button{display:none!important;}}</style></head><body>');
+  w.document.write(body.innerHTML);
+  w.document.write('<br><br><button onclick="window.print()" style="padding:10px 24px;background:#020a5b;color:#fff;border:none;cursor:pointer;font-size:14px;border-radius:3px;">&#128424; Print</button>');
+  w.document.write('</body></html>');
+  w.document.close();
+}
+
+function onSvcChange(val) {
+  var wrap = document.getElementById('scopegrid_wrap');
+  if (wrap) wrap.style.display = val ? 'block' : 'none';
+}
+
 function selRadio(el,group) {
   el.closest('.rg').querySelectorAll('.ro').forEach(function(o){o.classList.remove('on');});
   el.classList.add('on');
