@@ -755,7 +755,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               </div>
               <div class="cal-head-right">
                 <button class="cal-nav" onclick="calNav(-1,'cl_cal')" title="Prev month">&#8592;</button>
-                <button class="cal-today-btn" onclick="calGoToday('cl_cal')">Today</button>
+                <button class="cal-today-btn" onclick="calGoToday('cl_cal')">February</button>
                 <button class="cal-nav" onclick="calNav(1,'cl_cal')"  title="Next month">&#8594;</button>
               </div>
             </div>
@@ -1182,7 +1182,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               </div>
               <div class="cal-head-right">
                 <button class="cal-nav" onclick="calNav(-1,'adash_cal')" title="Prev month">&#8592;</button>
-                <button class="cal-today-btn" onclick="calGoToday('adash_cal')">Today</button>
+                <button class="cal-today-btn" onclick="calGoToday('adash_cal')">February</button>
                 <button class="cal-nav" onclick="calNav(1,'adash_cal')"  title="Next month">&#8594;</button>
               </div>
             </div>
@@ -8882,6 +8882,12 @@ function renderCal(prefix) {
   var yEl = document.getElementById(prefix+'_year');
   if (mEl) mEl.textContent = MONTHS[month];
   if (yEl) yEl.textContent = String(year);
+  // Update "Today" button to show current month name
+  var todayBtn = document.querySelector('[onclick*="calGoToday(\''+prefix+'\')"]');
+  if (todayBtn) {
+    var now = new Date();
+    todayBtn.textContent = MONTHS[now.getMonth()];
+  }
   // Legacy title fallback
   var titleEl = document.getElementById(prefix+'_title');
   if (titleEl) titleEl.textContent = MONTHS[month]+' '+year;
