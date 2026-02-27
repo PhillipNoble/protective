@@ -1641,6 +1641,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
         <button class="bs gn" style="font-size:11px;padding:4px 10px;" onclick="printWorkOrder()">&#128424; Print / Save PDF</button>
         <button class="bs ol" id="phbtn" style="font-size:11px;padding:4px 10px;" onclick="togPhotos()">Include Photos</button>
+        <button class="bs nv" id="pobtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openWoPoBar()">&#128203; Add / Edit PO #</button>
         <button class="bs gd" id="confirmbtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openConfirm(this.dataset.woid)">&#10003; Confirm</button>
         <button class="bs gn" id="completebtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="quickComplete(this.dataset.woid)">&#10003; Complete</button>
         <button class="bs nv" id="editwobtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openWoEdit(this.dataset.woid)">&#9998; Edit Order</button>
@@ -1650,7 +1651,19 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <button class="mx" onclick="closeM('mwo')">&#10005;</button>
       </div>
     </div>
-    <div class="mbody" style="padding:0;"><div class="wopp parea" id="woprint"></div></div>
+    <div class="mbody" style="padding:0;">
+      <!-- PO inline editor (client-only) -->
+      <div id="wo_po_bar" style="display:none;padding:10px 18px;background:#fffbeb;border-bottom:1px solid #fde68a;display:none;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:12px;font-weight:600;color:#78350f;">&#128203; Purchase Order #</span>
+        <input type="text" id="wo_po_input" placeholder="e.g. PO-2026-0042" maxlength="60"
+          style="flex:1;min-width:160px;max-width:300px;font-size:13px;padding:5px 10px;border:1px solid #fde68a;border-radius:var(--r);background:#fff;outline:none;"
+          onkeydown="if(event.key==='Enter')saveWoPo();">
+        <button class="bs gd" style="font-size:11px;padding:4px 12px;" onclick="saveWoPo()">&#10003; Save PO</button>
+        <button class="bs ol" style="font-size:11px;padding:4px 10px;" onclick="closeWoPoBar()">Cancel</button>
+        <span id="wo_po_saved_msg" style="font-size:11px;color:#15803d;display:none;">&#10003; Saved!</span>
+      </div>
+      <div class="wopp parea" id="woprint"></div>
+    </div>
     <!-- Internal Notes Thread (admin only) -->
     <div id="wo_notes_section" style="display:none;border-top:1px solid var(--border);padding:16px 24px;background:var(--cream);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -6380,6 +6393,12 @@ function oworder(id) {
     '<div class="wofoot"><span>Protective Services Company, Inc. dba Protective Flooring</span><span>#'+o.num+' -- '+today+'</span><span>"We Stand on Our Word"</span></div>';
   _currentWoId = id;
   var isAdminView = !!(window.currentTeamUser);
+  // PO button: show for clients (non-admin), label changes if PO already set
+  var poBtn = document.getElementById('pobtn');
+  if (poBtn) {
+    poBtn.style.display = isAdminView ? 'none' : 'inline-flex';
+    poBtn.textContent   = o.po ? '\u00A0\u{1F4CB} Edit PO #' : '\u{1F4CB} Add PO #';
+  }
   // Stamp each button with the current WO id so onclick doesn't rely on the global
   ['editwobtn','logbtn','voidbtn'].forEach(function(btnId){
     var btn = document.getElementById(btnId);
@@ -6418,6 +6437,46 @@ function oworder(id) {
   if (logBtn)  logBtn.style.display   = (isAdminView && o.log && o.log.length) ? 'inline-flex' : 'none';
   openM('mwo');
 }
+function openWoPoBar() {
+  var bar   = document.getElementById('wo_po_bar');
+  var input = document.getElementById('wo_po_input');
+  var msg   = document.getElementById('wo_po_saved_msg');
+  if (!bar || !input) return;
+  var o = _currentWoId ? orders[_currentWoId] : null;
+  input.value = o && o.po ? o.po : '';
+  if (msg) msg.style.display = 'none';
+  bar.style.display = 'flex';
+  setTimeout(function(){ input.focus(); input.select(); }, 60);
+}
+
+function closeWoPoBar() {
+  var bar = document.getElementById('wo_po_bar');
+  if (bar) bar.style.display = 'none';
+}
+
+function saveWoPo() {
+  if (!_currentWoId) return;
+  var input = document.getElementById('wo_po_input');
+  var msg   = document.getElementById('wo_po_saved_msg');
+  if (!input) return;
+  var val = input.value.trim();
+  orders[_currentWoId].po = val;
+  saveOrders();
+  // Re-render the preview in place
+  oworder(_currentWoId);
+  // Re-open the bar so user sees the updated state
+  var bar = document.getElementById('wo_po_bar');
+  if (bar) {
+    bar.style.display = 'flex';
+    var inp2 = document.getElementById('wo_po_input');
+    if (inp2) inp2.value = val;
+  }
+  if (msg) { msg.style.display = 'inline'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
+  var poBtn = document.getElementById('pobtn');
+  if (poBtn) poBtn.textContent = val ? '\u00A0\u{1F4CB} Edit PO #' : '\u{1F4CB} Add PO #';
+  toast(val ? 'PO # saved: ' + val : 'PO # removed.');
+}
+
 function togPhotos() {
   photosOn = !photosOn;
   var s = document.querySelector('.wophsec');
