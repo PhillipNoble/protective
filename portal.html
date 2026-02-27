@@ -6075,25 +6075,32 @@ function switchClientDashTab(tab) {
 function logClientActivity(action, data) { /* no-op in demo mode */ }
 
 function cnav(pid, el) {
-  if (pid === 'cx') { setTimeout(renderClientDocuments, 50); logClientActivity('view_document',{}); }
-  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); logClientActivity('settings_view',{}); }
+  // ── 1. Update nav highlight ──────────────────────────────────────────────
+  document.querySelectorAll('#cl .ni').forEach(function(n){ n.classList.remove('on'); });
+  if (el) el.classList.add('on');
+
+  // ── 2. Show the target panel ─────────────────────────────────────────────
+  document.querySelectorAll('#cl .panel').forEach(function(pnl){ pnl.classList.remove('on'); });
+  var t = document.getElementById(pid);
+  if (t) t.classList.add('on');
+
+  // ── 3. Update topbar title ───────────────────────────────────────────────
+  var titles = {cd:'Dashboard',co:'Place Order Request',ch:'Order History',cf:'Floor Plans',cx:'Documents',cs:'Account Settings'};
+  var titleEl = document.getElementById('ctitle');
+  if (titleEl) titleEl.textContent = titles[pid] || pid;
+
+  // ── 4. Run panel-specific logic AFTER panel is visible ───────────────────
   if (pid === 'co') {
-    // Default install date to tomorrow if blank
     var dateEl = document.getElementById('cinstdate');
     if (dateEl && !dateEl.value) {
       var tmr = new Date(); tmr.setDate(tmr.getDate()+1);
       dateEl.value = tmr.getFullYear()+'-'+String(tmr.getMonth()+1).padStart(2,'0')+'-'+String(tmr.getDate()).padStart(2,'0');
     }
   }
-  if (pid==='cd') renderClientDash();
-  if (pid==='ch') renderClientHistory();
-  document.querySelectorAll('#cl .ni').forEach(function(n){ n.classList.remove('on'); });
-  if (el) el.classList.add('on');
-  document.querySelectorAll('#cl .panel').forEach(function(p){ p.classList.remove('on'); });
-  var t = document.getElementById(pid);
-  if (t) t.classList.add('on');
-  var titles = {cd:'Dashboard',co:'Place Order Request',ch:'Order History',cf:'Floor Plans',cx:'Documents',cs:'Account Settings'};
-  document.getElementById('ctitle').textContent = titles[pid] || pid;
+  if (pid === 'cd') { try { renderClientDash(); } catch(e){} }
+  if (pid === 'ch') { try { renderClientHistory(); } catch(e){} }
+  if (pid === 'cx') { try { renderClientDocuments(); } catch(e){} logClientActivity('view_document',{}); }
+  if (pid === 'cs') { try { renderClientSettings(); } catch(e){} try { renderClientNotifPrefs(); } catch(e){} logClientActivity('settings_view',{}); }
 }
 function anav(pid, el) {
   if (pid==='adash') { renderAdashRecent(); renderAdashStats(); }
