@@ -642,8 +642,8 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
     <h1>Welcome Back</h1>
     <p class="sub">Sign in to your Protective Flooring portal</p>
     <div id="lerr" class="lerr">Incorrect email or password. Please try again.</div>
-    <div class="fg"><label>Email Address</label><input type="email" id="lemail" placeholder="you@example.com" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('lpw').focus();"></div>
-    <div class="fg"><label>Password</label><input type="password" id="lpw" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin();"></div>
+    <div class="fg"><label>Email Address</label><input type="email" id="lemail" placeholder="you@example.com" autocomplete="username" value="manager@cherrycreek.com" onkeydown="if(event.key==='Enter')document.getElementById('lpw').focus();"></div>
+    <div class="fg"><label>Password</label><input type="password" id="lpw" placeholder="Password" autocomplete="current-password" value="Cherry2025!" onkeydown="if(event.key==='Enter')doLogin();"></div>
     <button class="btn-pri" onclick="doLogin()" style="margin-top:6px;">Sign In</button>
     <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray);">Need access? <a href="#" style="color:var(--gold);font-weight:600;" onclick="toast('Contact info+@+protectiveflooring.com to request an account.')">Contact us</a></div>
     <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--gray);"><a href="#" style="color:var(--gray);text-decoration:underline;" onclick="resetPortalData();return false;">Reset portal data</a> &mdash; clears saved changes and restores defaults</div>
@@ -2513,7 +2513,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         </label>
         <div id="terms_err" style="display:none;color:#b91c1c;font-size:12px;margin-bottom:10px;">&#9888; Please check the box above to confirm you have read and accepted the Terms of Use.</div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <button id="terms_next_btn" class="bl gd" style="min-width:180px;" disabled onclick="termsGoToSms()">Next: Text Notifications &#8594;</button>
+          <button id="terms_next_btn" class="bl gd" style="min-width:180px;" disabled onclick="termsGoToSms()">Next &#8594;</button>
           <button class="bl ol" onclick="declineTerms()">Decline &amp; Sign Out</button>
         </div>
       </div>
