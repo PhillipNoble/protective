@@ -860,7 +860,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <h3>&#128197; Scheduling</h3>
           <div class="form-row">
             <div class="fg"><label>Requested Install Date *</label><input type="date" id="cinstdate"></div>
-            <div class="fg"><label>Preferred Time Window</label><select><option>No Preference</option><option>Morning (7 AM - 12 PM)</option><option>Afternoon (12 PM - 5 PM)</option></select></div>
+            <div class="fg"><label>Preferred Time Window</label><select id="ctimewindow"><option value="">No Preference</option><option>Morning (7 AM - 12 PM)</option><option>Afternoon (12 PM - 5 PM)</option></select></div>
           </div>
         </div>
         <div class="fc">
@@ -1134,10 +1134,12 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <option value="">All Hubs</option>
             </select>
             <div style="display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
-              <button id="tab_recent"   class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
-              <button id="tab_today"    class="tab-toggle"    onclick="switchDashTab('today')">Today's Installs</button>
-              <button id="tab_calendar" class="tab-toggle"    onclick="switchDashTab('calendar')">&#128197; Calendar</button>
-              <button id="tab_aging"    class="tab-toggle"    onclick="switchDashTab('aging')">&#9888; Aging</button>
+              <button id="tab_recent"    class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
+              <button id="tab_yesterday" class="tab-toggle"    onclick="switchDashTab('yesterday')">Yesterday</button>
+              <button id="tab_today"     class="tab-toggle"    onclick="switchDashTab('today')">Today</button>
+              <button id="tab_tomorrow"  class="tab-toggle"    onclick="switchDashTab('tomorrow')">Tomorrow</button>
+              <button id="tab_calendar"  class="tab-toggle"    onclick="switchDashTab('calendar')">&#128197; Calendar</button>
+              <button id="tab_aging"     class="tab-toggle"    onclick="switchDashTab('aging')">&#9888; Aging</button>
             </div>
             <button class="bs gd" style="white-space:nowrap;" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*=&quot;co&quot;]'));},150);">&#128221; New Order</button>
           </div>
@@ -1149,6 +1151,14 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="tw" style="margin-bottom:28px;display:none;" id="adash_today_wrap"><table id="adash_today_tbl">
           <thead><tr><th class="sortable" onclick="sortTable('adash_today_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_today_tbl',1,'str')">Property / Hub</th><th class="sortable" onclick="sortTable('adash_today_tbl',2,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_today_tbl',3,'str')">Service</th><th class="sortable" onclick="sortTable('adash_today_tbl',4,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_today_tbl',5,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_today_tbl',6,'str')">Status</th><th>Action</th></tr></thead>
           <tbody id="adash_today_tbody"></tbody>
+        </table></div>
+        <div class="tw" style="margin-bottom:28px;display:none;" id="adash_yesterday_wrap"><table id="adash_yesterday_tbl">
+          <thead><tr><th class="sortable" onclick="sortTable('adash_yesterday_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_yesterday_tbl',1,'str')">Property / Hub</th><th class="sortable" onclick="sortTable('adash_yesterday_tbl',2,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_yesterday_tbl',3,'str')">Service</th><th class="sortable" onclick="sortTable('adash_yesterday_tbl',4,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_yesterday_tbl',5,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_yesterday_tbl',6,'str')">Status</th><th>Action</th></tr></thead>
+          <tbody id="adash_yesterday_tbody"></tbody>
+        </table></div>
+        <div class="tw" style="margin-bottom:28px;display:none;" id="adash_tomorrow_wrap"><table id="adash_tomorrow_tbl">
+          <thead><tr><th class="sortable" onclick="sortTable('adash_tomorrow_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_tomorrow_tbl',1,'str')">Property / Hub</th><th class="sortable" onclick="sortTable('adash_tomorrow_tbl',2,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_tomorrow_tbl',3,'str')">Service</th><th class="sortable" onclick="sortTable('adash_tomorrow_tbl',4,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_tomorrow_tbl',5,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_tomorrow_tbl',6,'str')">Status</th><th>Action</th></tr></thead>
+          <tbody id="adash_tomorrow_tbody"></tbody>
         </table></div>
         <!-- Admin Calendar view -->
         <div id="adash_calendar_wrap" style="display:none;margin-bottom:20px;">
@@ -1628,7 +1638,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <button class="bs gn" onclick="printWorkOrder()">&#128424; Print / Save PDF</button>
         <button class="bs ol" id="phbtn" onclick="togPhotos()">Include Photos</button>
         <button class="bs gd" id="confirmbtn" onclick="openConfirm(this.dataset.woid)" style="display:none;">&#10003; Confirm</button>
-        <button class="bs gn" id="completebtn" onclick="markOrderComplete(this.dataset.woid)" style="display:none;">&#10003; Complete</button>
+        <button class="bs gn" id="completebtn" onclick="quickComplete(this.dataset.woid)" style="display:none;">&#10003; Complete</button>
         <button class="bs nv" id="editwobtn" onclick="openWoEdit(this.dataset.woid)" style="display:none;">&#9998; Edit Order</button>
         <button class="bs ol" id="logbtn" onclick="exportWoLog(this.dataset.woid)" style="display:none;">&#128220; Export Log</button>
         <button class="bs nv" id="copybtn" onclick="openCopyOrder(this.dataset.woid)" style="display:none;font-size:11px;">&#128203; Duplicate</button>
@@ -4943,8 +4953,8 @@ function renderAdminOrders() {
     var view     = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
     var conf     = o.status==='requested'
       ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button>' : '';
-    var complete = o.status==='scheduled'
-      ? ' <button class="bs gn" onclick="event.stopPropagation();markOrderComplete(\''+id+'\')">&#10003; Complete</button>' : '';
+    var complete = (o.status==='scheduled' || o.status==='requested')
+      ? ' <button class="bs gn" onclick="event.stopPropagation();quickComplete(\''+id+'\')">&#10003; Complete</button>' : '';
     var vd = (o.status==='completed'||o.status==='requested'||o.status==='scheduled')
       ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
     rows += '<tr onclick="oworder(\''+id+'\')">'+
@@ -5080,8 +5090,8 @@ function dashStatClick(type) {
 
 function switchDashTab(tab) {
   _dashTab = tab;
-  var allTabs = ['recent','today','calendar','aging'];
-  var titles  = {recent:'New Orders — Action Required', today:"Today's Installs", calendar:'Installation Calendar', aging:'Aging Orders — Action Required'};
+  var allTabs = ['recent','yesterday','today','tomorrow','calendar','aging'];
+  var titles  = {recent:'New Orders — Action Required', yesterday:"Yesterday's Installs", today:"Today's Installs", tomorrow:"Tomorrow's Installs", calendar:'Installation Calendar', aging:'Aging Orders — Action Required'};
   allTabs.forEach(function(t) {
     var btn  = document.getElementById('tab_'+t);
     var wrap = document.getElementById('adash_'+t+'_wrap');
@@ -5090,9 +5100,11 @@ function switchDashTab(tab) {
   });
   var titleEl = document.getElementById('adash_table_title');
   if (titleEl) titleEl.textContent = titles[tab] || '';
-  if (tab === 'today')    renderAdashToday();
-  else if (tab === 'recent') renderAdashRecent();
-  else if (tab === 'aging')  renderAdashAging();
+  if (tab === 'today')     renderAdashToday();
+  else if (tab === 'yesterday') renderAdashYesterday();
+  else if (tab === 'tomorrow')  renderAdashTomorrow();
+  else if (tab === 'recent')    renderAdashRecent();
+  else if (tab === 'aging') { /* aging wrap is self-rendering */ }
   else if (tab === 'calendar') {
     if (!_calState['adash_cal']) initCal('adash_cal');
     else renderCal('adash_cal');
@@ -5182,6 +5194,28 @@ function markOrderComplete(id) {
   // Store pending photos array
   window._compPhotos = [];
   openM('mcompphoto');
+}
+
+function quickComplete(id) {
+  // Directly complete without prompting for photos or reason
+  var o = orders[id]; if (!o) return;
+  if (o.status === 'completed' || o.status === 'vd') return;
+  var prevStatus = o.status;
+  o.status = 'completed';
+  o.completedDate = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  if (!o.log) o.log = [];
+  o.log.push({
+    ts: cstNow(),
+    by: (window.currentTeamUser && window.currentTeamUser.name) || 'Admin',
+    reason: 'Completed',
+    changes: [{field:'Status', from: prevStatus.charAt(0).toUpperCase()+prevStatus.slice(1), to:'Completed'}]
+  });
+  saveOrders();
+  refreshAllOrderViews();
+  notifOnCompleted(o);
+  toast('Work order #'+o.num+' marked complete.');
+  var mwo = document.getElementById('mwo');
+  if (mwo && mwo.classList.contains('open')) { oworder(id); }
 }
 function previewCompPhotos(input) {
   var prev = document.getElementById('comp_photo_preview');
@@ -5332,6 +5366,64 @@ function renderAdashToday() {
   });
   tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:24px;">No installs scheduled for today.</td></tr>';
 }
+function renderAdashYesterday() {
+  populateHubSelect('adash_hub', (document.getElementById('adash_hub')||{value:''}).value, 'All Hubs');
+  var tbody = document.getElementById('adash_yesterday_tbody');
+  if (!tbody) return;
+  var adashHub = (document.getElementById('adash_hub')||{value:''}).value;
+  var d = new Date(); d.setDate(d.getDate() - 1);
+  var yest = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var html = '';
+  Object.keys(orders).forEach(function(id) {
+    var o = orders[id];
+    if (o.status === 'vd') return;
+    if (adashHub && (o.hub||'') !== adashHub) return;
+    var effDate = resolveOrderDate(o);
+    if (effDate !== yest) return;
+    var hub = hubBadgeHtml(o.hub);
+    html += '<tr onclick="oworder(\''+id+'\')">'+
+      '<td><strong>#'+o.num+'</strong></td>'+
+      '<td>'+o.property+'<br>'+hub+'</td>'+
+      '<td>'+o.unit+'</td>'+
+      '<td>'+svcDisplay(o)+'</td>'+
+      '<td>'+fmtDate(o.reqDate)+'</td>'+
+      '<td>'+fmtDate(o.confDate)+'</td>'+
+      '<td>'+statusBadge(o.status)+'</td>'+
+      '<td>'+orderActionBtns(id,o)+'</td>'+
+      '</tr>';
+  });
+  tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px;">No installs scheduled for yesterday.</td></tr>';
+}
+
+function renderAdashTomorrow() {
+  populateHubSelect('adash_hub', (document.getElementById('adash_hub')||{value:''}).value, 'All Hubs');
+  var tbody = document.getElementById('adash_tomorrow_tbody');
+  if (!tbody) return;
+  var adashHub = (document.getElementById('adash_hub')||{value:''}).value;
+  var d = new Date(); d.setDate(d.getDate() + 1);
+  var tmrw = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var html = '';
+  Object.keys(orders).forEach(function(id) {
+    var o = orders[id];
+    if (o.status === 'vd') return;
+    if (adashHub && (o.hub||'') !== adashHub) return;
+    var effDate = resolveOrderDate(o);
+    if (effDate !== tmrw) return;
+    var hub = hubBadgeHtml(o.hub);
+    html += '<tr onclick="oworder(\''+id+'\')">'+
+      '<td><strong>#'+o.num+'</strong></td>'+
+      '<td>'+o.property+'<br>'+hub+'</td>'+
+      '<td>'+o.unit+'</td>'+
+      '<td>'+svcDisplay(o)+'</td>'+
+      '<td>'+fmtDate(o.reqDate)+'</td>'+
+      '<td>'+fmtDate(o.confDate)+'</td>'+
+      '<td>'+statusBadge(o.status)+'</td>'+
+      '<td>'+orderActionBtns(id,o)+'</td>'+
+      '</tr>';
+  });
+  tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px;">No installs scheduled for tomorrow.</td></tr>';
+}
+
 
 function renderClientDash() {
   var tbody = document.getElementById('cd_tbody');
@@ -6155,7 +6247,7 @@ function oworder(id) {
               '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Unit '+_unit+'</div>'+
               '<div style="font-size:12px;color:var(--gray);margin-bottom:4px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Floor Plan</span><br>'+_plan+'</div>'+
               '<div style="margin-top:6px;"><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid '+_occColor+';color:'+_occColor+';">'+_occ+'</span></div>'+
-              (o.timeWindow && o.timeWindow !== 'To be confirmed' && o.timeWindow !== 'TBD' ? '<div style="margin-top:10px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Preferred Time</span>'+
+              (o.timeWindow && o.timeWindow !== 'To be confirmed' && o.timeWindow !== 'TBD' && o.timeWindow !== 'No Preference' && o.timeWindow !== 'No preference' ? '<div style="margin-top:10px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Preferred Time</span>'+
               '<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px;">'+o.timeWindow+'</div></div>' : '')+
             '</div>'+
           '</div>'+
@@ -6195,7 +6287,7 @@ function oworder(id) {
   var completeBtn = document.getElementById('completebtn');
   if (confirmBtn)  confirmBtn.style.display  = (isAdminView && o.status === 'requested') ? 'inline-flex' : 'none';
   if (confirmBtn)  confirmBtn.dataset.woid    = id;
-  if (completeBtn) completeBtn.style.display  = (isAdminView && o.status === 'scheduled') ? 'inline-flex' : 'none';
+  if (completeBtn) completeBtn.style.display  = (isAdminView && (o.status === 'requested' || o.status === 'scheduled')) ? 'inline-flex' : 'none';
   if (completeBtn) completeBtn.dataset.woid   = id;
   if (voidBtn) voidBtn.style.display = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
   if (editBtn) {
@@ -6730,7 +6822,7 @@ function submitOrder() {
     email:         (currentUser && currentUser.email) || '',
     po:            poVal || '',
     notes:         notesVal || 'No additional notes.',
-    timeWindow:    'To be confirmed',
+    timeWindow:    (document.getElementById('ctimewindow')||{value:''}).value || '',
     photos:        false
   };
 
@@ -8626,12 +8718,13 @@ function renderCal(prefix) {
   if (!gridEl) return;
   if (dowEl) dowEl.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
     .map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
-  // Build orders map for this month keyed by ISO date
+  // Build orders map for this month keyed by ISO date (YYYY-MM-DD)
   var byDate = {};
   Object.keys(orders||{}).forEach(function(id) {
     var o = orders[id];
     if (!o || o.status==='vd') return;
-    var d = (o.confDate && o.confDate!=='Pending') ? o.confDate : o.reqDate;
+    // Always normalise to ISO so the key matches the grid cell lookup
+    var d = resolveOrderDate(o);
     if (!d) return;
     if (prefix==='cl_cal' && currentUser) {
       var props = currentUser.props||[];
