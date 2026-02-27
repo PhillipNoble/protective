@@ -1283,7 +1283,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </div></div>
         <div class="fb" style="margin-bottom:16px;">
           <div class="sw" style="max-width:400px;"><span class="si2">&#128269;</span><input type="text" id="psearch" placeholder="Search by name, city, or zip..." oninput="filterProps()"></div>
-          <select class="fs" id="pstatus" onchange="filterProps()"><option value="">All Statuses</option><option value="active" selected>Active</option><option value="inactive">Inactive</option></select>
+          <select class="fs" id="pstatus" onchange="filterProps()"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
         </div>
         <div class="tabs" id="hub_tabs"></div>
         <div id="proplist"></div>
@@ -1305,7 +1305,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </select>
           <select class="fs" id="ucl_status" onchange="renderUserTable()">
             <option value="">All Statuses</option>
-            <option value="active" selected>Active</option>
+            <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
           <select class="fs" id="ucl_sort" onchange="renderUserTable()">
@@ -4937,6 +4937,7 @@ function renderAdminOrders() {
     var voidNote = o.status==='vd'
       ? '<div style="font-size:11px;color:#7f1d1d;margin-top:2px;">'+(o.voidReason||'')+'</div>' : '';
     var effDate = resolveOrderDate(o);
+    var isChecked = !!(_bulkSelected && _bulkSelected[id]);
     var view     = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
     var conf     = o.status==='requested'
       ? ' <button class="bs gd" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button>' : '';
@@ -6894,7 +6895,7 @@ function renderTeamTable() {
       + '<td style="color:var(--gray);font-size:12px;">' + (u.lastLogin||'Never') + '</td>'
       + '<td>' + sbadge + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + (u.created||'--') + '</td>'
-      + '<td>' + actions + '</td></tr>';
+      + '<td style="white-space:nowrap;">' + '<button class="bs ol" onclick="openEditUser(\'' + u.id + '\')">Edit</button>' + '</td>' + '<td><button class="bs ol" onclick="openClientActivity(\'' + u.id + '\')">Log</button></td>' + '</tr>';
   }).join('');
 }
 
@@ -7262,7 +7263,7 @@ function renderUserTable() {
       + '</td>'
       + '<td>' + sbadge + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + (u.created||'--') + '</td>'
-      + '<td>' + actions + '</td></tr>';
+      + '<td>' + ('<button class="bs ol" onclick="openEditUser(\'' + u.id + '\')">Edit</button> <button class="bs ol" onclick="openClientActivity(\'' + u.id + '\')">Log</button>') + '</td></tr>';
   }).join('');
 }
 
