@@ -1255,9 +1255,26 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             The <strong>Company Email</strong> below receives all internal notifications.
           </p>
 
-          <div class="fg" style="max-width:420px;margin-bottom:20px;">
-            <label>Company Notification Email</label>
-            <input type="email" id="set_notif_email" value="info@protectiveflooring.com" placeholder="info@protectiveflooring.com">
+          <div style="margin-bottom:20px;">
+            <div class="fg" style="max-width:420px;margin-bottom:10px;">
+              <label>Primary Company Notification Email</label>
+              <input type="email" id="set_notif_email" value="info@protectiveflooring.com" placeholder="info@protectiveflooring.com">
+            </div>
+            <div style="max-width:560px;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--navy);margin-bottom:8px;">
+                Additional Company Emails
+                <span style="font-size:10px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;margin-left:6px;">All listed emails receive company notifications</span>
+              </div>
+              <div id="extra_emails_list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+              <div style="display:flex;gap:8px;align-items:flex-end;">
+                <div class="fg" style="flex:1;margin-bottom:0;">
+                  <label>Add Email Address</label>
+                  <input type="email" id="extra_email_input" placeholder="name@company.com" onkeydown="if(event.key==='Enter'){addExtraEmail();event.preventDefault();}">
+                </div>
+                <button class="bs gd" style="margin-bottom:0;" onclick="addExtraEmail()">+ Add</button>
+              </div>
+              <div id="extra_email_err" style="display:none;color:#b91c1c;font-size:12px;margin-top:4px;"></div>
+            </div>
           </div>
 
           <div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:8px;">
@@ -1946,6 +1963,30 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <label class="perm-row"><input type="checkbox" id="te_p_settings"> <span class="perm-row-label">Portal Settings</span><span class="perm-row-desc">Scopes, markets, service types, branding</span></label>
         </div>
       </div>
+      <!-- SMS Notifications section -->
+      <div class="ms" style="margin-bottom:0;margin-top:14px;">
+        <div class="mst">&#128241; Text Message Notifications</div>
+        <div class="form-row" style="align-items:flex-end;gap:12px;margin-bottom:10px;">
+          <div class="fg" style="margin-bottom:0;flex:1;">
+            <label>Mobile Phone Number <span style="font-size:10px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">Optional</span></label>
+            <input type="tel" id="te_sms_phone" placeholder="(555) 000-0000" oninput="fmtPhoneInput(this)" autocomplete="tel">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding-bottom:2px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text);">
+              <input type="checkbox" id="te_sms_optin" style="width:15px;height:15px;accent-color:var(--navy);">
+              SMS Opted In
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:#b91c1c;">
+              <input type="checkbox" id="te_sms_stopped" style="width:15px;height:15px;accent-color:#b91c1c;" onchange="handleStopToggle('te')">
+              User replied STOP
+            </label>
+          </div>
+        </div>
+        <div id="te_sms_stopped_notice" style="display:none;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:4px;font-size:12px;color:#b91c1c;">
+          &#9888; This user has opted out via STOP reply. SMS notifications are disabled. To re-enable, uncheck "User replied STOP" and ensure they have re-consented.
+        </div>
+        <div id="te_sms_status_display" style="margin-top:8px;font-size:11px;color:var(--gray);"></div>
+      </div>
       <div id="te_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:12px;"></div>
     </div>
     <div class="mf">
@@ -1995,6 +2036,30 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         </div>
         <div id="euproplist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:8px;"></div>
         <div id="eu_prop_count" style="font-size:11px;color:var(--gray);margin-top:6px;"></div>
+      </div>
+      <!-- SMS Notifications section -->
+      <div class="ms" style="margin-bottom:16px;">
+        <div class="mst">&#128241; Text Message Notifications</div>
+        <div class="form-row" style="align-items:flex-end;gap:12px;margin-bottom:10px;">
+          <div class="fg" style="margin-bottom:0;flex:1;">
+            <label>Mobile Phone Number <span style="font-size:10px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">Optional</span></label>
+            <input type="tel" id="eu_sms_phone" placeholder="(555) 000-0000" oninput="fmtPhoneInput(this)" autocomplete="tel">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding-bottom:2px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text);">
+              <input type="checkbox" id="eu_sms_optin" style="width:15px;height:15px;accent-color:var(--navy);">
+              SMS Opted In
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:#b91c1c;">
+              <input type="checkbox" id="eu_sms_stopped" style="width:15px;height:15px;accent-color:#b91c1c;" onchange="handleStopToggle('eu')">
+              User replied STOP
+            </label>
+          </div>
+        </div>
+        <div id="eu_sms_stopped_notice" style="display:none;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:4px;font-size:12px;color:#b91c1c;">
+          &#9888; This user has opted out via STOP reply. SMS notifications are disabled. To re-enable, uncheck "User replied STOP" and ensure they have re-consented.
+        </div>
+        <div id="eu_sms_status_display" style="margin-top:8px;font-size:11px;color:var(--gray);"></div>
       </div>
       <div id="eu_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
     </div>
@@ -3696,6 +3761,8 @@ function savePortalSettings() {
   var notifEmail = (document.getElementById('set_notif_email')||{value:''}).value.trim();
   if (notifEmail) try { localStorage.setItem('pf_notif_email', notifEmail); } catch(e){}
   try { localStorage.setItem('pf_notif', JSON.stringify(getNotifSettings())); } catch(e){}
+  // Save extra emails
+  try { localStorage.setItem('pf_notif_extra_emails', JSON.stringify(getExtraEmails())); } catch(e){}
   toast('Settings saved.');
 }
 
@@ -4797,6 +4864,7 @@ function markOrderComplete(id) {
   });
   saveOrders();
   refreshAllOrderViews();
+  notifOnCompleted(o);
   toast('Work order #'+o.num+' marked complete.');
   // Refresh WO detail if open
   var mwo = document.getElementById('mwo');
@@ -5556,7 +5624,7 @@ function anav(pid, el) {
   if (pid==='adash') { renderAdashRecent(); renderAdashStats(); }
   if (pid==='aord')  renderAdminOrders();
   if (pid==='aprops') { renderPropList(); setTimeout(filterProps, 50); }
-  if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); renderMarketSettings(); renderDocManager(); }
+  if (pid==='aset') { renderScopeAdmin(); renderServiceTypes(); renderMarketSettings(); renderDocManager(); renderExtraEmailList(); }
   document.querySelectorAll('#ad .ni').forEach(function(n){ n.classList.remove('on'); });
   if (el) el.classList.add('on');
   document.querySelectorAll('#ad .panel').forEach(function(p){ p.classList.remove('on'); });
@@ -5889,6 +5957,7 @@ function saveConf() {
     var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     var pt=iso.split('-'); return mn[parseInt(pt[1],10)-1]+' '+parseInt(pt[2],10)+', '+pt[0];
   })(confDateStr);
+  notifOnScheduled(o);
   toast('Order #'+o.num+' confirmed for '+dispDate+'.');
 }
 
@@ -6282,6 +6351,7 @@ function submitOrder() {
     photos:        false
   };
 
+  notifOnRequested(orders[woId]);
   toast('\u2713 Order submitted! Your request has been received.');
   document.querySelectorAll('#co .field-err').forEach(function(el){ el.classList.remove('field-err'); });
   var _eb = document.getElementById('co_form_err'); if (_eb) { _eb.style.display='none'; _eb.innerHTML=''; }
@@ -6424,7 +6494,8 @@ function renderTeamTable() {
     var initials = u.initials || (u.name||'?')[0];
     var nameCell = '<div style="display:flex;align-items:center;gap:10px;">'
       + '<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy),#1a2d9a);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + initials + '</div>'
-      + '<div><div style="font-weight:600;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditTeamUser(\''+u.id+'\')" title="Click to edit">' + u.name + '</div></div></div>';
+      + '<div><div style="font-weight:600;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditTeamUser(\''+u.id+'\')" title="Click to edit">' + u.name + '</div>'
+      + (u.smsPhone ? '<div style="font-size:10px;margin-top:2px;">' + smsStatusChip(u) + '</div>' : '') + '</div></div>';
     var actions = '<div style="display:flex;gap:6px;">';
     if (isAdmin) actions += '<button class="bs ol" onclick="openEditTeamUser(\''+u.id+'\')">Edit</button>';
     if (isSA && u.role!=='superadmin') {
@@ -6590,6 +6661,15 @@ function saveEditTeamUser() {
       break;
     }
   }
+  // Save SMS fields
+  var teRaw = (document.getElementById('te_sms_phone').value||'').replace(/\D/g,'');
+  var teOpt = document.getElementById('te_sms_optin').checked;
+  var teStp = document.getElementById('te_sms_stopped').checked;
+  u.smsPhone   = teRaw;
+  u.smsOptIn   = teOpt && !teStp;
+  u.smsStopped = teStp;
+  if (teStp && !u.smsStoppedDate) u.smsStoppedDate = new Date().toLocaleDateString('en-US');
+  if (!teStp && teRaw && teOpt && !u.smsOptInDate) u.smsOptInDate = new Date().toLocaleDateString('en-US');
   saveTeam(team);
   ADMIN_USERS=getTeam();
   closeM('mteamedit');
@@ -6783,7 +6863,8 @@ function renderUserTable() {
         + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;cursor:default;" title="'+daysTitle+'">('+daysLabel+')</div>';
     }
     return '<tr>'
-      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong></td>'
+      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong>'
+      + (u.smsPhone ? '<div style="font-size:10px;margin-top:2px;">' + smsStatusChip(u) + '</div>' : '') + '</td>'
       + '<td style="font-size:12px;color:var(--gray);">' + u.email + '</td>'
       + '<td>' + pwCell(u.id, u.password, 'ucl') + '</td>'
       + '<td style="font-size:12px;">' + props + '</td>'
@@ -6948,6 +7029,15 @@ function saveEditTeamUser() {
       break;
     }
   }
+  // Save SMS fields
+  var teRaw = (document.getElementById('te_sms_phone').value||'').replace(/\D/g,'');
+  var teOpt = document.getElementById('te_sms_optin').checked;
+  var teStp = document.getElementById('te_sms_stopped').checked;
+  u.smsPhone   = teRaw;
+  u.smsOptIn   = teOpt && !teStp;
+  u.smsStopped = teStp;
+  if (teStp && !u.smsStoppedDate) u.smsStoppedDate = new Date().toLocaleDateString('en-US');
+  if (!teStp && teRaw && teOpt && !u.smsOptInDate) u.smsOptInDate = new Date().toLocaleDateString('en-US');
   saveTeam(team);
   ADMIN_USERS=getTeam();
   closeM('mteamedit');
@@ -7141,7 +7231,8 @@ function renderUserTable() {
         + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;cursor:default;" title="'+daysTitle+'">('+daysLabel+')</div>';
     }
     return '<tr>'
-      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong></td>'
+      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong>'
+      + (u.smsPhone ? '<div style="font-size:10px;margin-top:2px;">' + smsStatusChip(u) + '</div>' : '') + '</td>'
       + '<td style="font-size:12px;color:var(--gray);">' + u.email + '</td>'
       + '<td>' + pwCell(u.id, u.password, 'ucl') + '</td>'
       + '<td style="font-size:12px;">' + props + '</td>'
@@ -7286,6 +7377,14 @@ function saveEditUser() {
       break;
     }
   }
+  var euRaw = (document.getElementById('eu_sms_phone').value||'').replace(/\D/g,'');
+  var euOpt = document.getElementById('eu_sms_optin').checked;
+  var euStp = document.getElementById('eu_sms_stopped').checked;
+  u.smsPhone   = euRaw;
+  u.smsOptIn   = euOpt && !euStp;
+  u.smsStopped = euStp;
+  if (euStp && !u.smsStoppedDate) u.smsStoppedDate = new Date().toLocaleDateString('en-US');
+  if (!euStp && euRaw && euOpt && !u.smsOptInDate) u.smsOptInDate = new Date().toLocaleDateString('en-US');
   saveUsers(clients);
   users = getUsers();
   closeM('medit');
@@ -7922,6 +8021,222 @@ function showTermsBanner() {
 }
 // ──────
 // ─────────────────────────────────────────────────────────────────────────────
+// ── SMS status helpers ────────────────────────────────────────────────────────
+function smsStatusChip(u) {
+  if (!u.smsPhone) return '';
+  var fmt = u.smsPhone.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3');
+  if (u.smsStopped) {
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:20px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:10px;font-weight:600;">&#128241; ' + fmt + ' &mdash; STOPPED</span>';
+  }
+  if (u.smsOptIn) {
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:20px;background:#ecfdf5;border:1px solid #6ee7b7;color:#15803d;font-size:10px;font-weight:600;">&#128241; ' + fmt + '</span>';
+  }
+  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:20px;background:var(--cream);border:1px solid var(--border);color:var(--gray);font-size:10px;">&#128241; ' + fmt + ' &mdash; not opted in</span>';
+}
+
+function buildSmsStatusHtml(u) {
+  if (!u.smsPhone) return '';
+  var lines = [];
+  if (u.smsOptIn && !u.smsStopped) {
+    lines.push('<span style="color:#15803d;">&#10003; Opted in' + (u.smsOptInDate ? ' on ' + u.smsOptInDate : '') + '</span>');
+  }
+  if (u.smsStopped) {
+    lines.push('<span style="color:#b91c1c;">&#10007; Opted out via STOP' + (u.smsStoppedDate ? ' on ' + u.smsStoppedDate : '') + '</span>');
+  }
+  return lines.join(' &nbsp;&bull;&nbsp; ');
+}
+
+function handleStopToggle(prefix) {
+  var stopped = document.getElementById(prefix + '_sms_stopped').checked;
+  var notice  = document.getElementById(prefix + '_sms_stopped_notice');
+  var optIn   = document.getElementById(prefix + '_sms_optin');
+  if (notice) notice.style.display = stopped ? 'block' : 'none';
+  if (stopped && optIn) optIn.checked = false;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── NOTIFICATION SYSTEM ───────────────────────────────────────────────────────
+
+// ── Extra company emails ──────────────────────────────────────────────────────
+function getExtraEmails() {
+  try { var s = localStorage.getItem('pf_notif_extra_emails'); return s ? JSON.parse(s) : []; }
+  catch(e) { return []; }
+}
+function saveExtraEmails(arr) {
+  try { localStorage.setItem('pf_notif_extra_emails', JSON.stringify(arr)); } catch(e){}
+}
+function renderExtraEmailList() {
+  var list = document.getElementById('extra_emails_list');
+  if (!list) return;
+  var arr = getExtraEmails();
+  if (!arr.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--gray);padding:6px 0;">No additional emails added.</div>';
+    return;
+  }
+  list.innerHTML = arr.map(function(em, i) {
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--cream);border:1px solid var(--border);border-radius:var(--r);">'
+      + '<span style="font-size:13px;flex:1;color:var(--text);">&#9993;&nbsp; ' + em + '</span>'
+      + '<button class="bs dn" style="font-size:10px;padding:3px 10px;" onclick="removeExtraEmail(' + i + ')">&#10005; Remove</button>'
+      + '</div>';
+  }).join('');
+}
+function addExtraEmail() {
+  var inp = document.getElementById('extra_email_input');
+  var err = document.getElementById('extra_email_err');
+  var val = (inp ? inp.value.trim() : '');
+  if (err) err.style.display = 'none';
+  if (!val || !val.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    if (err) { err.textContent = 'Please enter a valid email address.'; err.style.display = 'block'; }
+    return;
+  }
+  var arr = getExtraEmails();
+  if (arr.indexOf(val) > -1) {
+    if (err) { err.textContent = 'This email is already in the list.'; err.style.display = 'block'; }
+    return;
+  }
+  arr.push(val);
+  saveExtraEmails(arr);
+  if (inp) inp.value = '';
+  renderExtraEmailList();
+}
+function removeExtraEmail(idx) {
+  var arr = getExtraEmails();
+  arr.splice(idx, 1);
+  saveExtraEmails(arr);
+  renderExtraEmailList();
+}
+
+// ── Client notification preferences ──────────────────────────────────────────
+function saveClientNotifPrefs() {
+  if (!currentUser) return;
+  var emailChk = document.getElementById('cs_notif_email');
+  var smsChk   = document.getElementById('cs_notif_sms');
+  var emailOn  = emailChk ? emailChk.checked : true;
+  var smsOn    = smsChk   ? smsChk.checked   : false;
+  // Prevent SMS toggle if stopped or no phone
+  if (smsOn && (!currentUser.smsPhone || currentUser.smsStopped)) {
+    if (smsChk) smsChk.checked = false;
+    smsOn = false;
+  }
+  var clients = getUsers();
+  for (var i = 0; i < clients.length; i++) {
+    if (clients[i].email.toLowerCase() === currentUser.email.toLowerCase()) {
+      clients[i].notifEmail = emailOn;
+      clients[i].notifSms   = smsOn;
+      currentUser.notifEmail = emailOn;
+      currentUser.notifSms   = smsOn;
+      break;
+    }
+  }
+  saveUsers(clients);
+  var saved = document.getElementById('cs_notif_saved');
+  if (saved) { saved.style.display = 'block'; setTimeout(function(){ saved.style.display='none'; }, 2000); }
+}
+function renderClientNotifPrefs() {
+  if (!currentUser) return;
+  var u = currentUser;
+  var emailChk = document.getElementById('cs_notif_email');
+  var smsChk   = document.getElementById('cs_notif_sms');
+  var smsDisp  = document.getElementById('cs_sms_phone_display');
+  var stopNote = document.getElementById('cs_sms_stopped_notice');
+  var smsRow   = document.getElementById('cs_sms_row');
+  if (emailChk) emailChk.checked = (u.notifEmail !== false); // default on
+  var hasSms = !!(u.smsPhone);
+  var fmtPh  = hasSms ? u.smsPhone.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3') : '';
+  if (smsDisp) smsDisp.textContent = hasSms ? fmtPh : 'No mobile number on file — add one in login settings';
+  if (smsChk) {
+    smsChk.checked  = !!(u.notifSms && hasSms && !u.smsStopped);
+    smsChk.disabled = !hasSms || u.smsStopped;
+  }
+  if (stopNote) stopNote.style.display = (hasSms && u.smsStopped) ? 'block' : 'none';
+}
+
+// ── Core notification dispatcher ──────────────────────────────────────────────
+// event: 'requested' | 'scheduled' | 'completed' | 'voided'
+// o: order object
+function sendPortalNotif(event, o) {
+  var notifCfg  = (function(){
+    try { var s=localStorage.getItem('pf_notif'); return s?JSON.parse(s):{}; } catch(e){ return {}; }
+  }());
+  var primaryEmail = (function(){
+    try { return localStorage.getItem('pf_notif_email') || 'info@protectiveflooring.com'; } catch(e){ return 'info@protectiveflooring.com'; }
+  }());
+  var extraEmails = getExtraEmails();
+
+  var sendToClient  = !!notifCfg[event + '_client'];
+  var sendToCompany = !!notifCfg[event + '_company'];
+
+  // ── Build notification record ────────────────────────────────────────────
+  var now = cstNow();
+  var eventLabels = {
+    requested:  'Order Requested',
+    scheduled:  'Order Confirmed & Scheduled',
+    completed:  'Installation Completed',
+    voided:     'Order Voided / Cancelled'
+  };
+  var label = eventLabels[event] || event;
+
+  // ── Resolve all client users associated with this property ───────────────
+  var propertyName = o.property || '';
+  var allClients = getUsers().filter(function(u) {
+    return u.status === 'active' && (u.props || []).indexOf(propertyName) > -1;
+  });
+
+  // ── Log the notification ─────────────────────────────────────────────────
+  if (!o.notifLog) o.notifLog = [];
+  var logEntry = {
+    ts:       now,
+    event:    event,
+    label:    label,
+    targets:  []
+  };
+
+  // ── Client users: email + SMS based on individual prefs ──────────────────
+  if (sendToClient) {
+    allClients.forEach(function(u) {
+      // Email
+      var emailEnabled = (u.notifEmail !== false);
+      if (emailEnabled && u.email) {
+        logEntry.targets.push({type:'email', to: u.email, name: u.name, channel:'client'});
+      }
+      // SMS
+      var smsEnabled = !!(u.notifSms && u.smsPhone && u.smsOptIn && !u.smsStopped);
+      if (smsEnabled) {
+        var fmtPh = u.smsPhone.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3');
+        logEntry.targets.push({type:'sms', to: fmtPh, name: u.name, channel:'client'});
+      }
+    });
+  }
+
+  // ── Company emails: primary + extra list ─────────────────────────────────
+  if (sendToCompany) {
+    if (primaryEmail) logEntry.targets.push({type:'email', to: primaryEmail, name:'Primary', channel:'company'});
+    extraEmails.forEach(function(em) {
+      logEntry.targets.push({type:'email', to: em, name:'Additional', channel:'company'});
+    });
+  }
+
+  o.notifLog.push(logEntry);
+  saveOrders();
+
+  // ── Toast summary ────────────────────────────────────────────────────────
+  var clientCount = logEntry.targets.filter(function(t){ return t.channel==='client'; }).length;
+  var compCount   = logEntry.targets.filter(function(t){ return t.channel==='company'; }).length;
+  var parts = [];
+  if (clientCount) parts.push(clientCount + ' client notification' + (clientCount>1?'s':''));
+  if (compCount)   parts.push(compCount + ' company notification' + (compCount>1?'s':''));
+  if (parts.length) {
+    toast('\u2709 ' + label + ': ' + parts.join(', ') + ' queued. (Backend delivery required)');
+  }
+}
+// ── Hook into order status changes ───────────────────────────────────────────
+// Called after saveOrders in saveConf and markOrderComplete
+function notifOnScheduled(o)  { sendPortalNotif('scheduled', o); }
+function notifOnCompleted(o)  { sendPortalNotif('completed', o); }
+function notifOnRequested(o)  { sendPortalNotif('requested', o); }
+function notifOnVoided(o)     { sendPortalNotif('voided', o); }
+// ─────────────────────────────────────────────────────────────────────────────
+
 </script>
 </body>
 </html>
