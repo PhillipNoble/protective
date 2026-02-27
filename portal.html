@@ -571,6 +571,30 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 }
 #co_form_err ul { margin: 6px 0 0 16px; padding: 0; font-weight: 400; }
 #co_form_err ul li { margin-bottom: 2px; }
+
+/* ── CALENDAR ── */
+.cal-wrap { background:var(--white); border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.cal-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:var(--navy); }
+.cal-header h3 { color:var(--white); font-size:15px; font-weight:600; margin:0; letter-spacing:.3px; }
+.cal-nav { background:rgba(255,255,255,.12); border:none; color:var(--white); width:30px; height:30px; border-radius:4px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+.cal-nav:hover { background:rgba(255,255,255,.25); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); }
+.cal-dow { text-align:center; padding:8px 4px; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--gray); background:var(--cream); border-bottom:1px solid var(--border); }
+.cal-cell { min-height:72px; padding:6px 8px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--white); position:relative; vertical-align:top; box-sizing:border-box; }
+.cal-cell:nth-child(7n) { border-right:none; }
+.cal-other { background:#fafafa; }
+.cal-other .cal-day-num { color:#ccc; }
+.cal-today { background:#fffbeb; }
+.cal-today .cal-day-num { background:var(--navy); color:var(--white); border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.cal-has-orders { background:#f0f4ff; }
+.cal-day-num { font-size:12px; font-weight:600; color:var(--text); margin-bottom:4px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
+.cal-dots { display:flex; flex-wrap:wrap; gap:3px; margin-top:2px; }
+.cal-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.cal-dot-req  { background:#f59e0b; }
+.cal-dot-sch  { background:#3b82f6; }
+.cal-dot-comp { background:#10b981; }
+.cal-extra { font-size:9px; color:var(--gray); font-weight:600; align-self:center; }
+
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
 </script>
@@ -1077,7 +1101,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <tbody id="adash_today_tbody"></tbody>
         </table></div>
         <!-- Admin Calendar view -->
-        <div id="adash_cal_wrap" style="display:none;margin-bottom:20px;">
+        <div id="adash_calendar_wrap" style="display:none;margin-bottom:20px;">
           <div class="cal-wrap">
             <div class="cal-header">
               <button class="cal-nav" onclick="calNav(-1,'adash_cal')">&#8592;</button>
@@ -5876,9 +5900,28 @@ function go(id) {
   var el = document.getElementById(id);
   if (el) el.classList.add('on');
 }
+
+function switchClientDashTab(tab) {
+  var listWrap = document.getElementById('cl_list_wrap');
+  var calWrap  = document.getElementById('cl_cal_wrap');
+  var tabList  = document.getElementById('cdash_tab_list');
+  var tabCal   = document.getElementById('cdash_tab_cal');
+  if (tab === 'cal') {
+    if (listWrap) listWrap.style.display = 'none';
+    if (calWrap)  calWrap.style.display  = '';
+    if (tabList)  tabList.classList.remove('on');
+    if (tabCal)   tabCal.classList.add('on');
+    if (!_calState['cl_cal']) initCal('cl_cal');
+    else renderCal('cl_cal');
+  } else {
+    if (listWrap) listWrap.style.display = '';
+    if (calWrap)  calWrap.style.display  = 'none';
+    if (tabList)  tabList.classList.add('on');
+    if (tabCal)   tabCal.classList.remove('on');
+  }
+}
 function cnav(pid, el) {
   if (pid === 'cx') { setTimeout(renderClientDocuments, 50); logClientActivity('view_document',{}); }
-  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); logClientActivity('settings_view',{}); }
   if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); logClientActivity('settings_view',{}); }
   if (pid === 'co') {
     // Default install date to tomorrow if blank
