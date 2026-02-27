@@ -1771,6 +1771,15 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         </div>
       </div>
 
+      <!-- PROPERTY NOTES SECTION (shown for all properties, printed on work orders) -->
+      <div id="madd_propnotes_section" class="ms" style="margin-top:0;">
+        <div class="mst">&#128203; Property Notes <span style="font-size:12px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">— printed on every work order for this property</span></div>
+        <div class="fg">
+          <textarea id="madd_propnotes" rows="3" placeholder="e.g. Gate code: #1234 • Ring bell twice • Clean up thoroughly after install"></textarea>
+          <div style="font-size:11px;color:var(--gray);margin-top:4px;">Use &bull; to separate multiple notes. These appear in the Property section of the work order.</div>
+        </div>
+      </div>
+
       <div id="madd_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:8px;"></div>
     </div>
     <div class="mf">
@@ -3145,6 +3154,7 @@ function openAddPropModal() {
   document.getElementById('madd_hub').value = 'memphis';
   document.getElementById('madd_status').value = 'active';
   document.getElementById('madd_notes').value = '';
+  document.getElementById('madd_propnotes').value = '';
   document.getElementById('madd_url').value = '';
   document.getElementById('madd_err').style.display = 'none';
   document.getElementById('madd_delbtn').style.display = 'none';
@@ -3172,6 +3182,7 @@ function openEditProp(propId) {
   document.getElementById('madd_hub').value = prop.hub||'memphis';
   document.getElementById('madd_status').value = prop.status||'active';
   document.getElementById('madd_notes').value = prop.notes||'';
+  document.getElementById('madd_propnotes').value = prop.propNotes||'';
   document.getElementById('madd_url').value = prop.web||'';
   document.getElementById('madd_err').style.display = 'none';
   var delbtn = document.getElementById('madd_delbtn');
@@ -3209,6 +3220,7 @@ function saveProperty() {
     units:parseInt(document.getElementById('madd_units').value)||0,
     status:document.getElementById('madd_status').value,
     notes:(document.getElementById('madd_notes').value||'').trim(),
+    propNotes:(document.getElementById('madd_propnotes').value||'').trim(),
     created: isNew ? new Date().toISOString().slice(0,10) : null,
     deletedAt: null
   };
@@ -6199,7 +6211,12 @@ function oworder(id) {
     var sym = t.d==='dn'?'✓':t.d==='ac'?'●':'○';
     return '<div class="tli"><div class="tld '+t.d+'">'+sym+'</div><div class="tlc"><div class="tlt">'+t.t+'</div><div class="tls">'+t.s+'</div></div></div>';
   }).join('');
-  var ph = o.photos ? '<div class="wopg"><div class="wopb">Photo 1</div><div class="wopb">Photo 2</div><div class="wopb">Photo 3</div></div>' : '<div class="wopn">No photos uploaded with this order.</div>';
+  var hasPhotos = !!(o.compPhotos && o.compPhotos.length);
+  var ph = hasPhotos ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">'+o.compPhotos.map(function(cp){
+    return cp.data && cp.data.startsWith('data:image')
+      ? '<img src="'+cp.data+'" style="max-width:180px;max-height:140px;border-radius:4px;border:1px solid var(--border);object-fit:cover;">'
+      : '<div class="wopb">'+cp.name+'</div>';
+  }).join('')+'</div>' : '';
   var nt = o.notes ? '<div class="wonb"><p>'+o.notes+'</p></div>' : '<div class="wonb"><p style="color:var(--gray);font-style:italic;">No additional notes.</p></div>';
   var today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   document.getElementById('woprint').innerHTML =
@@ -6229,8 +6246,9 @@ function oworder(id) {
       (function(){
         var _pr = null;
         getActiveProps().forEach(function(pr){ if(pr.name===o.property) _pr=pr; });
-        var _propAddr = _pr ? [_pr.addr, _pr.city, _pr.state+' '+_pr.zip].filter(Boolean).join(', ') : '';
+        var _propAddr  = _pr ? [_pr.addr, _pr.city, _pr.state+' '+_pr.zip].filter(Boolean).join(', ') : '';
         var _propPhone = _pr ? (_pr.phone||'') : '';
+        var _propNotes = _pr ? (_pr.propNotes||'') : '';
         var _propName  = o.property || '&#8212;';
         var _unit      = o.unit || '&#8212;';
         var _plan      = o.plan || '&#8212;';
@@ -6243,6 +6261,7 @@ function oworder(id) {
               '<div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px;">'+_propName+'</div>'+
               (_propAddr ? '<div style="font-size:12px;color:var(--gray);line-height:1.6;">'+_propAddr+'</div>' : '')+
               (_propPhone ? '<div style="font-size:12px;color:var(--gray);">'+_propPhone+'</div>' : '')+
+              (_propNotes ? '<div style="margin-top:10px;padding:8px 10px;background:#fffbeb;border-left:3px solid var(--gold);border-radius:2px;font-size:12px;color:#78350f;line-height:1.6;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#92400e;display:block;margin-bottom:3px;">Property Notes</span>'+_propNotes+'</div>' : '')+
             '</div>'+
             '<div>'+
               '<div class="wofl" style="margin-bottom:8px;">Service Address</div>'+
@@ -6267,7 +6286,7 @@ function oworder(id) {
           (o.voidNotes ? '<div class="wof"><div class="wofl">Notes</div><div class="wofv">'+o.voidNotes+'</div></div>' : '')+
         '</div></div>' : '')+
       (o.notes && o.notes !== 'No additional notes.' ? '<div class="wosec"><div class="wosect">Notes and Special Instructions</div>'+nt+'</div>' : '')+
-      (o.photos ? '<div class="wosec wophsec"><div class="wosect">Customer Photos</div>'+ph+'</div>' : '')+
+      (hasPhotos ? '<div class="wosec wophsec"><div class="wosect">Completion Photos</div>'+ph+'</div>' : '')+
       '<div class="wosec"><div class="wosect">Submitted By</div><div class="wog">'+
         '<div class="wof"><div class="wofl">Contact Name</div><div class="wofv">'+o.submittedBy+'</div></div>'+
         '<div class="wof"><div class="wofl">Email</div><div class="wofv">'+o.email+'</div></div>'+
