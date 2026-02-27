@@ -2273,7 +2273,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
         <!-- TCPA / data rate notice -->
         <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:11px;color:var(--gray);line-height:1.6;">
-          <strong style="color:var(--text);">Message &amp; Data Rates May Apply.</strong> Message frequency varies based on order activity. Reply <strong>STOP</strong> to opt out at any time &mdash; you will receive one confirmation message and no further texts will be sent. Reply <strong>HELP</strong> for help. For support contact <span style="color:var(--navy);">info@protectiveflooring.com</span>. View our <a href="#" onclick="return false;" style="color:var(--navy);">Privacy Policy</a>.
+          <strong style="color:var(--text);">Message &amp; Data Rates May Apply.</strong> Message frequency varies based on order activity. Reply <strong>STOP</strong> to opt out at any time &mdash; you will receive one confirmation message and no further texts will be sent. Reply <strong>HELP</strong> for help. For support contact <span style="color:var(--navy);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3950575f5679494b564d5c5a4d504f5c5f5556564b50575e175a5654">[email&#160;protected]</a></span>. View our <a href="#" onclick="return false;" style="color:var(--navy);">Privacy Policy</a>.
         </div>
 
       </div>
@@ -2314,7 +2314,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
 // ── DATA VERSION GUARD ───────────────────────────────────────────────────────
 var PORTAL_DATA_VERSION = '2026-02-v1';
@@ -5675,7 +5675,34 @@ function oworder(id) {
           '<span style="font-size:13px;font-weight:600;color:var(--text);">'+(o.po)+'</span></div>' : '')+
       '</div>'+
       '</div>'+
-      '<div style="margin-bottom:18px;">'+
+      (function(){
+        var _pr = null;
+        getActiveProps().forEach(function(pr){ if(pr.name===o.property) _pr=pr; });
+        var _propAddr = _pr ? [_pr.addr, _pr.city, _pr.state+' '+_pr.zip].filter(Boolean).join(', ') : '';
+        var _propPhone = _pr ? (_pr.phone||'') : '';
+        var _propName  = o.property || '&#8212;';
+        var _unit      = o.unit || '&#8212;';
+        var _plan      = o.plan || '&#8212;';
+        var _occ       = o.occ  || '&#8212;';
+        var _occColor  = (_occ==='Occupied') ? '#b45309' : '#15803d';
+        return '<div class="wosec" style="margin-bottom:0;">'+
+          '<div class="wog">'+
+            '<div>'+
+              '<div class="wofl" style="margin-bottom:8px;">Property</div>'+
+              '<div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px;">'+_propName+'</div>'+
+              (_propAddr ? '<div style="font-size:12px;color:var(--gray);line-height:1.6;">'+_propAddr+'</div>' : '')+
+              (_propPhone ? '<div style="font-size:12px;color:var(--gray);">'+_propPhone+'</div>' : '')+
+            '</div>'+
+            '<div>'+
+              '<div class="wofl" style="margin-bottom:8px;">Service Address</div>'+
+              '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Unit '+_unit+'</div>'+
+              '<div style="font-size:12px;color:var(--gray);margin-bottom:4px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Floor Plan</span><br>'+_plan+'</div>'+
+              '<div style="margin-top:6px;"><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid '+_occColor+';color:'+_occColor+';">'+_occ+'</span></div>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+      }())+
+      '<div style="margin-bottom:18px;margin-top:20px;">'+
         '<div class="wof" style="margin-bottom:14px;"><div class="wofl">Scope of Work</div><div style="margin-top:8px;"><div class="woscl">'+sc+'</div></div></div>'+
         '<div class="wof"><div class="wofl">Time Window</div><div class="wofv">'+o.timeWindow+'</div></div>'+
       '</div>'+
@@ -7893,8 +7920,8 @@ function showTermsBanner() {
     }
   }
 }
+// ──────
 // ─────────────────────────────────────────────────────────────────────────────
-
 </script>
 </body>
 </html>
