@@ -1455,7 +1455,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <div style="margin-bottom:20px;">
             <div class="fg" style="max-width:420px;margin-bottom:10px;">
               <label>Primary Company Notification Email</label>
-              <input type="email" id="set_notif_email" value="info"+"@"+"protectiveflooring.com" placeholder="info"+"@"+"protectiveflooring.com">
+              <input type="email" id="set_notif_email" value="info@protectiveflooring.com" placeholder="info@protectiveflooring.com">
             </div>
             <div style="max-width:560px;">
               <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--navy);margin-bottom:8px;">
@@ -1574,7 +1574,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             </div>
             <div class="fg">
               <label>General Email</label>
-              <input type="email" id="set_email" value="info"+"@"+"protectiveflooring.com">
+              <input type="email" id="set_email" value="info@protectiveflooring.com">
             </div>
           </div>
         </div>
@@ -1589,7 +1589,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             </div>
             <div class="fg">
               <label>Support Email (shown to clients)</label>
-              <input type="email" id="set_support_email" value="info"+"@"+"protectiveflooring.com">
+              <input type="email" id="set_support_email" value="info@protectiveflooring.com">
             </div>
           </div>
         </div>
@@ -1979,7 +1979,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="fg"><label>First Name *</label><input type="text" id="mu_first" placeholder="Jane"></div>
         <div class="fg"><label>Last Name *</label><input type="text" id="mu_last" placeholder="Smith"></div>
       </div>
-      <div class="fg"><label>Email Address *</label><input type="email" id="mu_email" placeholder="jane"+"@"+"propertyco.com"></div>
+      <div class="fg"><label>Email Address *</label><input type="email" id="mu_email" placeholder="jane@propertyco.com"></div>
       <div class="form-row">
         <div class="fg"><label>Password *</label><input type="password" id="mu_pw" placeholder="Min 8 characters"></div>
         <div class="fg"><label>Confirm Password *</label><input type="password" id="mu_pw2" placeholder="Repeat password"></div>
@@ -2055,7 +2055,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="fg"><label>First Name *</label><input type="text" id="tm_first" placeholder="Jane"></div>
         <div class="fg"><label>Last Name *</label><input type="text" id="tm_last" placeholder="Smith"></div>
       </div>
-      <div class="fg"><label>Email Address *</label><input type="email" id="tm_email" placeholder="jane"+"@"+"protectiveflooring.com"></div>
+      <div class="fg"><label>Email Address *</label><input type="email" id="tm_email" placeholder="jane@protectiveflooring.com"></div>
       <div class="form-row">
         <div class="fg"><label>Password *</label><input type="password" id="tm_pw" placeholder="Min 8 characters"></div>
         <div class="fg"><label>Confirm Password *</label><input type="password" id="tm_pw2" placeholder="Repeat password"></div>
@@ -2802,11 +2802,11 @@ function populateAllMarketsSelect(elId, selectedKey) {
 
 // ── TEAM STORE ──
 var DEFAULT_TEAM = [
-  {id:"t1", email:"admin"+"@"+"protectiveflooring.com",  password:"PF-Admin-2025!", name:"PF Admin",       initials:"PA", role:"superadmin", hub:"",          status:"active", created:"Jan 1, 2025"},
-  {id:"t2", email:"sarah"+"@"+"protectiveflooring.com",  password:"PF-Sarah-25!",  name:"Sarah Williams",  initials:"SW", role:"admin",      hub:"",          status:"active", created:"Jan 5, 2025"},
-  {id:"t3", email:"james"+"@"+"protectiveflooring.com",  password:"PF-James-25!",  name:"James Carter",    initials:"JC", role:"management", hub:"Memphis",   status:"active", created:"Mar 1, 2025"},
-  {id:"t4", email:"lisa"+"@"+"protectiveflooring.com",   password:"PF-Lisa-25!",   name:"Lisa Monroe",     initials:"LM", role:"sales",      hub:"Nashville", status:"active", created:"Apr 1, 2025"},
-  {id:"t5", email:"derek"+"@"+"protectiveflooring.com",  password:"PF-Derek-25!",  name:"Derek Shaw",      initials:"DS", role:"editor",     hub:"Memphis",   status:"active", created:"Apr 15, 2025"}
+  {id:"t1", email:"admin@protectiveflooring.com",  password:"PF-Admin-2025!", name:"PF Admin",       initials:"PA", role:"superadmin", hub:"",          status:"active", created:"Jan 1, 2025"},
+  {id:"t2", email:"sarah@protectiveflooring.com",  password:"PF-Sarah-25!",  name:"Sarah Williams",  initials:"SW", role:"admin",      hub:"",          status:"active", created:"Jan 5, 2025"},
+  {id:"t3", email:"james@protectiveflooring.com",  password:"PF-James-25!",  name:"James Carter",    initials:"JC", role:"management", hub:"Memphis",   status:"active", created:"Mar 1, 2025"},
+  {id:"t4", email:"lisa@protectiveflooring.com",   password:"PF-Lisa-25!",   name:"Lisa Monroe",     initials:"LM", role:"sales",      hub:"Nashville", status:"active", created:"Apr 1, 2025"},
+  {id:"t5", email:"derek@protectiveflooring.com",  password:"PF-Derek-25!",  name:"Derek Shaw",      initials:"DS", role:"editor",     hub:"Memphis",   status:"active", created:"Apr 15, 2025"}
 ];
 function loadTeam() {
   try { var s=localStorage.getItem('pf_team'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_TEAM)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_TEAM)); }
@@ -2816,9 +2816,9 @@ function getTeam() { return loadTeam(); }
 
 // ── CLIENT LOGIN STORE ──
 var DEFAULT_CLIENTS = [
-  {id:"u1",email:"manager"+"@"+"cherrycreek.com",  password:"Cherry2025!", name:"Jessica Lane",   initials:"JL",props:["Cherry Creek Apartments"],  role:"Property Manager",hub:"nashville",status:"active", created:"Feb 20, 2025", lastLogin:"2/24/2026 9:15 AM CST",  lastLoginISO:"2026-02-24T15:15:00.000Z"},
-  {id:"u2",email:"manager"+"@"+"riverside.com",    password:"PF-River25!", name:"Rachel Moore",   initials:"RM",props:["Riverside Apartments"],      role:"Property Manager",hub:"memphis",  status:"active", created:"Jan 10, 2025", lastLogin:"2/18/2026 2:42 PM CST",  lastLoginISO:"2026-02-18T20:42:00.000Z"},
-  {id:"u3",email:"manager"+"@"+"arborridge.com",   password:"Arbor2025!",  name:"Keisha Davis",   initials:"KD",props:["Arbor Ridge Nashville"],      role:"Property Manager",hub:"nashville",status:"active", created:"Jan 15, 2025", lastLogin:"1/30/2026 11:03 AM CST", lastLoginISO:"2026-01-30T17:03:00.000Z"}
+  {id:"u1",email:"manager@cherrycreek.com",  password:"Cherry2025!", name:"Jessica Lane",   initials:"JL",props:["Cherry Creek Apartments"],  role:"Property Manager",hub:"nashville",status:"active", created:"Feb 20, 2025", lastLogin:"2/24/2026 9:15 AM CST",  lastLoginISO:"2026-02-24T15:15:00.000Z"},
+  {id:"u2",email:"manager@riverside.com",    password:"PF-River25!", name:"Rachel Moore",   initials:"RM",props:["Riverside Apartments"],      role:"Property Manager",hub:"memphis",  status:"active", created:"Jan 10, 2025", lastLogin:"2/18/2026 2:42 PM CST",  lastLoginISO:"2026-02-18T20:42:00.000Z"},
+  {id:"u3",email:"manager@arborridge.com",   password:"Arbor2025!",  name:"Keisha Davis",   initials:"KD",props:["Arbor Ridge Nashville"],      role:"Property Manager",hub:"nashville",status:"active", created:"Jan 15, 2025", lastLogin:"1/30/2026 11:03 AM CST", lastLoginISO:"2026-01-30T17:03:00.000Z"}
 ];
 function loadUsers() {
   try { var s=localStorage.getItem('pf_users'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_CLIENTS)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_CLIENTS)); }
@@ -2828,14 +2828,14 @@ function getUsers() { return loadUsers(); }
 
 // ── PROPERTY STORE ──
 var DEFAULT_PROPS = [
-  {id:"prop-rv", name:"Riverside Apartments",      mgmt:"",                        addr:"3846 Delp Street",     city:"Memphis",   state:"TN",zip:"38118",phone:"(901) 362-7700",email:"office"+"@"+"riverside.com",   web:"",hub:"memphis",  units:100,status:"active", notes:"",created:"2024-01-10",deletedAt:null},
-  {id:"prop-pk", name:"Parkview Commons",           mgmt:"",                        addr:"4820 Millbranch Road", city:"Memphis",   state:"TN",zip:"38116",phone:"(901) 396-6644",email:"manager"+"@"+"parkview.com",   web:"",hub:"memphis",  units:148,status:"active", notes:"",created:"2024-01-15",deletedAt:null},
-  {id:"prop-co", name:"The Columns at Bartlett",    mgmt:"",                        addr:"7200 US-70",           city:"Bartlett",  state:"TN",zip:"38134",phone:"(901) 388-3300",email:"office"+"@"+"columns.com",     web:"",hub:"memphis",  units:72, status:"active", notes:"",created:"2024-03-01",deletedAt:null},
-  {id:"prop-mg", name:"Magnolia Trace",             mgmt:"",                        addr:"1480 Goodman Road",    city:"Southaven", state:"MS",zip:"38671",phone:"(662) 349-4400",email:"leasing"+"@"+"magnoliatrace.com",web:"",hub:"memphis",  units:90, status:"active", notes:"",created:"2024-04-01",deletedAt:null},
+  {id:"prop-rv", name:"Riverside Apartments",      mgmt:"",                        addr:"3846 Delp Street",     city:"Memphis",   state:"TN",zip:"38118",phone:"(901) 362-7700",email:"office@riverside.com",   web:"",hub:"memphis",  units:100,status:"active", notes:"",created:"2024-01-10",deletedAt:null},
+  {id:"prop-pk", name:"Parkview Commons",           mgmt:"",                        addr:"4820 Millbranch Road", city:"Memphis",   state:"TN",zip:"38116",phone:"(901) 396-6644",email:"manager@parkview.com",   web:"",hub:"memphis",  units:148,status:"active", notes:"",created:"2024-01-15",deletedAt:null},
+  {id:"prop-co", name:"The Columns at Bartlett",    mgmt:"",                        addr:"7200 US-70",           city:"Bartlett",  state:"TN",zip:"38134",phone:"(901) 388-3300",email:"office@columns.com",     web:"",hub:"memphis",  units:72, status:"active", notes:"",created:"2024-03-01",deletedAt:null},
+  {id:"prop-mg", name:"Magnolia Trace",             mgmt:"",                        addr:"1480 Goodman Road",    city:"Southaven", state:"MS",zip:"38671",phone:"(662) 349-4400",email:"leasing@magnoliatrace.com",web:"",hub:"memphis",  units:90, status:"active", notes:"",created:"2024-04-01",deletedAt:null},
   {id:"prop-wh", name:"Whitehaven Village",         mgmt:"",                        addr:"4100 Elvis Presley Blvd",city:"Memphis", state:"TN",zip:"38116",phone:"",              email:"",                       web:"",hub:"memphis",  units:55, status:"inactive",notes:"Inactive pending renovation",created:"2023-06-01",deletedAt:null},
-  {id:"prop-cc", name:"Cherry Creek Apartments",    mgmt:"Willow Bridge Property Co.",addr:"1100 Crystal Spring Lane",city:"Hermitage",state:"TN",zip:"37076",phone:"(615) 229-8238",email:"manager"+"@"+"cherrycreek.com",web:"https://www.willowbridgepc.com/properties/cherry-creek-apartments-hermitage-tn",hub:"nashville",units:627,status:"active",notes:"",created:"2024-02-01",deletedAt:null},
-  {id:"prop-ar", name:"Arbor Ridge Nashville",      mgmt:"",                        addr:"2940 Brick Church Pike",city:"Nashville",state:"TN",zip:"37207",phone:"(615) 228-5500",email:"leasing"+"@"+"arborridge.com", web:"",hub:"nashville",units:200,status:"active", notes:"",created:"2024-01-20",deletedAt:null},
-  {id:"prop-rh", name:"The Reserve at Hermitage",   mgmt:"",                        addr:"600 Hermitage Ave",    city:"Hermitage", state:"TN",zip:"37076",phone:"(615) 883-7700",email:"office"+"@"+"reservehermitage.com",web:"",hub:"nashville",units:160,status:"active", notes:"",created:"2024-05-01",deletedAt:null}
+  {id:"prop-cc", name:"Cherry Creek Apartments",    mgmt:"Willow Bridge Property Co.",addr:"1100 Crystal Spring Lane",city:"Hermitage",state:"TN",zip:"37076",phone:"(615) 229-8238",email:"manager@cherrycreek.com",web:"https://www.willowbridgepc.com/properties/cherry-creek-apartments-hermitage-tn",hub:"nashville",units:627,status:"active",notes:"",created:"2024-02-01",deletedAt:null},
+  {id:"prop-ar", name:"Arbor Ridge Nashville",      mgmt:"",                        addr:"2940 Brick Church Pike",city:"Nashville",state:"TN",zip:"37207",phone:"(615) 228-5500",email:"leasing@arborridge.com", web:"",hub:"nashville",units:200,status:"active", notes:"",created:"2024-01-20",deletedAt:null},
+  {id:"prop-rh", name:"The Reserve at Hermitage",   mgmt:"",                        addr:"600 Hermitage Ave",    city:"Hermitage", state:"TN",zip:"37076",phone:"(615) 883-7700",email:"office@reservehermitage.com",web:"",hub:"nashville",units:160,status:"active", notes:"",created:"2024-05-01",deletedAt:null}
 ];
 function loadProps() {
   try { var s=localStorage.getItem('pf_props'); return s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_PROPS)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_PROPS)); }
@@ -4106,6 +4106,9 @@ function savePortalSettings() {
   // Save extra emails
   try { localStorage.setItem('pf_notif_extra_emails', JSON.stringify(getExtraEmails())); } catch(e){}
   toast('Settings saved.');
+  // Navigate back to dashboard
+  var dashNav = document.querySelector('#ad .ni[onclick*="adash"]');
+  anav('adash', dashNav);
 }
 
 function renderDocManager() {
@@ -6231,13 +6234,13 @@ function anav(pid, el) {
 // ── ORDERS DATA ──
 // ── ORDER STORE ──
 var ORDER_SEED = {
-  'CC-001':{num:'NA0001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'2026-02-20',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2026',email:'manager"+"@"+"cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  'CC-002':{num:'NA0002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2026-02-18',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2026',email:'manager"+"@"+"cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'',photos:true},
-  'CC-003':{num:'NA0003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'2026-02-10',confDate:'2026-02-10',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2026',email:'manager"+"@"+"cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  '2411':{num:'ME0001',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'2026-02-28',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2026',email:'rmoore"+"@"+"riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2414':{num:'ME0002',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'2026-03-03',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2026',email:'shill"+"@"+"parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2413':{num:'ME0003',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'2026-02-26',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2026',email:'rmoore"+"@"+"riverside.com',notes:'',timeWindow:'',photos:false},
-  '2410':{num:'NA0004',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2026-02-24',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2026',email:'kdavis"+"@"+"arborridge.com',notes:'',timeWindow:'',photos:false}
+  'CC-001':{num:'NA0001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'2026-02-20',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2026',email:'manager@cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  'CC-002':{num:'NA0002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2026-02-18',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2026',email:'manager@cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'',photos:true},
+  'CC-003':{num:'NA0003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'2026-02-10',confDate:'2026-02-10',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2026',email:'manager@cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  '2411':{num:'ME0001',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'2026-02-28',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2026',email:'rmoore@riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2414':{num:'ME0002',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'2026-03-03',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2026',email:'shill@parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2413':{num:'ME0003',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'2026-02-26',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2026',email:'rmoore@riverside.com',notes:'',timeWindow:'',photos:false},
+  '2410':{num:'NA0004',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2026-02-24',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2026',email:'kdavis@arborridge.com',notes:'',timeWindow:'',photos:false}
 };
 
 function saveOrders() {
