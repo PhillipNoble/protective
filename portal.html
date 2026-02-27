@@ -547,6 +547,30 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 #adash_recent_tbl td:nth-child(2), #adash_today_tbl td:nth-child(2) { white-space: normal; min-width: 120px; max-width: 160px; }
 #adash_recent_tbl td:nth-child(4), #adash_today_tbl td:nth-child(4) { white-space: normal; min-width: 100px; }
 #adash_recent_tbl th, #adash_today_tbl th { white-space: nowrap; }
+
+/* Order form field error state */
+.fg.field-err input, .fg.field-err select, .fg.field-err textarea {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,.12) !important;
+}
+.fg.field-err label { color: #dc2626 !important; }
+.fg.field-err .rg { outline: 2px solid #dc2626; outline-offset: 4px; border-radius: 4px; }
+#co_form_err {
+  display: none;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-left: 4px solid #dc2626;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+#co_form_err ul { margin: 6px 0 0 16px; padding: 0; font-weight: 400; }
+#co_form_err ul li { margin-bottom: 2px; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -745,6 +769,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <h3>&#128247; Photos <span style="font-size:13px;font-weight:400;color:var(--gray);">-- Optional</span></h3>
           <div class="uz" onclick="toast('Photo upload ready in live version.')"><div style="font-size:36px;margin-bottom:10px;">&#128247;</div><div style="font-size:14px;color:var(--gray);font-weight:300;"><strong style="color:var(--navy);font-weight:600;">Click to upload photos</strong></div><div style="font-size:11px;color:var(--gray);margin-top:6px;">JPG, PNG up to 20MB each. Max 10 photos.</div></div>
         </div>
+        <div id="co_form_err" role="alert"></div>
         <div class="fa">
           <button class="bl ol" onclick="cnav('cd',document.querySelectorAll('#cl .ni')[0])">Cancel</button>
           <button class="bl gd" onclick="submitOrder()">&#10003; Submit Order Request</button>
@@ -5956,17 +5981,45 @@ function submitOrder() {
   });
 
   // ── Validation ──
+  // Clear previous error states
+  document.querySelectorAll('#co .field-err').forEach(function(el){ el.classList.remove('field-err'); });
+  var errBanner = document.getElementById('co_form_err');
+  if (errBanner) { errBanner.style.display = 'none'; errBanner.innerHTML = ''; }
+
   var errors = [];
-  if (!propVal)  errors.push('Property is required.');
-  if (!unitVal)  errors.push('Unit number is required.');
-  if (!planVal)  errors.push('Floor Plan is required.');
-  if (!dateVal)  errors.push('Requested install date is required.');
-  // Service OR at least one scope is required
-  if (!svcVal && selectedScopes.length === 0)
-    errors.push('Select a Flooring Service and/or at least one Installation Scope.');
+  var firstErrEl = null;
+
+  function markErr(el, msg) {
+    // Walk up to find the .fg wrapper
+    var fg = el;
+    while (fg && !fg.classList.contains('fg')) fg = fg.parentElement;
+    if (fg) fg.classList.add('field-err');
+    errors.push(msg);
+    if (!firstErrEl) firstErrEl = fg || el;
+    // Clear error when user interacts with the field
+    el.addEventListener('input',  function(){ var f=el; while(f&&!f.classList.contains('fg'))f=f.parentElement; if(f)f.classList.remove('field-err'); }, {once:true});
+    el.addEventListener('change', function(){ var f=el; while(f&&!f.classList.contains('fg'))f=f.parentElement; if(f)f.classList.remove('field-err'); }, {once:true});
+  }
+
+  if (!propVal)  markErr(propSel,  'Property is required.');
+  if (!unitVal)  markErr(unitEl,   'Unit number is required.');
+  if (!planVal)  markErr(planSel,  'Floor Plan is required.');
+  if (!dateVal)  markErr(dateEl,   'Requested install date is required.');
+  if (!svcVal && selectedScopes.length === 0) {
+    markErr(svcEl, 'Select a Flooring Service and/or at least one scope.');
+  }
 
   if (errors.length) {
-    toast(errors[0]);
+    // Show red banner with all errors
+    if (errBanner) {
+      var listItems = errors.map(function(e){ return '<li>' + e + '</li>'; }).join('');
+      errBanner.innerHTML = '<strong>Please complete the required fields:</strong><ul>' + listItems + '</ul>';
+      errBanner.style.display = 'block';
+    }
+    // Scroll to first error field
+    if (firstErrEl) {
+      firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     return;
   }
 
@@ -6013,6 +6066,8 @@ function submitOrder() {
   };
 
   toast('\u2713 Order submitted! Your request has been received.');
+  document.querySelectorAll('#co .field-err').forEach(function(el){ el.classList.remove('field-err'); });
+  var _eb = document.getElementById('co_form_err'); if (_eb) { _eb.style.display='none'; _eb.innerHTML=''; }
 
   // Reset form
   if (planSel) planSel.selectedIndex = 0;
