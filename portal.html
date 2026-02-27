@@ -1136,7 +1136,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         </div>
         <div class="tw"><table id="ucl_table">
           <thead><tr>
-            <th>Name</th><th>Email</th><th>Properties</th><th>Hub</th>
+            <th>Name</th><th>Email</th><th>Password</th><th>Properties</th><th>Hub</th>
             <th>Role</th><th>Status</th>
             <th style="white-space:nowrap;">Last Login <span id="ucl_count" style="font-weight:400;font-size:10px;color:rgba(255,255,255,.6);"></span></th>
             <th></th>
@@ -1163,7 +1163,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <div style="display:flex;align-items:center;gap=6px;font-size:12px;"><span class="b" style="background:#fefce8;color:#854d0e;border-color:#fde68a;">&#9998; Editor</span> Create &amp; edit orders and floor plans · No admin access</div>
         </div>
         <div class="tw"><table>
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Default Hub</th><th>Last Login</th><th>Status</th><th>Created</th><th></th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Password</th><th>Role</th><th>Default Hub</th><th>Last Login</th><th>Status</th><th>Created</th><th></th></tr></thead>
           <tbody id="teamTbody"><!-- rendered by renderTeamTable() --></tbody>
         </table></div>
       </div>
@@ -6253,6 +6253,7 @@ function renderTeamTable() {
     return '<tr>'
       + '<td>' + nameCell + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + u.email + '</td>'
+      + '<td>' + pwCell(u.id, u.password, 'team') + '</td>'
       + '<td>' + roleLabel(u.role) + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + (u.hub || '—') + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + (u.lastLogin||'Never') + '</td>'
@@ -6569,7 +6570,7 @@ function renderUserTable() {
   if (countEl) countEl.textContent = '(' + clients.length + ')';
 
   if (clients.length === 0) {
-    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--gray);">No matching client logins.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--gray);">No matching client logins.</td></tr>';
     return;
   }
 
@@ -6601,6 +6602,7 @@ function renderUserTable() {
     return '<tr>'
       + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong></td>'
       + '<td style="font-size:12px;color:var(--gray);">' + u.email + '</td>'
+      + '<td>' + pwCell(u.id, u.password, 'ucl') + '</td>'
       + '<td style="font-size:12px;">' + props + '</td>'
       + '<td>' + hbadge + '</td>'
       + '<td style="font-size:12px;">' + (u.role || 'Property Manager') + '</td>'
@@ -7191,6 +7193,34 @@ function showScopeConflictErr(existing, attempted, svc) {
 function clearScopeConflictErr() {
   var el = document.getElementById('scope_conflict_err');
   if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Password cell with show/hide toggle ──────────────────────────────────────
+function pwCell(uid, pw, tbl) {
+  var safeId = 'pw_' + tbl + '_' + uid.replace(/[^a-zA-Z0-9]/g,'_');
+  var masked = '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;';
+  return '<div style="display:flex;align-items:center;gap:6px;min-width:120px;">'
+    + '<span id="' + safeId + '" data-pw="' + pw.replace(/"/g,'&quot;') + '" data-show="0"'
+    + ' style="font-size:12px;color:var(--gray);font-family:monospace;letter-spacing:1px;">'
+    + masked + '</span>'
+    + '<button class="bs ol" style="font-size:10px;padding:2px 7px;flex-shrink:0;" '
+    + 'onclick="togglePwVis(\'' + safeId + '\');event.stopPropagation();" '
+    + 'title="Show / hide password">&#128065;</button>'
+    + '</div>';
+}
+function togglePwVis(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var showing = el.getAttribute('data-show') === '1';
+  if (showing) {
+    el.textContent = '';
+    el.innerHTML = '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;';
+    el.setAttribute('data-show', '0');
+  } else {
+    el.textContent = el.getAttribute('data-pw');
+    el.setAttribute('data-show', '1');
+  }
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
