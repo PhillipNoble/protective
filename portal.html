@@ -927,6 +927,38 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
         <div style="border-top:1px solid var(--border);margin:32px 0;max-width:480px;"></div>
 
+        <!-- Notification Preferences -->
+        <div class="fc" style="max-width:480px;" id="cs_notif_section">
+          <h3 style="margin-bottom:4px;">&#128276; Notification Preferences</h3>
+          <p style="font-size:13px;color:var(--gray);margin:0 0 20px;line-height:1.6;">Choose how you want to be notified about your work orders.</p>
+
+          <div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;">
+            <!-- Email row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff;border-bottom:1px solid var(--border);">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--navy);">&#9993; Email Notifications</div>
+                <div style="font-size:11px;color:var(--gray);margin-top:2px;">Receive order updates at your registered email address</div>
+              </div>
+              <label class="notif-toggle"><input type="checkbox" id="cs_notif_email" onchange="saveClientNotifPrefs()"><span class="nt-track"><span class="nt-thumb"></span></span></label>
+            </div>
+            <!-- SMS row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--cream);" id="cs_sms_row">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--navy);">&#128241; Text Message (SMS)</div>
+                <div id="cs_sms_phone_display" style="font-size:11px;color:var(--gray);margin-top:2px;">No mobile number on file</div>
+              </div>
+              <label class="notif-toggle"><input type="checkbox" id="cs_notif_sms" onchange="saveClientNotifPrefs()"><span class="nt-track"><span class="nt-thumb"></span></span></label>
+            </div>
+          </div>
+
+          <div id="cs_sms_stopped_notice" style="display:none;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--r);font-size:12px;color:#b91c1c;margin-bottom:12px;">
+            &#9888; You previously opted out via STOP reply. To re-enable texts, please contact Protective Flooring to re-register your number.
+          </div>
+          <div id="cs_notif_saved" style="display:none;font-size:12px;color:#15803d;margin-bottom:4px;">&#10003; Preferences saved.</div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:32px 0;max-width:480px;"></div>
+
         <!-- Reset Password -->
         <div class="fc" style="max-width:480px;">
           <h3 style="margin-bottom:4px;">&#128257; Reset to Temporary Password</h3>
@@ -2037,9 +2069,18 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div id="euproplist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:8px;"></div>
         <div id="eu_prop_count" style="font-size:11px;color:var(--gray);margin-top:6px;"></div>
       </div>
-      <!-- SMS Notifications section -->
+      <!-- Notifications section -->
       <div class="ms" style="margin-bottom:16px;">
-        <div class="mst">&#128241; Text Message Notifications</div>
+        <div class="mst">&#128276; Notifications</div>
+        <!-- Email notification toggle -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--cream);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);">&#9993; Email Notifications</div>
+            <div style="font-size:11px;color:var(--gray);margin-top:1px;">Send order updates to this user's email address</div>
+          </div>
+          <label class="notif-toggle"><input type="checkbox" id="eu_notif_email" style="accent-color:var(--navy);"><span class="nt-track"><span class="nt-thumb"></span></span></label>
+        </div>
+        <div class="mst" style="font-size:11px;margin-bottom:10px;">&#128241; Text Message Notifications</div>
         <div class="form-row" style="align-items:flex-end;gap:12px;margin-bottom:10px;">
           <div class="fg" style="margin-bottom:0;flex:1;">
             <label>Mobile Phone Number <span style="font-size:10px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">Optional</span></label>
@@ -5600,8 +5641,8 @@ function go(id) {
 }
 function cnav(pid, el) {
   if (pid === 'cx') { setTimeout(renderClientDocuments, 50); }
-  if (pid === 'cs') { setTimeout(renderClientSettings, 50); }
-  if (pid === 'cs') { setTimeout(renderClientSettings, 50); }
+  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); }
+  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); }
   if (pid === 'co') {
     // Default install date to tomorrow if blank
     var dateEl = document.getElementById('cinstdate');
@@ -7321,6 +7362,22 @@ function openEditUser(uid) {
   var searchEl = document.getElementById('eu_prop_search');
   if (searchEl) searchEl.value = '';
   buildEditUserPropList(u.props || []);
+  // Notification prefs
+  var euNotifEl = document.getElementById('eu_notif_email');
+  if (euNotifEl) euNotifEl.checked = (u.notifEmail !== false);
+  // SMS fields
+  var rawPh = u.smsPhone || '';
+  var fmtPh = rawPh.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3');
+  var euPhEl = document.getElementById('eu_sms_phone');
+  if (euPhEl) euPhEl.value = fmtPh;
+  var euOptEl = document.getElementById('eu_sms_optin');
+  if (euOptEl) euOptEl.checked = !!(u.smsOptIn && !u.smsStopped);
+  var euStpEl = document.getElementById('eu_sms_stopped');
+  if (euStpEl) euStpEl.checked = !!(u.smsStopped);
+  var euStpNotice = document.getElementById('eu_sms_stopped_notice');
+  if (euStpNotice) euStpNotice.style.display = u.smsStopped ? 'block' : 'none';
+  var euStatusEl = document.getElementById('eu_sms_status_display');
+  if (euStatusEl) euStatusEl.innerHTML = buildSmsStatusHtml(u);
   openM('medit');
 }
 
@@ -7365,6 +7422,8 @@ function saveEditUser() {
       break;
     }
   }
+  var euNotifEmailEl = document.getElementById('eu_notif_email');
+  u.notifEmail = euNotifEmailEl ? euNotifEmailEl.checked : true;
   var euRaw = (document.getElementById('eu_sms_phone').value||'').replace(/\D/g,'');
   var euOpt = document.getElementById('eu_sms_optin').checked;
   var euStp = document.getElementById('eu_sms_stopped').checked;
