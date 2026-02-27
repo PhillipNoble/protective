@@ -8545,38 +8545,4 @@ function renderAgingReport() {
     var o = orders[id];
     var days = Math.floor((now - new Date(o.submittedDate).getTime()) / 86400000);
     return {id:id, o:o, days:days};
-  }).sort(function(a,b){ return b.days-a.days; });
-  if (!aged.length) {
-    body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray);font-size:13px;">&#10003; No aging orders — all requests have been confirmed within '+threshold+' days.</div>';
-    return;
-  }
-  var html = '<div class="tw"><table><thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Submitted</th><th>Days Waiting</th><th>Actions</th></tr></thead><tbody>';
-  aged.forEach(function(item) {
-    var o=item.o, id=item.id, days=item.days;
-    var badgeCls = days>=14?'age-crit':'age-warn';
-    html += '<tr onclick="oworder(\''+id+'\')" style="cursor:pointer;">'+
-      '<td><strong>#'+o.num+'</strong></td>'+
-      '<td>'+o.property+'</td>'+
-      '<td>'+o.unit+'</td>'+
-      '<td>'+svcDisplay(o)+'</td>'+
-      '<td>'+(o.submittedDate||'—')+'</td>'+
-      '<td><span class="age-warn '+badgeCls+'">'+days+' day'+(days!==1?'s':'')+'</span></td>'+
-      '<td><button class="bs gd" style="font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button></td>'+
-      '</tr>';
-  });
-  html += '</tbody></table></div>';
-  body.innerHTML = html;
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// FEATURE: CLIENT ACTIVITY LOG
-// ════════════════════════════════════════════════════════════════════════════
-function logClientActivity(action, meta) {
-  if (!currentUser) return;
-  var key = 'pf_activity_'+currentUser.email.replace(/[^a-z0-9]/gi,'_');
-  var log = [];
-  try { var s=localStorage.getItem(key); log=s?JSON.parse(s):[]; } catch(e){}
-  log.unshift({ts:new Date().toLocaleString('en-US',{timeZone:'America/Chicago'}), action:action, meta:meta||{}});
-  if (log.length>200) log=log.slice(0,200);
-  try { localStorage.setItem(key,JSON.stringify(log)); } catch(e){}
-}
+  }).sort(function(a,b){ return b.d
