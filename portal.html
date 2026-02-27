@@ -7156,7 +7156,7 @@ function renderTeamTable() {
       + '<td style="color:var(--gray);font-size:12px;">' + (u.lastLogin||'Never') + '</td>'
       + '<td>' + sbadge + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + (u.created||'--') + '</td>'
-      + '<td style="white-space:nowrap;">' + '<button class="bs ol" onclick="openEditUser(\'' + u.id + '\')">Edit</button>' + '</td>' + '<td><button class="bs ol" onclick="openClientActivity(\'' + u.id + '\')">Log</button></td>' + '</tr>';
+      + '<td style="white-space:nowrap;">' + '<button class="bs ol" onclick="openEditUser(\'' + u.id + '\')">Edit</button>' + '</td>' + '<td><button class="bs ol" onclick="openActivityLog(\'' + u.id + '\')">Log</button></td>' + '</tr>';
   }).join('');
 }
 
