@@ -585,8 +585,8 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
     <h1>Welcome Back</h1>
     <p class="sub">Sign in to your Protective Flooring portal</p>
     <div id="lerr" class="lerr">Incorrect email or password. Please try again.</div>
-    <div class="fg"><label>Email Address</label><input type="email" id="lemail" placeholder="you@example.com" autocomplete="username"></div>
-    <div class="fg"><label>Password</label><input type="password" id="lpw" placeholder="Password" autocomplete="current-password"></div>
+    <div class="fg"><label>Email Address</label><input type="email" id="lemail" placeholder="you@example.com" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('lpw').focus();"></div>
+    <div class="fg"><label>Password</label><input type="password" id="lpw" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin();"></div>
     <button class="btn-pri" onclick="doLogin()" style="margin-top:6px;">Sign In</button>
     <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray);">Need access? <a href="#" style="color:var(--gold);font-weight:600;" onclick="toast('Contact info@protectiveflooring.com to request an account.')">Contact us</a></div>
     <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--gray);"><a href="#" style="color:var(--gray);text-decoration:underline;" onclick="resetPortalData();return false;">Reset portal data</a> &mdash; clears saved changes and restores defaults</div>
@@ -715,6 +715,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <div id="fpscopes-section" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:none;">
                 <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Installation Scopes for This Plan</div>
                 <div id="fpscopes-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+              <div id="scope_conflict_err" style="display:none;margin-top:10px;padding:10px 14px;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #dc2626;color:#991b1b;border-radius:var(--r);font-size:12px;line-height:1.5;"></div>
               </div>
             </div>
           </div>
@@ -5331,19 +5332,40 @@ function onPlanChange(fpId) {
 
   if (chips.length) {
     scopesEl.innerHTML = '';
+    clearScopeConflictErr();
     chips.forEach(function(c, ci) {
       var span = document.createElement('span');
       span.className = 'scope-chip-sel';
       span.setAttribute('data-scope', c.name);
+      span.setAttribute('data-svc', c.svc || '');
       span.title = c.svc || '';
       span.innerHTML = c.name + (c.svc ? ' <span style="opacity:.55;font-weight:400;font-size:10px;">(' + c.svc + ')</span>' : '');
-      span.onclick = function(){ span.classList.toggle('chosen'); };
+      span.onclick = function() {
+        var svc = span.getAttribute('data-svc');
+        // If trying to SELECT (not deselect) and has a service type, check for conflict
+        if (!span.classList.contains('chosen') && svc) {
+          var conflict = null;
+          document.querySelectorAll('#fpscopes-chips .scope-chip-sel.chosen').forEach(function(other) {
+            if (other !== span && other.getAttribute('data-svc') === svc) {
+              conflict = other.getAttribute('data-scope');
+            }
+          });
+          if (conflict) {
+            showScopeConflictErr(conflict, span.getAttribute('data-scope'), svc);
+            return; // block selection
+          }
+        }
+        span.classList.toggle('chosen');
+        // Clear any existing scope conflict error when user deselects
+        if (!span.classList.contains('chosen')) clearScopeConflictErr();
+      };
       scopesEl.appendChild(span);
     });
     scopesSec.style.display = 'block';
   } else {
     scopesEl.innerHTML = '';
     scopesSec.style.display = 'none';
+    clearScopeConflictErr();
   }
 
   prev.style.display = 'block';
@@ -7141,6 +7163,22 @@ function csDoReset() {
     '\u2713 Password reset. Your temporary password is: ' + tmp +
     '  \u2014  Please change it immediately after logging out and back in.',
     'ok');
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Scope conflict error (duplicate service type) ────────────────────────────
+function showScopeConflictErr(existing, attempted, svc) {
+  var el = document.getElementById('scope_conflict_err');
+  if (!el) return;
+  el.innerHTML = '&#9888; <strong>Duplicate service type:</strong> &ldquo;' + attempted +
+    '&rdquo; uses the same service (<em>' + svc + '</em>) as the already-selected ' +
+    '&ldquo;' + existing + '&rdquo;. Please deselect one before adding another.';
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function clearScopeConflictErr() {
+  var el = document.getElementById('scope_conflict_err');
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
