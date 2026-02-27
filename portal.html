@@ -714,10 +714,22 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <!-- DASHBOARD -->
       <div class="panel on" id="cd">
         <div class="stats">
-          <div class="sc"><div class="si g">&#9783;</div><div><div class="snum">8</div><div class="slbl">Total Orders</div></div></div>
-          <div class="sc"><div class="si n">&#9200;</div><div><div class="snum">2</div><div class="slbl">Pending Scheduling</div></div></div>
-          <div class="sc"><div class="si gr">&#10003;</div><div><div class="snum">5</div><div class="slbl">Completed</div></div></div>
-          <div class="sc"><div class="si rd">&#9888;</div><div><div class="snum">1</div><div class="slbl">Needs Attention</div></div></div>
+          <div class="sc sc-link" id="cstat_all"    onclick="cstatFilter('all')"    title="View all orders">
+            <div class="si g">&#9783;</div>
+            <div><div class="snum" id="cstat_all_n">—</div><div class="slbl">All Orders (YTD)</div></div>
+          </div>
+          <div class="sc sc-link" id="cstat_active" onclick="cstatFilter('active')" title="View scheduled installs">
+            <div class="si n">&#128197;</div>
+            <div><div class="snum" id="cstat_active_n">—</div><div class="slbl">Upcoming Installs</div></div>
+          </div>
+          <div class="sc sc-link" id="cstat_done"   onclick="cstatFilter('done')"   title="View completed orders">
+            <div class="si gr">&#10003;</div>
+            <div><div class="snum" id="cstat_done_n">—</div><div class="slbl">Completed</div></div>
+          </div>
+          <div class="sc sc-link" id="cstat_attn"   onclick="cstatFilter('attn')"   title="View orders needing attention">
+            <div class="si rd">&#9888;</div>
+            <div><div class="snum" id="cstat_attn_n">—</div><div class="slbl">Needs Attention</div></div>
+          </div>
         </div>
         <div class="shd">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -5428,37 +5440,109 @@ function renderAdashTomorrow() {
 }
 
 
-function renderClientDash() {
+function renderClientDash(filterMode) {
   var tbody = document.getElementById('cd_tbody');
   if (!tbody || !currentUser) return;
   var userProps = currentUser.props || [];
-  var html = '';
-  var shown = 0;
-  // Sort: requested first, then by date
   var allPNames = getActiveProps().map(function(pr){ return pr.name; });
   var isAdminView = userProps.length >= allPNames.length - 1;
-  var ids = Object.keys(orders).filter(function(id){
+
+  // Get all orders for this client
+  var ids = Object.keys(orders).filter(function(id) {
     var o = orders[id];
     return isAdminView || userProps.indexOf(o.property) !== -1;
   });
-  ids.sort(function(a,b){
-    var aTs = a.indexOf("WO-")===0, bTs = b.indexOf("WO-")===0;
-    if (aTs && !bTs) return -1; if (!aTs && bTs) return 1;
+
+  // Compute stat counts
+  var thisYear  = new Date().getFullYear();
+  var cntAll    = ids.filter(function(id){
+    var o = orders[id];
+    var d = o.submittedDate || o.reqDate || '';
+    return d && new Date(d).getFullYear() === thisYear;
+  }).length;
+  var cntActive = ids.filter(function(id){ var s=orders[id].status; return s==='scheduled'||s==='requested'; }).length;
+  var cntDone   = ids.filter(function(id){ return orders[id].status==='completed'; }).length;
+  var cntAttn   = ids.filter(function(id){ var s=orders[id].status; return s==='requested'; }).length;
+
+  // Update stat cards
+  var _sn = function(id,n){ var el=document.getElementById(id); if(el) el.textContent=n; };
+  _sn('cstat_all_n',    cntAll);
+  _sn('cstat_active_n', cntActive);
+  _sn('cstat_done_n',   cntDone);
+  _sn('cstat_attn_n',   cntAttn);
+
+  // Urgent styling on Needs Attention card
+  var attnCard = document.getElementById('cstat_attn');
+  if (attnCard) {
+    if (cntAttn > 0) attnCard.classList.add('sc-urgent');
+    else attnCard.classList.remove('sc-urgent');
+  }
+
+  // Active filter highlight
+  ['all','active','done','attn'].forEach(function(k){
+    var card = document.getElementById('cstat_'+k);
+    if (card) {
+      if (k === (filterMode||'all')) card.style.borderColor = 'var(--navy)';
+      else card.style.borderColor = '';
+    }
+  });
+
+  // Filter ids for table display
+  var mode = filterMode || 'all';
+  var filtered = ids.filter(function(id) {
+    var s = orders[id].status;
+    if (mode === 'active') return s === 'scheduled' || s === 'requested';
+    if (mode === 'done')   return s === 'completed';
+    if (mode === 'attn')   return s === 'requested';
+    // 'all' = year-to-date
+    var _d = orders[id].submittedDate || orders[id].reqDate || '';
+    return _d && new Date(_d).getFullYear() === thisYear;
+  });
+
+  // Sort: requested first, then newest
+  filtered.sort(function(a,b){
+    var sa = orders[a].status, sb = orders[b].status;
+    if (sa==='requested' && sb!=='requested') return -1;
+    if (sa!=='requested' && sb==='requested') return  1;
     return b > a ? 1 : -1;
   });
-  ids.slice(0,10).forEach(function(id) {
+
+  var html = '';
+  filtered.slice(0, 20).forEach(function(id) {
     var o = orders[id];
-    shown++;
-    html += '<tr onclick="oworder(\''+id+'\')">'
+    var _q = id.replace(/'/g,"&#39;");
+    html += '<tr onclick="oworder(&quot;'+_q+'&quot;)" style="cursor:pointer;">'
       +'<td><strong>#'+o.num+'</strong></td>'
       +'<td>Unit '+o.unit+'</td>'
       +'<td>'+svcDisplay(o)+'</td>'
       +'<td>'+fmtDate(o.reqDate)+'</td>'
       +'<td>'+statusBadge(o.status)+'</td>'
-      +'<td><button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View / Print</button></td>'
+      +'<td><button class="bs ol" onclick="event.stopPropagation();oworder(&quot;'+_q+'&quot;)">View</button></td>'
       +'</tr>';
   });
-  tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">No orders yet. <a href="#" onclick="cnav(\'co\',document.querySelector(\'#cl .ni[onclick*=&quot;co&quot;]\'))">Submit your first order.</a></td></tr>';
+
+  tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">'
+    + (mode === 'all'
+                ? 'No orders yet. <a href="#" onclick="cnav(&quot;co&quot;,document.querySelectorAll(&quot;#cl .ni&quot;)[1])">Submit your first order.</a>'
+        : 'No orders in this category.')
+    + '</td></tr>';
+
+  // Store current filter for re-renders
+  window._cDashFilter = mode;
+}
+
+function cstatFilter(mode) {
+  window._cDashFilter = mode;
+  renderClientDash(mode);
+  // Switch to list view if on calendar
+  var listWrap = document.getElementById('cl_list_wrap');
+  var calWrap  = document.getElementById('cl_cal_wrap');
+  var tabList  = document.getElementById('cdash_tab_list');
+  var tabCal   = document.getElementById('cdash_tab_cal');
+  if (listWrap) listWrap.style.display = '';
+  if (calWrap)  calWrap.style.display  = 'none';
+  if (tabList)  tabList.classList.add('on');
+  if (tabCal)   tabCal.classList.remove('on');
 }
 
 function onChDateRangeChange() {
