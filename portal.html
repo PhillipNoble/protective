@@ -5766,15 +5766,15 @@ function oworder(id) {
               '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Unit '+_unit+'</div>'+
               '<div style="font-size:12px;color:var(--gray);margin-bottom:4px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Floor Plan</span><br>'+_plan+'</div>'+
               '<div style="margin-top:6px;"><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid '+_occColor+';color:'+_occColor+';">'+_occ+'</span></div>'+
+              (o.timeWindow && o.timeWindow !== 'To be confirmed' && o.timeWindow !== 'TBD' ? '<div style="margin-top:10px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Preferred Time</span>'+
+              '<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px;">'+o.timeWindow+'</div></div>' : '')+
             '</div>'+
           '</div>'+
         '</div>';
       }())+
       '<div style="margin-bottom:18px;margin-top:20px;">'+
         '<div class="wof" style="margin-bottom:14px;"><div class="wofl">Scope of Work</div><div style="margin-top:8px;"><div class="woscl">'+sc+'</div></div></div>'+
-        '<div class="wof"><div class="wofl">Time Window</div><div class="wofv">'+o.timeWindow+'</div></div>'+
       '</div>'+
-      '<div class="wosec"><div class="wosect">Notes and Special Instructions</div>'+nt+'</div>'+
       (o.status==='vd' ? '<div class="wosec" style="background:#fef2f2;border:1px solid #fecaca;border-radius:4px;"><div class="wosect" style="color:#b91c1c;">&#128683; VOID — Cancellation Record</div>'+
         '<div class="wog">'+
           '<div class="wof"><div class="wofl">Status</div><div class="wofv" style="color:#b91c1c;font-weight:700;">VOID / CANCELLED</div></div>'+
@@ -5783,25 +5783,13 @@ function oworder(id) {
           '<div class="wof"><div class="wofl">Voided Date</div><div class="wofv">'+(o.voidDate||'')+'</div></div>'+
           (o.voidNotes ? '<div class="wof"><div class="wofl">Notes</div><div class="wofv">'+o.voidNotes+'</div></div>' : '')+
         '</div></div>' : '')+
-      '<div class="wosec wophsec"><div class="wosect">Customer Photos</div>'+ph+'</div>'+
-      '<div class="wosec"><div class="wosect">Order Timeline</div><div class="tl">'+tlh+'</div></div>'+
+      (o.notes && o.notes !== 'No additional notes.' ? '<div class="wosec"><div class="wosect">Notes and Special Instructions</div>'+nt+'</div>' : '')+
+      (o.photos ? '<div class="wosec wophsec"><div class="wosect">Customer Photos</div>'+ph+'</div>' : '')+
       '<div class="wosec"><div class="wosect">Submitted By</div><div class="wog">'+
         '<div class="wof"><div class="wofl">Contact Name</div><div class="wofv">'+o.submittedBy+'</div></div>'+
         '<div class="wof"><div class="wofl">Email</div><div class="wofv">'+o.email+'</div></div>'+
       '</div></div>'+
       '<div class="wosec"><div class="wosr"><div class="wosb">Protective Flooring Representative Signature and Date</div><div class="wosb">Customer / Property Manager Signature and Date</div></div></div>'+
-      (o.log && o.log.length ? '<div class="wosec wo-log-sec"><div class="wosect">&#128221; Change Log</div>'+
-        o.log.map(function(entry,i){
-          var chHtml = entry.changes.map(function(c){
-            return '<div class="wo-log-change"><span class="wo-log-field">'+c.field+'</span>'+
-              '<span class="wo-log-arrow">'+c.from+' &#8594; '+c.to+'</span></div>';
-          }).join('');
-          return '<div class="wo-log-entry">'+
-            '<div class="wo-log-hd"><strong>Edit #'+(i+1)+'</strong><span>'+entry.ts+'</span></div>'+
-            '<div class="wo-log-meta">By '+entry.by+' &mdash; Reason: '+entry.reason+'</div>'+
-            chHtml+'</div>';
-        }).join('')+
-      '</div>' : '')+
     '</div>'+
     '<div class="wofoot"><span>Protective Services Company, Inc. dba Protective Flooring</span><span>#'+o.num+' -- '+today+'</span><span>"We Stand on Our Word"</span></div>';
   _currentWoId = id;
