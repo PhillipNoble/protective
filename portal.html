@@ -2385,6 +2385,10 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             </select></div>
         </div>
       </div>
+      <div class="ms"><div class="mst">Purchase Order</div>
+        <div class="fg"><label>PO Number <span style="font-size:11px;font-weight:400;color:var(--gray);">(Optional)</span></label>
+          <input type="text" id="woedit_po" placeholder="e.g. PO-2026-0042" maxlength="60"></div>
+      </div>
       <div class="ms"><div class="mst">Notes &amp; Instructions</div>
         <div class="fg"><textarea id="woedit_notes" rows="3" placeholder="Special instructions, damage notes, access info..." style="resize:vertical;"></textarea></div>
       </div>
@@ -2721,7 +2725,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
 
 // ── DATA VERSION GUARD ───────────────────────────────────────────────────────
-var PORTAL_DATA_VERSION = '2026-02-v3';
+var PORTAL_DATA_VERSION = '2026-02-v4';
 (function() {
   try {
     var stored = localStorage.getItem('pf_data_version');
@@ -4586,6 +4590,7 @@ function openWoEdit(id) {
   document.getElementById('woedit_reqdate').value     = displayToIso(o.reqDate);
   document.getElementById('woedit_confdate').value    = displayToIso(o.confDate);
   document.getElementById('woedit_timewindow').value  = o.timeWindow || 'To be confirmed';
+  document.getElementById('woedit_po').value           = o.po || '';
   document.getElementById('woedit_notes').value       = o.notes !== 'No additional notes.' ? (o.notes||'') : '';
   document.getElementById('woedit_reason_sel').value  = '';
   document.getElementById('woedit_reason_other').style.display = 'none';
@@ -4681,7 +4686,7 @@ function saveWoEdit() {
     property:'Property', unit:'Unit', plan:'Floor Plan', occ:'Occupancy',
     hub:'Hub', status:'Status', service:'Service', scope:'Scope',
     reqDate:'Requested Date', confDate:'Confirmed Date',
-    timeWindow:'Time Window', notes:'Notes'
+    timeWindow:'Time Window', notes:'Notes', po:'Purchase Order'
   };
   var changes = [];
   var newVals = {
@@ -4696,7 +4701,8 @@ function saveWoEdit() {
     reqDate:    newReqDate,
     confDate:   newConf,
     timeWindow: document.getElementById('woedit_timewindow').value,
-    notes:      document.getElementById('woedit_notes').value.trim() || 'No additional notes.'
+    notes:      document.getElementById('woedit_notes').value.trim() || 'No additional notes.',
+    po:         document.getElementById('woedit_po').value.trim()
   };
 
   Object.keys(FIELD_LABELS).forEach(function(key) {
@@ -6327,7 +6333,7 @@ function oworder(id) {
       (function(){ var _m=getMarket(o.hub); return '<p>Protective Services Company, Inc. dba Protective Flooring<br>'+(_m&&_m.address?_m.address:'3846 Delp Street, Memphis, TN 38118')+'<br>'+(_m&&_m.phone?_m.phone:'(901) 794-4101')+' &mdash; info&#64;protectiveflooring.com</p>'; }())+
       '</div>'+
       '<div class="wor">'+
-        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Key Dates</div>'+
+        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">'+o.num+'</div>'+
         '<table style="border-collapse:collapse;text-align:right;">'+
           '<tr><td style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:2px 10px 2px 0;">Submitted</td>'+
               '<td style="font-size:13px;font-weight:600;color:var(--text);padding:2px 0;">'+(o.submittedDate||'&#8212;')+'</td></tr>'+
