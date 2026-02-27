@@ -1139,7 +1139,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <button id="tab_today"     class="tab-toggle"    onclick="switchDashTab('today')">Today</button>
               <button id="tab_tomorrow"  class="tab-toggle"    onclick="switchDashTab('tomorrow')">Tomorrow</button>
               <button id="tab_calendar"  class="tab-toggle"    onclick="switchDashTab('calendar')">&#128197; Calendar</button>
-              <button id="tab_aging"     class="tab-toggle"    onclick="switchDashTab('aging')">&#9888; Aging</button>
+
             </div>
             <button class="bs gd" style="white-space:nowrap;" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*=&quot;co&quot;]'));},150);">&#128221; New Order</button>
           </div>
@@ -1191,18 +1191,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </div>
         </div>
         <!-- Admin Aging Report -->
-        <div id="adash_aging_wrap" style="display:none;margin-bottom:20px;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
-            <div style="font-size:13px;color:var(--gray);">Flag <strong>Requested</strong> orders unconfirmed longer than:</div>
-            <select id="aging_threshold" class="fs" style="width:auto;" onchange="renderAgingReport()">
-              <option value="3">3 days</option>
-              <option value="5" selected>5 days</option>
-              <option value="7">7 days</option>
-              <option value="14">14 days</option>
-            </select>
-          </div>
-          <div id="aging_report_body"></div>
-        </div>
+        
       </div>
 
       <!-- ADMIN ALL ORDERS -->
@@ -1212,6 +1201,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <h2 style="margin:0;">All Orders</h2>
             <span id="aord_count" style="font-size:13px;color:var(--gray);font-weight:400;"></span>
           </div>
+          <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelectorAll('#cl .ni')[1]);},120);">&#43; New Order</button>
           <div class="exp-wrap" id="expWrap">
             <button class="exp-btn" onclick="toggleExpMenu(event)">&#8681; Export <span class="exp-arrow">&#9660;</span></button>
             <div class="exp-menu" id="expMenu">
@@ -5090,8 +5080,8 @@ function dashStatClick(type) {
 
 function switchDashTab(tab) {
   _dashTab = tab;
-  var allTabs = ['recent','yesterday','today','tomorrow','calendar','aging'];
-  var titles  = {recent:'New Orders — Action Required', yesterday:"Yesterday's Installs", today:"Today's Installs", tomorrow:"Tomorrow's Installs", calendar:'Installation Calendar', aging:'Aging Orders — Action Required'};
+  var allTabs = ['recent','yesterday','today','tomorrow','calendar'];
+  var titles  = {recent:'New Orders — Action Required', yesterday:"Yesterday's Installs", today:"Today's Installs", tomorrow:"Tomorrow's Installs", calendar:'Installation Calendar'};
   allTabs.forEach(function(t) {
     var btn  = document.getElementById('tab_'+t);
     var wrap = document.getElementById('adash_'+t+'_wrap');
@@ -5104,7 +5094,6 @@ function switchDashTab(tab) {
   else if (tab === 'yesterday') renderAdashYesterday();
   else if (tab === 'tomorrow')  renderAdashTomorrow();
   else if (tab === 'recent')    renderAdashRecent();
-  else if (tab === 'aging') { /* aging wrap is self-rendering */ }
   else if (tab === 'calendar') {
     if (!_calState['adash_cal']) initCal('adash_cal');
     else renderCal('adash_cal');
