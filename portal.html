@@ -1201,8 +1201,9 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <h2 style="margin:0;">All Orders</h2>
             <span id="aord_count" style="font-size:13px;color:var(--gray);font-weight:400;"></span>
           </div>
-          <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelectorAll('#cl .ni')[1]);},120);">&#43; New Order</button>
-          <div class="exp-wrap" id="expWrap">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="bs gd" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelectorAll('#cl .ni')[1]);},120);">&#43; New Order</button>
+            <div class="exp-wrap" id="expWrap">
             <button class="exp-btn" onclick="toggleExpMenu(event)">&#8681; Export <span class="exp-arrow">&#9660;</span></button>
             <div class="exp-menu" id="expMenu">
               <div class="exp-item" onclick="exportAordCsv()"><span class="exp-item-icon">&#128196;</span><span class="exp-item-label">CSV</span><span class="exp-item-ext">.csv</span></div>
@@ -1211,6 +1212,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <div class="exp-item" onclick="exportAordPrint()"><span class="exp-item-icon">&#128424;</span><span class="exp-item-label">Print / PDF</span><span class="exp-item-ext">.pdf</span></div>
               <div class="exp-item" onclick="exportAordTsv()"><span class="exp-item-icon">&#128196;</span><span class="exp-item-label">Tab-Separated</span><span class="exp-item-ext">.tsv</span></div>
             </div>
+          </div>
           </div>
         </div>
         <div class="fb" style="flex-wrap:wrap;gap:8px;margin-bottom:12px;">
