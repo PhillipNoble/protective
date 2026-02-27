@@ -1626,15 +1626,15 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
   <div class="modal w">
     <div class="mh">
       <h3 id="wotitle">Work Order</h3>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <button class="bs gn" onclick="printWorkOrder()">&#128424; Print / Save PDF</button>
-        <button class="bs ol" id="phbtn" onclick="togPhotos()">Include Photos</button>
-        <button class="bs gd" id="confirmbtn" onclick="openConfirm(this.dataset.woid)" style="display:none;">&#10003; Confirm</button>
-        <button class="bs gn" id="completebtn" onclick="quickComplete(this.dataset.woid)" style="display:none;">&#10003; Complete</button>
-        <button class="bs nv" id="editwobtn" onclick="openWoEdit(this.dataset.woid)" style="display:none;">&#9998; Edit Order</button>
-        <button class="bs ol" id="logbtn" onclick="exportWoLog(this.dataset.woid)" style="display:none;">&#128220; Export Log</button>
-        <button class="bs nv" id="copybtn" onclick="openCopyOrder(this.dataset.woid)" style="display:none;font-size:11px;">&#128203; Duplicate</button>
-        <button class="bs dn" id="voidbtn" onclick="openVoidOrder(this.dataset.woid)" style="display:none;">&#128683; Cancel / Void</button>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <button class="bs gn" style="font-size:11px;padding:4px 10px;" onclick="printWorkOrder()">&#128424; Print / Save PDF</button>
+        <button class="bs ol" id="phbtn" style="font-size:11px;padding:4px 10px;" onclick="togPhotos()">Include Photos</button>
+        <button class="bs gd" id="confirmbtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openConfirm(this.dataset.woid)">&#10003; Confirm</button>
+        <button class="bs gn" id="completebtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="quickComplete(this.dataset.woid)">&#10003; Complete</button>
+        <button class="bs nv" id="editwobtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openWoEdit(this.dataset.woid)">&#9998; Edit Order</button>
+        <button class="bs ol" id="logbtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="exportWoLog(this.dataset.woid)">&#128220; Export Log</button>
+        <button class="bs nv" id="copybtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openCopyOrder(this.dataset.woid)">&#128203; Duplicate</button>
+        <button class="bs dn" id="voidbtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openVoidOrder(this.dataset.woid)">&#128683; Cancel / Void</button>
         <button class="mx" onclick="closeM('mwo')">&#10005;</button>
       </div>
     </div>
@@ -6071,6 +6071,9 @@ function switchClientDashTab(tab) {
     if (tabCal)   tabCal.classList.remove('on');
   }
 }
+// ── CLIENT ACTIVITY LOG (stub; replaced by backend in production) ──────────
+function logClientActivity(action, data) { /* no-op in demo mode */ }
+
 function cnav(pid, el) {
   if (pid === 'cx') { setTimeout(renderClientDocuments, 50); logClientActivity('view_document',{}); }
   if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); logClientActivity('settings_view',{}); }
