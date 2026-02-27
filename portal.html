@@ -2072,14 +2072,14 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       </div>
       <div class="ms" style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:14px 16px;">
         <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#b45309;margin-bottom:8px;">&#9998; Reason for Edit <span style="color:#b91c1c;">*</span></div>
-        <select id="woedit_reason_sel" onchange="toggleWoEditOther(this.value)" style="margin-bottom:8px;">
+        <select id="woedit_reason_sel" onchange="toggleWoEditOther(this.value)" style="margin-bottom:10px;">
           <option value="">-- Select reason --</option>
           <option>Date change</option><option>Scope of work updated</option>
           <option>Service type correction</option><option>Unit number correction</option>
           <option>Property or address correction</option><option>Status update</option>
           <option>Customer request</option><option value="Other">Other (specify)</option>
         </select>
-        <textarea id="woedit_reason_other" placeholder="Describe the reason..." style="display:none;resize:vertical;min-height:60px;"></textarea>
+        <textarea id="woedit_reason_other" placeholder="Describe the reason for this edit..." style="display:none;resize:vertical;min-height:120px;width:100%;box-sizing:border-box;font-size:14px;line-height:1.6;padding:12px 14px;border:1px solid #fde68a;border-radius:4px;background:#fff;color:#1c1c2e;font-family:inherit;"></textarea>
       </div>
       <div id="woedit_err" style="display:none;color:#b91c1c;font-size:13px;margin-top:10px;padding:8px 12px;background:#fef2f2;border-radius:4px;"></div>
     </div>
@@ -4086,8 +4086,20 @@ function woeditPopulatePlans(propName, currentPlan) {
 }
 
 function toggleWoEditOther(val) {
-  document.getElementById('woedit_reason_other').style.display =
-    val === 'Other' ? 'block' : 'none';
+  var ta = document.getElementById('woedit_reason_other');
+  if (!ta) return;
+  if (val && val !== '') {
+    ta.style.display = 'block';
+    // Update placeholder based on selection
+    ta.placeholder = val === 'Other'
+      ? 'Please describe the reason for this edit...'
+      : 'Describe the details of this ' + val.toLowerCase() + '... (optional)';
+    // Focus the textarea so user can start typing immediately
+    setTimeout(function(){ ta.focus(); }, 50);
+  } else {
+    ta.style.display = 'none';
+    ta.value = '';
+  }
 }
 
 function saveWoEdit() {
