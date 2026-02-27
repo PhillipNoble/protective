@@ -2695,7 +2695,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
 
 // ── DATA VERSION GUARD ───────────────────────────────────────────────────────
-var PORTAL_DATA_VERSION = '2026-02-v1';
+var PORTAL_DATA_VERSION = '2026-02-v3';
 (function() {
   try {
     var stored = localStorage.getItem('pf_data_version');
@@ -6121,13 +6121,13 @@ function anav(pid, el) {
 // ── ORDERS DATA ──
 // ── ORDER STORE ──
 var ORDER_SEED = {
-  'CC-001':{num:'NA0001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'2025-02-20',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2025',email:'manager"+"@"+"cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  'CC-002':{num:'NA0002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2025-02-18',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2025',email:'manager"+"@"+"cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'No Preference',photos:true},
-  'CC-003':{num:'NA0003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'2025-02-10',confDate:'February 10, 2025',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2025',email:'manager"+"@"+"cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
-  '2411':{num:'ME0001',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'2025-02-28',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2025',email:'rmoore"+"@"+"riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2414':{num:'ME0002',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'2025-03-03',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2025',email:'shill"+"@"+"parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
-  '2413':{num:'ME0003',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'2025-02-26',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2025',email:'rmoore"+"@"+"riverside.com',notes:'',timeWindow:'No Preference',photos:false},
-  '2410':{num:'NA0004',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2025-02-24',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2025',email:'kdavis"+"@"+"arborridge.com',notes:'',timeWindow:'No Preference',photos:false}
+  'CC-001':{num:'NA0001',property:'Cherry Creek Apartments',hub:'Nashville',unit:'214',plan:'2 Bed / 2 Bath',sqft:'1,080 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bed 1','Bed 2','Hallway'],reqDate:'2026-02-20',confDate:'__TODAY__',status:'scheduled',submittedBy:'Jessica Lane',submittedDate:'February 15, 2026',email:'manager"+"@"+"cherrycreek.com',notes:'Standard turnover carpet. Match neutral tone.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  'CC-002':{num:'NA0002',property:'Cherry Creek Apartments',hub:'Nashville',unit:'108',plan:'1 Bed / 1 Bath',sqft:'720 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2026-02-18',confDate:'Pending',status:'requested',submittedBy:'Jessica Lane',submittedDate:'February 14, 2026',email:'manager"+"@"+"cherrycreek.com',notes:'Kitchen vinyl is lifting near dishwasher. Bathroom showing wear.',timeWindow:'',photos:true},
+  'CC-003':{num:'NA0003',property:'Cherry Creek Apartments',hub:'Nashville',unit:'301',plan:'3 Bed / 2 Bath',sqft:'1,350 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bed 1','Bed 2','Bed 3','Hallway'],reqDate:'2026-02-10',confDate:'2026-02-10',status:'completed',submittedBy:'Jessica Lane',submittedDate:'February 5, 2026',email:'manager"+"@"+"cherrycreek.com',notes:'Full turnover LVP all carpeted areas.',timeWindow:'Morning (7 AM - 12 PM)',photos:false},
+  '2411':{num:'ME0001',property:'Riverside Apartments',hub:'Memphis',unit:'204',plan:'2 Bed / 2 Bath',sqft:'1,050 sq ft',occ:'Vacant',service:'Luxury Vinyl Plank (LVP)',scope:['Living Room','Bedroom 1','Bedroom 2'],reqDate:'2026-02-28',confDate:'__TODAY__',status:'scheduled',submittedBy:'Rachel Moore',submittedDate:'February 22, 2026',email:'rmoore"+"@"+"riverside.com',notes:'Please use darker walnut tone LVP.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2414':{num:'ME0002',property:'Parkview Commons',hub:'Memphis',unit:'08B',plan:'2 Bed / 2 Bath',sqft:'980 sq ft',occ:'Vacant',service:'Carpet + Pet Seal Treatment',scope:['Living Room','Bedroom 1','Bedroom 2','Hallway'],reqDate:'2026-03-03',confDate:'Pending',status:'requested',submittedBy:'Sandra Hill',submittedDate:'February 22, 2026',email:'shill"+"@"+"parkview.com',notes:'Heavy pet damage. Strong odor in both bedrooms.',timeWindow:'Morning (7 AM - 12 PM)',photos:true},
+  '2413':{num:'ME0003',property:'Riverside Apartments',hub:'Memphis',unit:'118',plan:'1 Bed / 1 Bath',sqft:'650 sq ft',occ:'Vacant',service:'Carpet Installation',scope:['Living Room','Bedroom'],reqDate:'2026-02-26',confDate:'Pending',status:'requested',submittedBy:'Rachel Moore',submittedDate:'February 20, 2026',email:'rmoore"+"@"+"riverside.com',notes:'',timeWindow:'',photos:false},
+  '2410':{num:'NA0004',property:'Arbor Ridge Nashville',hub:'Nashville',unit:'15C',plan:'1 Bed / 1 Bath',sqft:'700 sq ft',occ:'Vacant',service:'Sheet Vinyl',scope:['Kitchen','Bathroom 1'],reqDate:'2026-02-24',confDate:'Pending',status:'requested',submittedBy:'Keisha Davis',submittedDate:'February 18, 2026',email:'kdavis"+"@"+"arborridge.com',notes:'',timeWindow:'',photos:false}
 };
 
 function saveOrders() {
@@ -6156,10 +6156,11 @@ function loadOrders() {
       var merged = JSON.parse(JSON.stringify(freshSeed));
       Object.keys(parsed).forEach(function(k) {
         merged[k] = parsed[k];
-        // Re-stamp seed order confDates so Today's Installs always works
-        if (freshSeed[k] && freshSeed[k].confDate) {
-          merged[k].confDate = freshSeed[k].confDate;
-          merged[k].status   = freshSeed[k].status;
+        // Re-stamp seed order dates so calendar always reflects current seed
+        if (freshSeed[k]) {
+          if (freshSeed[k].confDate) merged[k].confDate = freshSeed[k].confDate;
+          if (freshSeed[k].reqDate)  merged[k].reqDate  = freshSeed[k].reqDate;
+          merged[k].status = freshSeed[k].status;
         }
         // Migrate long-form reqDate to ISO for date filter compatibility
         if (merged[k].reqDate && !/^\d{4}-\d{2}-\d{2}$/.test(merged[k].reqDate)) {
@@ -8583,29 +8584,35 @@ function clearBulkSelect() {
 function bulkConfirm() {
   var ids = Object.keys(_bulkSelected).filter(function(id){ return orders[id] && orders[id].status==='requested'; });
   if (!ids.length) { toast('No Requested orders selected.'); return; }
-  if (!confirm('Confirm '+ids.length+' order(s) with today\'s date as install date?')) return;
-  var today = new Date();
-  var iso = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  if (!confirm('Confirm '+ids.length+' order(s) as scheduled for their requested install date?')) return;
   ids.forEach(function(id) {
     var o = orders[id];
-    o.status = 'scheduled'; o.confDate = iso;
+    // Confirm scheduled for the order's own requested install date
+    var reqIso = resolveOrderDate(o) || (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+    o.status   = 'scheduled';
+    o.confDate = reqIso;
     if (!o.log) o.log = [];
-    o.log.push({ts:cstNow(),by:(window.currentTeamUser&&window.currentTeamUser.name)||'Admin',reason:'Bulk Confirmed',changes:[{field:'Status',from:'Requested',to:'Scheduled'}]});
+    o.log.push({ts:cstNow(),by:(window.currentTeamUser&&window.currentTeamUser.name)||'Admin',reason:'Bulk Confirmed',
+      changes:[{field:'Status',from:'Requested',to:'Scheduled'},{field:'Install Date',from:'Pending',to:fmtDate(reqIso)}]});
     notifOnScheduled(o);
   });
   saveOrders(); refreshAllOrderViews(); clearBulkSelect();
-  toast('\u2713 '+ids.length+' order(s) confirmed.');
+  toast('\u2713 '+ids.length+' order(s) confirmed for their requested install dates.');
 }
 function bulkComplete() {
-  var ids = Object.keys(_bulkSelected).filter(function(id){ return orders[id] && orders[id].status==='scheduled'; });
-  if (!ids.length) { toast('No Scheduled orders selected.'); return; }
-  if (!confirm('Mark '+ids.length+' order(s) as Completed?')) return;
-  var today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var ids = Object.keys(_bulkSelected).filter(function(id){ return orders[id] && (orders[id].status==='scheduled'||orders[id].status==='requested'); });
+  if (!ids.length) { toast('No Requested or Scheduled orders selected.'); return; }
+  if (!confirm('Mark '+ids.length+' order(s) as Completed on their requested/confirmed install date?')) return;
   ids.forEach(function(id) {
     var o = orders[id];
-    o.status='completed'; o.completedDate=today;
-    if (!o.log) o.log=[];
-    o.log.push({ts:cstNow(),by:(window.currentTeamUser&&window.currentTeamUser.name)||'Admin',reason:'Bulk Completed',changes:[{field:'Status',from:'Scheduled',to:'Completed'}]});
+    var prevStatus = o.status;
+    // Use confirmed date if available, otherwise requested date
+    var effIso = resolveOrderDate(o) || (function(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+    o.status        = 'completed';
+    o.completedDate = fmtDate(effIso);
+    if (!o.log) o.log = [];
+    o.log.push({ts:cstNow(),by:(window.currentTeamUser&&window.currentTeamUser.name)||'Admin',reason:'Bulk Completed',
+      changes:[{field:'Status',from:prevStatus.charAt(0).toUpperCase()+prevStatus.slice(1),to:'Completed'},{field:'Completed Date',from:'—',to:fmtDate(effIso)}]});
     notifOnCompleted(o);
   });
   saveOrders(); refreshAllOrderViews(); clearBulkSelect();
