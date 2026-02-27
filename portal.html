@@ -1256,9 +1256,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="service">By Service</option>
           </select>
         </div>
-        <div class="tw"><table id="aord_tbl">
-          <!-- Bulk action bar -->
-          <div class="bulk-bar" id="bulk_bar">
+        <div class="bulk-bar" id="bulk_bar">
             <span class="bulk-count" id="bulk_count">0 selected</span>
             <button class="bs gd" style="font-size:11px;padding:5px 12px;" onclick="bulkConfirm()">&#10003; Confirm Selected</button>
             <button class="bs gn" style="font-size:11px;padding:5px 12px;" onclick="bulkComplete()">&#10003; Complete Selected</button>
@@ -1266,6 +1264,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <button class="bs dn" style="font-size:11px;padding:5px 12px;background:transparent;color:#dc2626;border-color:#fca5a5;" onclick="bulkVoid()">&#128683; Void Selected</button>
             <button class="bs ol" style="font-size:11px;padding:5px 12px;margin-left:auto;" onclick="clearBulkSelect()">&#10005; Clear</button>
           </div>
+        <div class="tw"><table id="aord_tbl">
           <thead><tr>
             <th style="width:32px;"><input type="checkbox" id="bulk_all" title="Select all" onchange="toggleSelectAll(this.checked)" style="cursor:pointer;accent-color:var(--navy);width:14px;height:14px;"></th>
             <th class="sortable" onclick="sortTable('aord_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('aord_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('aord_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('aord_tbl',3,'str')">Unit</th>
