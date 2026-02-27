@@ -1137,7 +1137,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="tw"><table id="ucl_table">
           <thead><tr>
             <th>Name</th><th>Email</th><th>Password</th><th>Properties</th><th>Hub</th>
-            <th>Role</th><th>Status</th>
+            <th>Role</th><th>Terms &amp; SMS</th><th>Status</th>
             <th style="white-space:nowrap;">Last Login <span id="ucl_count" style="font-weight:400;font-size:10px;color:rgba(255,255,255,.6);"></span></th>
             <th></th>
           </tr></thead>
@@ -2177,6 +2177,137 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
     <div class="mf">
       <button class="bs ol" onclick="closeM('mvoid')">Keep Order</button>
       <button class="bl dn" onclick="confirmVoidOrder()">&#128683; Confirm Cancellation</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- TERMS OF USE + SMS OPT-IN MODAL (two-step) -->
+<div class="mb" id="mterms" style="z-index:9999;">
+  <div class="modal" style="max-width:660px;width:95%;max-height:92vh;display:flex;flex-direction:column;">
+
+    <!-- ── STEP 1: Terms of Use ── -->
+    <div id="terms_step1" style="display:flex;flex-direction:column;flex:1;min-height:0;">
+      <div class="mh" style="flex-shrink:0;">
+        <div>
+          <h3 style="margin:0;">Portal Terms of Use</h3>
+          <div style="font-size:12px;color:var(--gray);margin-top:2px;">Step 1 of 2 &mdash; Please read and accept before continuing</div>
+        </div>
+      </div>
+      <div class="mbody" style="overflow-y:auto;flex:1;padding:22px 28px;font-size:13px;line-height:1.75;color:var(--text);">
+        <p style="margin:0 0 12px;"><strong>Effective Date:</strong> February 2026 &nbsp;|&nbsp; <strong>Protective Flooring</strong></p>
+        <p style="margin:0 0 12px;">By accessing and using the Protective Flooring Client Portal (&ldquo;Portal&rdquo;), you agree to the following Terms of Use. If you do not agree, do not use the Portal.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">1. Purpose &amp; Scope</div>
+        <p style="margin:0 0 12px;">The Portal is provided as a <strong>convenience tool</strong> for submitting flooring service requests and viewing order history. It does not constitute a binding service agreement. All work orders submitted through the Portal are <strong>requests only</strong> and are not confirmed until acknowledged in writing or by phone by a Protective Flooring coordinator.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">2. Order Accuracy</div>
+        <p style="margin:0 0 12px;">You are solely responsible for the accuracy of all information submitted, including unit numbers, floor plans, scope of work, occupancy status, and requested dates. Protective Flooring is not liable for errors resulting from inaccurate submissions.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">3. Confirmation Requirement</div>
+        <p style="margin:0 0 12px;">Submission of an order request does <strong>not</strong> guarantee scheduling or pricing. A Protective Flooring coordinator will contact you to confirm details, dates, and costs before work is scheduled. Occupied unit installations additionally require a signed <strong>Occupied Unit Authorization Form</strong> before an install date can be confirmed.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">4. Data &amp; Technical Limitations</div>
+        <p style="margin:0 0 12px;">The Portal stores certain data locally in your browser. Clearing your browser data, switching devices, or using a different browser may result in loss of locally stored information. Protective Flooring is not responsible for data loss resulting from browser or device limitations.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">5. Account Security</div>
+        <p style="margin:0 0 12px;">Your login credentials are personal and non-transferable. You are responsible for maintaining the confidentiality of your username and password. Notify Protective Flooring immediately if you suspect unauthorized access to your account.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">6. Limitation of Liability</div>
+        <p style="margin:0 0 12px;">The Portal is provided &ldquo;as is&rdquo; without warranty of any kind. Protective Flooring makes no representations regarding the availability, accuracy, or reliability of the Portal. To the fullest extent permitted by applicable law, Protective Flooring shall not be liable for any indirect, incidental, or consequential damages arising from your use of or inability to use the Portal.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">7. Changes to Terms</div>
+        <p style="margin:0 0 12px;">Protective Flooring reserves the right to update these Terms at any time. Continued use of the Portal following notice of changes constitutes acceptance of the revised Terms.</p>
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin:18px 0 5px;">8. Governing Law</div>
+        <p style="margin:0 0 0;">These Terms are governed by the laws of the State of Tennessee. Any disputes shall be resolved in the courts of Shelby County or Davidson County, Tennessee, as applicable.</p>
+      </div>
+      <div style="flex-shrink:0;padding:18px 28px;border-top:1px solid var(--border);background:var(--cream);">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
+          <input type="checkbox" id="terms_chk" style="margin-top:2px;width:16px;height:16px;flex-shrink:0;accent-color:var(--navy);cursor:pointer;" onchange="document.getElementById('terms_next_btn').disabled=!this.checked;">
+          <span style="font-size:13px;line-height:1.5;color:var(--text);">I have read and agree to the Protective Flooring Portal Terms of Use. I understand that order submissions are requests only and are not confirmed until acknowledged by a coordinator.</span>
+        </label>
+        <div id="terms_err" style="display:none;color:#b91c1c;font-size:12px;margin-bottom:10px;">&#9888; Please check the box above to confirm you have read and accepted the Terms of Use.</div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button id="terms_next_btn" class="bl gd" style="min-width:180px;" disabled onclick="termsGoToSms()">Next: Text Notifications &#8594;</button>
+          <button class="bl ol" onclick="declineTerms()">Decline &amp; Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: SMS Opt-In ── -->
+    <div id="terms_step2" style="display:none;flex-direction:column;flex:1;">
+      <div class="mh" style="flex-shrink:0;">
+        <div>
+          <h3 style="margin:0;">&#128241; Text Message Notifications</h3>
+          <div style="font-size:12px;color:var(--gray);margin-top:2px;">Step 2 of 2 &mdash; Optional</div>
+        </div>
+      </div>
+      <div class="mbody" style="padding:28px;flex:1;">
+
+        <p style="font-size:14px;color:var(--text);line-height:1.6;margin:0 0 20px;">Receive text updates on your work orders &mdash; including scheduling confirmations, install reminders, and completion notices.</p>
+
+        <div style="background:#f0f4ff;border:1px solid rgba(2,10,91,.15);border-radius:6px;padding:16px 18px;margin-bottom:22px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">&#128241; How it works</div>
+          <ul style="font-size:13px;color:var(--text);line-height:1.8;margin:0;padding-left:18px;">
+            <li>Enter your mobile number below to opt in</li>
+            <li>You'll receive texts when orders are confirmed, scheduled, and completed</li>
+            <li>Reply <strong>STOP</strong> at any time to opt out of all messages</li>
+            <li>Reply <strong>HELP</strong> for assistance</li>
+          </ul>
+        </div>
+
+        <div class="fg" style="max-width:320px;margin-bottom:18px;">
+          <label>Mobile Phone Number <span style="font-size:11px;font-weight:400;color:var(--gray);">Optional</span></label>
+          <input type="tel" id="sms_phone_input" placeholder="(555) 000-0000" autocomplete="tel"
+            style="font-size:15px;letter-spacing:.5px;"
+            oninput="fmtPhoneInput(this)">
+          <div id="sms_phone_err" style="display:none;color:#b91c1c;font-size:12px;margin-top:4px;"></div>
+        </div>
+
+        <!-- Consent checkbox -->
+        <label id="sms_consent_wrap" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:8px;">
+          <input type="checkbox" id="sms_consent_chk" style="margin-top:2px;width:15px;height:15px;flex-shrink:0;accent-color:var(--navy);cursor:pointer;">
+          <span style="font-size:12px;line-height:1.6;color:var(--text);">By checking this box and providing my number, I consent to receive automated text messages from Protective Flooring regarding my work orders. Consent is not a condition of any purchase or service.</span>
+        </label>
+
+        <!-- TCPA / data rate notice -->
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:11px;color:var(--gray);line-height:1.6;">
+          <strong style="color:var(--text);">Message &amp; Data Rates May Apply.</strong> Message frequency varies based on order activity. Reply <strong>STOP</strong> to opt out at any time &mdash; you will receive one confirmation message and no further texts will be sent. Reply <strong>HELP</strong> for help. For support contact <span style="color:var(--navy);">info@protectiveflooring.com</span>. View our <a href="#" onclick="return false;" style="color:var(--navy);">Privacy Policy</a>.
+        </div>
+
+      </div>
+      <div style="flex-shrink:0;padding:18px 28px;border-top:1px solid var(--border);background:var(--cream);display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="bl gd" onclick="acceptTermsAndSms()" style="min-width:200px;">&#10003; Finish &amp; Enter Portal</button>
+        <button class="bl ol" onclick="skipSms()">Skip &mdash; No texts please</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TERMS VIEW-ONLY MODAL -->
+<div class="mb" id="mterms_view" onclick="if(event.target===this)closeM('mterms_view')">
+  <div class="modal" style="max-width:660px;width:95%;max-height:88vh;display:flex;flex-direction:column;">
+    <div class="mh" style="flex-shrink:0;">
+      <h3>Portal Terms of Use</h3>
+      <button class="mx" onclick="closeM('mterms_view')">&#10005;</button>
+    </div>
+    <div class="mbody" style="overflow-y:auto;flex:1;padding:24px 28px;font-size:13px;line-height:1.75;color:var(--text);">
+      <p><strong>Effective Date:</strong> February 2026 &nbsp;|&nbsp; <strong>Protective Flooring</strong></p>
+      <p><strong>1. Purpose &amp; Scope</strong><br>The Portal is a convenience tool for submitting flooring service requests. All work orders are requests only and not confirmed until acknowledged by a coordinator.</p>
+      <p><strong>2. Order Accuracy</strong><br>You are responsible for the accuracy of all submitted information.</p>
+      <p><strong>3. Confirmation Requirement</strong><br>Order submission does not guarantee scheduling or pricing. Occupied units require a signed Occupied Unit Authorization Form.</p>
+      <p><strong>4. Data &amp; Technical Limitations</strong><br>The Portal stores data locally in your browser. Protective Flooring is not responsible for data loss from browser or device limitations.</p>
+      <p><strong>5. Account Security</strong><br>Credentials are personal and non-transferable.</p>
+      <p><strong>6. Limitation of Liability</strong><br>The Portal is provided &ldquo;as is.&rdquo; Protective Flooring is not liable for indirect or consequential damages from Portal use.</p>
+      <p><strong>7. Changes to Terms</strong><br>Protective Flooring may update these Terms at any time. Continued use constitutes acceptance.</p>
+      <p><strong>8. Governing Law</strong><br>Governed by the laws of Tennessee. Disputes resolved in Shelby or Davidson County courts.</p>
+      <div id="mterms_view_accepted" style="margin-top:20px;padding:12px 16px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:3px;font-size:12px;color:#065f46;display:none;"></div>
+      <div id="mterms_view_sms" style="margin-top:12px;padding:12px 16px;background:#f0f4ff;border:1px solid rgba(2,10,91,.2);border-radius:3px;font-size:12px;color:var(--navy);display:none;"></div>
+    </div>
+    <div style="flex-shrink:0;padding:14px 28px;border-top:1px solid var(--border);text-align:right;">
+      <button class="bl ol" onclick="closeM('mterms_view')">Close</button>
     </div>
   </div>
 </div>
@@ -5199,6 +5330,13 @@ function loadClientPortal(user) {
   // Populate floor plans page
   buildFloorPlansPage(user);
   cnav('cd', document.querySelectorAll('#cl .ni')[0]);
+
+  // Check terms acceptance
+  if (!checkTermsAcceptance(user)) {
+    setTimeout(showTermsModal, 400);
+  } else {
+    showTermsBanner();
+  }
 }
 
 // ── FLOOR PLANS PAGE ──
@@ -5518,8 +5656,26 @@ function oworder(id) {
     '<div class="wod">'+
       '<div class="woh">'+
       '<div><img src="'+logo+'" style="height:48px;width:auto;margin-bottom:12px;">'+
-      (function(){ var _m=getMarket(o.hub); return '<p>Protective Services Company, Inc. dba Protective Flooring<br>'+(_m&&_m.address?_m.address:'3846 Delp Street, Memphis, TN 38118')+'<br>'+(_m&&_m.phone?_m.phone:'(901) 794-4101')+' &mdash; info@protectiveflooring.com</p>'; }())+'>'+o.confDate+'</div></div>'+
-        '</div>'+
+      (function(){ var _m=getMarket(o.hub); return '<p>Protective Services Company, Inc. dba Protective Flooring<br>'+(_m&&_m.address?_m.address:'3846 Delp Street, Memphis, TN 38118')+'<br>'+(_m&&_m.phone?_m.phone:'(901) 794-4101')+' &mdash; info@protectiveflooring.com</p>'; }())+
+      '</div>'+
+      '<div class="wor">'+
+        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Key Dates</div>'+
+        '<table style="border-collapse:collapse;text-align:right;">'+
+          '<tr><td style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:2px 10px 2px 0;">Submitted</td>'+
+              '<td style="font-size:13px;font-weight:600;color:var(--text);padding:2px 0;">'+(o.submittedDate||'&#8212;')+'</td></tr>'+
+          '<tr><td style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:2px 10px 2px 0;">Scheduled</td>'+
+              '<td style="font-size:13px;font-weight:600;color:var(--text);padding:2px 0;">'+(o.confDate&&o.confDate!=='Pending'?fmtDate(o.confDate):'<span style="color:var(--gray);font-style:italic;">Pending</span>')+'</td></tr>'+
+          '<tr><td style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:2px 10px 2px 0;">Install Date</td>'+
+              '<td style="font-size:13px;font-weight:600;color:var(--text);padding:2px 0;">'+(o.reqDate?fmtDate(o.reqDate):'<span style="color:var(--gray);font-style:italic;">TBD</span>')+'</td></tr>'+
+          (o.status==='completed'?'<tr><td style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#15803d;padding:2px 10px 2px 0;">Completed</td>'+
+              '<td style="font-size:13px;font-weight:600;color:#15803d;padding:2px 0;">'+(o.completedDate||o.confDate||'&#8212;')+'</td></tr>':'')+
+        '</table>'+
+        (o.po ? '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;text-align:right;">'+
+          '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Purchase Order</span><br>'+
+          '<span style="font-size:13px;font-weight:600;color:var(--text);">'+(o.po)+'</span></div>' : '')+
+      '</div>'+
+      '</div>'+
+      '<div style="margin-bottom:18px;">'+
         '<div class="wof" style="margin-bottom:14px;"><div class="wofl">Scope of Work</div><div style="margin-top:8px;"><div class="woscl">'+sc+'</div></div></div>'+
         '<div class="wof"><div class="wofl">Time Window</div><div class="wofv">'+o.timeWindow+'</div></div>'+
       '</div>'+
@@ -6241,7 +6397,7 @@ function renderTeamTable() {
     var initials = u.initials || (u.name||'?')[0];
     var nameCell = '<div style="display:flex;align-items:center;gap:10px;">'
       + '<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy),#1a2d9a);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + initials + '</div>'
-      + '<div><div style="font-weight:600;font-size:13px;">' + u.name + '</div></div></div>';
+      + '<div><div style="font-weight:600;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditTeamUser(\''+u.id+'\')" title="Click to edit">' + u.name + '</div></div></div>';
     var actions = '<div style="display:flex;gap:6px;">';
     if (isAdmin) actions += '<button class="bs ol" onclick="openEditTeamUser(\''+u.id+'\')">Edit</button>';
     if (isSA && u.role!=='superadmin') {
@@ -6253,7 +6409,7 @@ function renderTeamTable() {
     return '<tr>'
       + '<td>' + nameCell + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + u.email + '</td>'
-      + '<td>' + pwCell(u.id, u.password, 'team') + '</td>'
+      + '<td>' + pwCell(u.id, u.password, 'team', u.role) + '</td>'
       + '<td>' + roleLabel(u.role) + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + (u.hub || '—') + '</td>'
       + '<td style="color:var(--gray);font-size:12px;">' + (u.lastLogin||'Never') + '</td>'
@@ -6570,7 +6726,7 @@ function renderUserTable() {
   if (countEl) countEl.textContent = '(' + clients.length + ')';
 
   if (clients.length === 0) {
-    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--gray);">No matching client logins.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--gray);">No matching client logins.</td></tr>';
     return;
   }
 
@@ -6605,8 +6761,365 @@ function renderUserTable() {
       + '<td>' + pwCell(u.id, u.password, 'ucl') + '</td>'
       + '<td style="font-size:12px;">' + props + '</td>'
       + '<td>' + hbadge + '</td>'
-      + '<td style="font-size:12px;">' + (u.role || 'Property Manager') + '</td>'
+      + '<td style="font-size:12px;">' + (u.role || 'Property Manager') + '</td>'      + '<td>' + (u.termsAccepted
+        ? '<div style="display:flex;flex-direction:column;gap:2px;">'
+          + '<span style="color:#15803d;font-size:11px;font-weight:600;">&#10003; Terms</span>'
+          + '<span style="font-size:10px;color:var(--gray);">' + u.termsAccepted + '</span>'
+          + (u.smsOptIn && u.smsPhone
+              ? '<span style="color:var(--navy);font-size:10px;">&#128241; ' + u.smsPhone.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3') + '</span>'
+              : '<span style="font-size:10px;color:var(--gray);">&#128241; No SMS</span>')
+          + '</div>'
+        : '<span style="color:#b91c1c;font-size:11px;font-weight:600;">&#10007; Not accepted</span>')
+      + '</td>'
       + '<td>' + sbadge + '</td>'
+      + '<td style="color:var(--gray);font-size:12px;">' + (u.created||'--') + '</td>'
+      + '<td>' + actions + '</td></tr>';
+  }).join('');
+}
+
+function openAddTeamUser() {
+  ['tm_first','tm_last','tm_email','tm_pw','tm_pw2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('tm_role').value = 'admin';
+  document.getElementById('tm_err').style.display = 'none';
+  populateHubSelect('tm_hub', '', 'All Hubs');
+  syncPermCheckboxes('tm');
+  // Hide superadmin option if not superadmin
+  var isSA = (window._portalRole==='superadmin');
+  var saOpt = document.querySelector('#tm_role option[value="superadmin"]');
+  if (saOpt) saOpt.style.display = isSA ? '' : 'none';
+  openM('mteam');
+}
+
+// ── PERMISSION SYSTEM ──
+
+// Role default permission sets
+var ROLE_PERMS = {
+  superadmin:  {view_orders:1,edit_orders:1,void_orders:1,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:1,proposals:1,reports:1,clients:1,users:1,settings:1},
+  admin:       {view_orders:1,edit_orders:1,void_orders:1,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:1,proposals:1,reports:1,clients:1,users:1,settings:1},
+  management:  {view_orders:1,edit_orders:1,void_orders:1,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:1,proposals:1,reports:1,clients:0,users:0,settings:0},
+  sales:       {view_orders:1,edit_orders:0,void_orders:0,confirm_orders:0,view_props:1,edit_props:0,edit_fps:0,leads:1,proposals:1,reports:0,clients:0,users:0,settings:0},
+  editor:      {view_orders:1,edit_orders:1,void_orders:0,confirm_orders:1,view_props:1,edit_props:1,edit_fps:1,leads:0,proposals:0,reports:0,clients:0,users:0,settings:0}
+};
+
+var PERM_KEYS = ['view_orders','edit_orders','void_orders','confirm_orders','view_props','edit_props','edit_fps','leads','proposals','reports','clients','users','settings'];
+
+// Sync checkboxes to role defaults (prefix = 'tm' or 'te')
+function syncPermCheckboxes(prefix) {
+  var role = (document.getElementById(prefix+'_role')||{}).value || 'editor';
+  var defaults = ROLE_PERMS[role] || ROLE_PERMS.editor;
+  PERM_KEYS.forEach(function(k) {
+    var cb = document.getElementById(prefix+'_p_'+k);
+    if (cb) cb.checked = !!defaults[k];
+  });
+  // Lock superadmin — all perms always on
+  var isLocked = (role === 'superadmin');
+  PERM_KEYS.forEach(function(k) {
+    var row = document.getElementById(prefix+'_p_'+k);
+    if (row) row.parentElement.classList.toggle('locked', isLocked);
+  });
+}
+
+// Read checkboxes into permissions object
+function readPermCheckboxes(prefix) {
+  var perms = {};
+  PERM_KEYS.forEach(function(k) {
+    var cb = document.getElementById(prefix+'_p_'+k);
+    perms[k] = cb ? (cb.checked ? 1 : 0) : 0;
+  });
+  return perms;
+}
+
+// Set checkboxes from saved permissions object
+function setPermCheckboxes(prefix, perms) {
+  PERM_KEYS.forEach(function(k) {
+    var cb = document.getElementById(prefix+'_p_'+k);
+    if (cb) cb.checked = !!(perms && perms[k]);
+  });
+}
+
+function saveNewTeamUser() {
+  var first = (document.getElementById('tm_first').value||'').trim();
+  var last  = (document.getElementById('tm_last').value||'').trim();
+  var email = (document.getElementById('tm_email').value||'').trim().toLowerCase();
+  var pw    = document.getElementById('tm_pw').value;
+  var pw2   = document.getElementById('tm_pw2').value;
+  var role  = document.getElementById('tm_role').value;
+  var hub   = (document.getElementById('tm_hub')||{value:''}).value;
+  var err   = document.getElementById('tm_err');
+  err.style.display='none';
+  if (!first||!last)           { err.textContent='First and last name required.'; err.style.display='block'; return; }
+  if (!email||!email.includes('@')) { err.textContent='Valid email required.'; err.style.display='block'; return; }
+  if (pw.length<8)             { err.textContent='Password must be at least 8 characters.'; err.style.display='block'; return; }
+  if (pw!==pw2)                { err.textContent='Passwords do not match.'; err.style.display='block'; return; }
+  var team = getTeam();
+  for (var i=0;i<team.length;i++) { if(team[i].email===email){err.textContent='Email already exists.';err.style.display='block';return;} }
+  var today=new Date(), months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  team.push({
+    id:'t'+Date.now(), email:email, password:pw,
+    name:first+' '+last, initials:(first[0]+last[0]).toUpperCase(),
+    role:role, hub:hub, status:'active', perms:readPermCheckboxes('tm'),
+    created:months[today.getMonth()]+' '+today.getDate()+', '+today.getFullYear()
+  });
+  saveTeam(team);
+  ADMIN_USERS = getTeam();
+  closeM('mteam');
+  renderTeamTable();
+  toast('Portal user created: '+first+' '+last+'.');
+}
+
+function openEditTeamUser(uid) {
+  var team=getTeam(), u=null;
+  for(var i=0;i<team.length;i++){if(team[i].id===uid){u=team[i];break;}}
+  if(!u)return;
+  document.getElementById('te_id').value=u.id;
+  var parts=u.name.split(' ');
+  document.getElementById('te_first').value=parts[0]||'';
+  document.getElementById('te_last').value=parts.slice(1).join(' ')||'';
+  document.getElementById('te_email').value=u.email;
+  document.getElementById('te_pw').value='';
+  document.getElementById('te_pw2').value='';
+  document.getElementById('te_role').value=u.role||'admin';
+  populateHubSelect('te_hub', u.hub||'', 'All Hubs');
+  document.getElementById('te_status').value=u.status||'active';
+  document.getElementById('te_err').style.display='none';
+  // Load saved perms or fall back to role defaults
+  if (u.perms) { setPermCheckboxes('te', u.perms); }
+  else { syncPermCheckboxes('te'); }
+  // Lock if superadmin
+  var isLocked = (u.role==='superadmin');
+  PERM_KEYS.forEach(function(k) {
+    var row = document.getElementById('te_p_'+k);
+    if (row) row.parentElement.classList.toggle('locked', isLocked);
+  });
+  openM('mteamedit');
+}
+
+function saveEditTeamUser() {
+  var uid   = document.getElementById('te_id').value;
+  var first = (document.getElementById('te_first').value||'').trim();
+  var last  = (document.getElementById('te_last').value||'').trim();
+  var email = (document.getElementById('te_email').value||'').trim().toLowerCase();
+  var pw    = document.getElementById('te_pw').value;
+  var pw2   = document.getElementById('te_pw2').value;
+  var err   = document.getElementById('te_err');
+  err.style.display='none';
+  if(!first||!last){err.textContent='Name required.';err.style.display='block';return;}
+  if(!email||!email.includes('@')){err.textContent='Valid email required.';err.style.display='block';return;}
+  if(pw&&pw.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return;}
+  if(pw&&pw!==pw2){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  var team=getTeam();
+  for(var i=0;i<team.length;i++){
+    if(team[i].id===uid){
+      team[i].name=first+' '+last;
+      team[i].initials=(first[0]+last[0]).toUpperCase();
+      team[i].email=email;
+      team[i].role=document.getElementById('te_role').value;
+      team[i].hub=(document.getElementById('te_hub')||{value:''}).value;
+      team[i].status=document.getElementById('te_status').value;
+      team[i].perms=readPermCheckboxes('te');
+      if(pw) team[i].password=pw;
+      break;
+    }
+  }
+  saveTeam(team);
+  ADMIN_USERS=getTeam();
+  closeM('mteamedit');
+  renderTeamTable();
+  toast('User updated.');
+}
+
+function toggleTeamStatus(uid, newStatus) {
+  var team=getTeam();
+  for(var i=0;i<team.length;i++){if(team[i].id===uid){team[i].status=newStatus;break;}}
+  saveTeam(team);
+  ADMIN_USERS=getTeam();
+  renderTeamTable();
+  toast(newStatus==='active'?'Account reactivated.':'Account suspended.');
+}
+
+function deleteTeamUser() {
+  var uid=document.getElementById('te_id').value;
+  var name=document.getElementById('te_first').value+' '+document.getElementById('te_last').value;
+  var team=getTeam();
+  if(team.length<=1){toast('Cannot delete the last admin user.');return;}
+  if(!confirm('Permanently delete '+name.trim()+'? This cannot be undone.'))return;
+  team=team.filter(function(u){return u.id!==uid;});
+  saveTeam(team);
+  ADMIN_USERS=getTeam();
+  closeM('mteamedit');
+  renderTeamTable();
+  toast('User deleted.');
+}
+
+function applyRoleRestrictions(role) {
+  // ── NAV VISIBILITY ──
+  // Portal Users: superadmin + admin only
+  document.querySelectorAll('[onclick*="ateam"]').forEach(function(el) {
+    el.style.display = (role==='superadmin'||role==='admin') ? '' : 'none';
+  });
+  // Portal Settings: superadmin + admin only
+  document.querySelectorAll('[onclick*="aset"]').forEach(function(el) {
+    el.style.display = (role==='superadmin'||role==='admin') ? '' : 'none';
+  });
+  // Client Logins panel: superadmin + admin only
+  document.querySelectorAll('[onclick*="ausers"]').forEach(function(el) {
+    el.style.display = (role==='superadmin'||role==='admin') ? '' : 'none';
+  });
+  // All Orders: superadmin + admin + management
+  document.querySelectorAll('[onclick*="aord"]').forEach(function(el) {
+    el.style.display = (role==='superadmin'||role==='admin'||role==='management') ? '' : 'none';
+  });
+
+  // ── WRITE CONTROLS ──
+  // Properties: add/edit/delete buttons — superadmin, admin, management, editor
+  var canEditProps = (role==='superadmin'||role==='admin'||role==='management'||role==='editor');
+  document.querySelectorAll('#aprops .bs.gd').forEach(function(b){ b.style.display=canEditProps?'':'none'; });
+
+  // Client logins: add/edit — superadmin + admin only
+  var canEditClients = (role==='superadmin'||role==='admin');
+  document.querySelectorAll('#ausers .bs.gd').forEach(function(b){ b.style.display=canEditClients?'':'none'; });
+
+  // Portal Users: delete button — superadmin only; role dropdown — superadmin only
+  var isSuperAdmin = (role==='superadmin');
+  var delbtn = document.querySelector('#mteamedit .bl.dn');
+  if (delbtn) delbtn.style.display = isSuperAdmin ? '' : 'none';
+  // Only superadmin can assign superadmin role
+  var tmRole = document.getElementById('tm_role');
+  var teRole = document.getElementById('te_role');
+  [tmRole, teRole].forEach(function(sel) {
+    if (!sel) return;
+    var saOpt = sel.querySelector('option[value="superadmin"]');
+    if (saOpt) saOpt.style.display = isSuperAdmin ? '' : 'none';
+  });
+
+  // ── DASHBOARD ACCESS ──
+  // Sales: dashboard shows but only their own leads/proposals (future)
+  // Editor: can see dashboard orders but not financials
+  // Hide nav items based on actual permissions
+  if (!can('edit_props') && !can('view_props')) {
+    document.querySelectorAll('[onclick*="aprops"]').forEach(function(el){ el.style.display='none'; });
+  }
+  if (!can('clients')) {
+    document.querySelectorAll('[onclick*="ausers"]').forEach(function(el){ el.style.display='none'; });
+  }
+  if (!can('users')) {
+    document.querySelectorAll('[onclick*="ateam"]').forEach(function(el){ el.style.display='none'; });
+  }
+  if (!can('settings')) {
+    document.querySelectorAll('[onclick*="aset"]').forEach(function(el){ el.style.display='none'; });
+  }
+
+  // ── HEADER BADGE ──
+  var badge = document.querySelector('.abadge');
+  if (badge) {
+    var labels = {superadmin:'&#128737; Super Admin',admin:'&#128274; Admin',management:'&#127970; Management',sales:'&#128200; Sales',editor:'&#9998; Editor'};
+    badge.innerHTML = labels[role] || role;
+  }
+
+  // Store role globally for runtime checks
+  window._portalRole = role;
+}
+
+// Runtime permission check — call anywhere to gate actions
+function can(action) {
+  // Check per-user override perms first (stored on currentTeamUser)
+  var u = window.currentTeamUser;
+  if (u && u.perms && typeof u.perms[action] !== 'undefined') {
+    return !!u.perms[action];
+  }
+  // Fall back to role defaults
+  var r = window._portalRole || 'editor';
+  var defaults = ROLE_PERMS[r] || ROLE_PERMS.editor;
+  return !!defaults[action];
+}
+
+// ── END PORTAL USER MANAGEMENT ──
+
+// ── USER MANAGEMENT ──
+function daysSince(isoStr) {
+  if (!isoStr) return null;
+  var then = new Date(isoStr);
+  if (isNaN(then)) return null;
+  var diff = Math.floor((Date.now() - then.getTime()) / 86400000);
+  return diff;
+}
+
+function renderUserTable() {
+  var tb = document.getElementById('ucl_tbody');
+  if (!tb) tb = document.querySelector('#ausers tbody');
+  if (!tb) return;
+
+  // Populate hub filter
+  populateHubKeySelect('ucl_hub', (document.getElementById('ucl_hub')||{value:''}).value, 'All Hubs');
+
+  var q       = ((document.getElementById('ucl_search')||{value:''}).value||'').trim().toLowerCase();
+  var hubF    = (document.getElementById('ucl_hub')||{value:''}).value;
+  var statusF = (document.getElementById('ucl_status')||{value:''}).value;
+  var sortF   = (document.getElementById('ucl_sort')||{value:'recent'}).value;
+
+  var clients = getUsers().filter(function(u) {
+    if (statusF && u.status !== statusF) return false;
+    if (hubF && u.hub !== hubF) return false;
+    if (q) {
+      var hay = (u.name+' '+u.email+' '+(u.props||[]).join(' ')).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+
+  clients.sort(function(a, b) {
+    if (sortF === 'name') return (a.name||'').localeCompare(b.name||'');
+    if (sortF === 'never') {
+      var an = !a.lastLoginISO, bn = !b.lastLoginISO;
+      if (an && bn) return (a.name||'').localeCompare(b.name||'');
+      if (an) return -1; if (bn) return 1;
+    }
+    // recent / oldest — sort by ISO timestamp
+    var at = a.lastLoginISO ? new Date(a.lastLoginISO).getTime() : 0;
+    var bt = b.lastLoginISO ? new Date(b.lastLoginISO).getTime() : 0;
+    return sortF === 'oldest' ? at - bt : bt - at;
+  });
+
+  var countEl = document.getElementById('ucl_count');
+  if (countEl) countEl.textContent = '(' + clients.length + ')';
+
+  if (clients.length === 0) {
+    tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--gray);">No matching client logins.</td></tr>';
+    return;
+  }
+
+  tb.innerHTML = clients.map(function(u) {
+    var hbadge = u.hub === 'memphis'
+      ? '<span class="b mp">Memphis</span>'
+      : u.hub === 'nashville'
+        ? '<span class="b nv">Nashville</span>'
+        : '<span class="b in">--</span>';
+    var sbadge = u.status === 'active'
+      ? '<span class="b ac">Active</span>'
+      : '<span class="b in">Inactive</span>';
+    var props = (u.props || []).join('<br>');
+    // Last login cell
+    var days = daysSince(u.lastLoginISO);
+    var loginCell;
+    if (!u.lastLogin) {
+      loginCell = '<span style="color:var(--gray);font-size:12px;" title="Gray — No login on record. Client has never accessed the portal.">Never</span>';
+    } else {
+      var daysLabel, daysColor, daysTitle;
+      if (days === 0)       { daysLabel = 'today';          daysColor = '#15803d'; daysTitle = 'Green — Logged in today. Client is actively using the portal.'; }
+      else if (days === 1)  { daysLabel = '1 day ago';      daysColor = '#15803d'; daysTitle = 'Green — Logged in yesterday. Client is recently active.'; }
+      else if (days <= 7)   { daysLabel = days+' days ago'; daysColor = '#b45309'; daysTitle = 'Amber — Last login was '+days+' days ago. Client activity is slowing — consider a follow-up.'; }
+      else if (days <= 30)  { daysLabel = days+' days ago'; daysColor = '#b45309'; daysTitle = 'Amber — Last login was '+days+' days ago. Client has not logged in recently.'; }
+      else                  { daysLabel = days+' days ago'; daysColor = '#b91c1c'; daysTitle = 'Red — Last login was '+days+' days ago. Client is inactive — follow up recommended.'; }
+      loginCell = '<div style="font-size:12px;color:var(--text);">' + u.lastLogin + '</div>'
+        + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;cursor:default;" title="'+daysTitle+'">('+daysLabel+')</div>';
+    }
+    return '<tr>'
+      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong></td>'
+      + '<td style="font-size:12px;color:var(--gray);">' + u.email + '</td>'
+      + '<td>' + pwCell(u.id, u.password, 'ucl') + '</td>'
+      + '<td style="font-size:12px;">' + props + '</td>'
+      + '<td>' + hbadge + '</td>'
+      + '<td style="font-size:12px;">' + (u.role || 'Property Manager') + '</td>'      + '<td>' + (u.termsAccepted         ? '<div style="display:flex;flex-direction:column;gap:1px;"><span style="color:#15803d;font-size:11px;font-weight:600;">&#10003; Accepted</span><span style="font-size:10px;color:var(--gray);">' + u.termsAccepted + '</span></div>'         : '<span style="color:#b91c1c;font-size:11px;font-weight:600;">&#10007; Not accepted</span>') + '</td>'      + '<td>' + sbadge + '</td>'
       + '<td>' + loginCell + '</td>'
       + '<td><div style="display:flex;gap:6px;">'
       +   '<button class="bs ol" onclick="openEditUser(\'' + u.id + '\')">Edit</button>'
@@ -7197,21 +7710,43 @@ function clearScopeConflictErr() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── Password cell with show/hide toggle ──────────────────────────────────────
-function pwCell(uid, pw, tbl) {
+function pwCell(uid, pw, tbl, rowRole) {
+  var viewerRole = window._portalRole || '';
+  var isSA     = viewerRole === 'superadmin';
+  var isAdmin  = viewerRole === 'admin';
+  var canView  = isSA || isAdmin;
+  // Admin cannot view superadmin passwords
+  if (isAdmin && rowRole === 'superadmin') canView = false;
+
   var safeId = 'pw_' + tbl + '_' + uid.replace(/[^a-zA-Z0-9]/g,'_');
   var masked = '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;';
-  return '<div style="display:flex;align-items:center;gap:6px;min-width:120px;">'
-    + '<span id="' + safeId + '" data-pw="' + pw.replace(/"/g,'&quot;') + '" data-show="0"'
+  var cell = '<div style="display:flex;align-items:center;gap:6px;min-width:120px;">'
+    + '<span id="' + safeId + '" data-pw="' + (canView ? pw.replace(/"/g,'&quot;') : '') + '" data-show="0"'
     + ' style="font-size:12px;color:var(--gray);font-family:monospace;letter-spacing:1px;">'
-    + masked + '</span>'
-    + '<button class="bs ol" style="font-size:10px;padding:2px 7px;flex-shrink:0;" '
-    + 'onclick="togglePwVis(\'' + safeId + '\');event.stopPropagation();" '
-    + 'title="Show / hide password">&#128065;</button>'
-    + '</div>';
+    + masked + '</span>';
+  if (canView) {
+    cell += '<button class="bs ol" style="font-size:10px;padding:2px 7px;flex-shrink:0;" '
+      + 'onclick="togglePwVis(\'' + safeId + '\');event.stopPropagation();" '
+      + 'title="Show / hide password">&#128065;</button>';
+  } else {
+    cell += '<span style="font-size:10px;color:var(--gray);opacity:.5;" title="'
+      + (canView ? '' : (viewerRole === '' ? 'Sign in as Admin to view' : 'Insufficient permissions'))
+      + '">&#128274;</span>';
+  }
+  cell += '</div>';
+  return cell;
 }
 function togglePwVis(id) {
+  var viewerRole = window._portalRole || '';
+  var canView = (viewerRole === 'superadmin' || viewerRole === 'admin');
+  if (!canView) { toast('Access denied — Admin or Super Admin role required.'); return; }
   var el = document.getElementById(id);
   if (!el) return;
+  // Extra guard: no stored pw means it was blocked at render time
+  if (!el.getAttribute('data-pw')) {
+    toast('Access denied — you cannot view passwords for Super Admin accounts.');
+    return;
+  }
   var showing = el.getAttribute('data-show') === '1';
   if (showing) {
     el.textContent = '';
@@ -7220,6 +7755,142 @@ function togglePwVis(id) {
   } else {
     el.textContent = el.getAttribute('data-pw');
     el.setAttribute('data-show', '1');
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── TERMS OF USE + SMS OPT-IN ────────────────────────────────────────────────
+function checkTermsAcceptance(user) {
+  return !!(user.termsAccepted && user.termsVersion === '2026-02-v1');
+}
+
+function showTermsModal() {
+  var chk = document.getElementById('terms_chk');
+  var btn = document.getElementById('terms_next_btn');
+  var err = document.getElementById('terms_err');
+  if (chk) chk.checked = false;
+  if (btn) btn.disabled = true;
+  if (err) err.style.display = 'none';
+  var ph  = document.getElementById('sms_phone_input');
+  var con = document.getElementById('sms_consent_chk');
+  var pe  = document.getElementById('sms_phone_err');
+  if (ph)  ph.value = '';
+  if (con) con.checked = false;
+  if (pe)  pe.style.display = 'none';
+  var s1 = document.getElementById('terms_step1');
+  var s2 = document.getElementById('terms_step2');
+  if (s1) { s1.style.display = 'flex'; s1.style.flexDirection = 'column'; }
+  if (s2) s2.style.display = 'none';
+  openM('mterms');
+}
+
+function termsGoToSms() {
+  var chk = document.getElementById('terms_chk');
+  var err = document.getElementById('terms_err');
+  if (!chk || !chk.checked) { if (err) err.style.display = 'block'; return; }
+  var s1 = document.getElementById('terms_step1');
+  var s2 = document.getElementById('terms_step2');
+  if (s1) s1.style.display = 'none';
+  if (s2) { s2.style.display = 'flex'; s2.style.flexDirection = 'column'; }
+}
+
+function fmtPhoneInput(el) {
+  var v = el.value.replace(/\D/g,'').slice(0,10);
+  var fmt = '';
+  if (v.length <= 3)      fmt = v;
+  else if (v.length <= 6) fmt = '(' + v.slice(0,3) + ') ' + v.slice(3);
+  else                    fmt = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
+  el.value = fmt;
+}
+
+function acceptTermsAndSms() {
+  var phoneEl   = document.getElementById('sms_phone_input');
+  var consentEl = document.getElementById('sms_consent_chk');
+  var phoneErr  = document.getElementById('sms_phone_err');
+  var rawPhone  = phoneEl ? phoneEl.value.replace(/\D/g,'') : '';
+  if (phoneErr) phoneErr.style.display = 'none';
+  if (rawPhone.length > 0 && rawPhone.length !== 10) {
+    if (phoneErr) { phoneErr.textContent = 'Please enter a valid 10-digit US mobile number.'; phoneErr.style.display = 'block'; }
+    return;
+  }
+  if (rawPhone.length === 10 && consentEl && !consentEl.checked) {
+    if (phoneErr) { phoneErr.textContent = 'Please check the consent box to opt in to text messages.'; phoneErr.style.display = 'block'; }
+    return;
+  }
+  _saveTermsAndPhone(rawPhone, consentEl && consentEl.checked);
+}
+
+function skipSms() {
+  _saveTermsAndPhone('', false);
+}
+
+function _saveTermsAndPhone(rawPhone, smsConsent) {
+  if (!currentUser) return;
+  var now = new Date();
+  var cst = new Date(now.toLocaleString('en-US', {timeZone: 'America/Chicago'}));
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  var hr = cst.getHours(), ampm = hr >= 12 ? 'PM' : 'AM';
+  hr = hr % 12 || 12;
+  var ts = (cst.getMonth()+1)+'/'+cst.getDate()+'/'+cst.getFullYear()+
+           ' '+hr+':'+pad(cst.getMinutes())+' '+ampm+' CST';
+  var clients = getUsers();
+  for (var i = 0; i < clients.length; i++) {
+    if (clients[i].email.toLowerCase() === currentUser.email.toLowerCase()) {
+      clients[i].termsAccepted    = ts;
+      clients[i].termsAcceptedISO = now.toISOString();
+      clients[i].termsVersion     = '2026-02-v1';
+      clients[i].smsPhone         = rawPhone || '';
+      clients[i].smsOptIn         = !!(rawPhone && smsConsent);
+      clients[i].smsOptInDate     = (rawPhone && smsConsent) ? ts : '';
+      currentUser.termsAccepted    = ts;
+      currentUser.termsAcceptedISO = now.toISOString();
+      currentUser.termsVersion     = '2026-02-v1';
+      currentUser.smsPhone         = rawPhone || '';
+      currentUser.smsOptIn         = !!(rawPhone && smsConsent);
+      currentUser.smsOptInDate     = (rawPhone && smsConsent) ? ts : '';
+      break;
+    }
+  }
+  saveUsers(clients);
+  closeM('mterms');
+  showTermsBanner();
+  var msg = (rawPhone && smsConsent)
+    ? '\u2713 Terms accepted & text notifications enabled. Welcome!'
+    : '\u2713 Terms accepted. Welcome to the portal.';
+  toast(msg);
+}
+
+function declineTerms() {
+  closeM('mterms');
+  doLogout();
+  toast('You must accept the Terms of Use to access the portal.');
+}
+
+function showTermsBanner() {
+  if (!currentUser) return;
+  var banner = document.getElementById('terms_footer_banner');
+  var nameEl = document.getElementById('terms_banner_name');
+  var dateEl = document.getElementById('terms_banner_date');
+  if (banner) banner.style.display = 'flex';
+  if (nameEl) nameEl.textContent = currentUser.name || currentUser.email;
+  if (dateEl) dateEl.textContent = 'Terms accepted: ' + (currentUser.termsAccepted || '\u2014');
+  var viewAcc = document.getElementById('mterms_view_accepted');
+  if (viewAcc) {
+    viewAcc.style.display = 'block';
+    viewAcc.innerHTML = '\u2713 Accepted by <strong>' + (currentUser.name || currentUser.email) +
+      '</strong> on ' + (currentUser.termsAccepted || '\u2014');
+  }
+  var viewSms = document.getElementById('mterms_view_sms');
+  if (viewSms) {
+    if (currentUser.smsOptIn && currentUser.smsPhone) {
+      viewSms.style.display = 'block';
+      var fmted = currentUser.smsPhone.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3');
+      viewSms.innerHTML = '\u260e Text notifications: <strong>' + fmted +
+        '</strong> &mdash; <span style="font-size:11px;">Opted in ' + currentUser.smsOptInDate +
+        '. Reply STOP to opt out.</span>';
+    } else {
+      viewSms.style.display = 'none';
+    }
   }
 }
 // ─────────────────────────────────────────────────────────────────────────────
