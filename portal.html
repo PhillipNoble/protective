@@ -572,7 +572,8 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 #co_form_err ul { margin: 6px 0 0 16px; padding: 0; font-weight: 400; }
 #co_form_err ul li { margin-bottom: 2px; }
 </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+</script>
 </head>
 <body>
 
@@ -662,11 +663,33 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <div class="sc"><div class="si gr">&#10003;</div><div><div class="snum">5</div><div class="slbl">Completed</div></div></div>
           <div class="sc"><div class="si rd">&#9888;</div><div><div class="snum">1</div><div class="slbl">Needs Attention</div></div></div>
         </div>
-        <div class="shd"><h2>Recent Orders</h2><button class="bs gd" onclick="cnav('co',document.querySelectorAll('#cl .ni')[1])">+ New Order</button></div>
-        <div class="tw"><table>
+        <div class="shd">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <h2 style="margin:0;">Dashboard</h2>
+            <div style="display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-left:8px;">
+              <button id="cdash_tab_list" class="tab-toggle on" onclick="switchClientDashTab('list')">&#9776; Orders</button>
+              <button id="cdash_tab_cal"  class="tab-toggle"    onclick="switchClientDashTab('cal')">&#128197; Calendar</button>
+            </div>
+          </div>
+          <button class="bs gd" onclick="cnav('co',document.querySelectorAll('#cl .ni')[1])">+ New Order</button>
+        </div>
+        <div id="cl_list_wrap"><div class="tw"><table>
           <thead><tr><th>Work Order</th><th>Unit</th><th>Service</th><th>Requested</th><th>Status</th><th></th></tr></thead>
           <tbody id="cd_tbody"></tbody>
-        </table></div>
+        </table></div></div>
+        <!-- Client Calendar view -->
+        <div id="cl_cal_wrap" style="display:none;margin-bottom:28px;">
+          <div class="cal-wrap">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calNav(-1,'cl_cal')">&#8592;</button>
+              <h3 id="cl_cal_title"></h3>
+              <button class="cal-nav" onclick="calNav(1,'cl_cal')">&#8594;</button>
+            </div>
+            <div class="cal-grid" id="cl_cal_dow"></div>
+            <div class="cal-grid" id="cl_cal_grid"></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- NEW ORDER -->
@@ -1037,8 +1060,10 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
               <option value="">All Hubs</option>
             </select>
             <div style="display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;">
-              <button id="tab_recent" class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
-              <button id="tab_today"  class="tab-toggle"    onclick="switchDashTab('today')">Today's Installs</button>
+              <button id="tab_recent"   class="tab-toggle on" onclick="switchDashTab('recent')">Recent Orders</button>
+              <button id="tab_today"    class="tab-toggle"    onclick="switchDashTab('today')">Today's Installs</button>
+              <button id="tab_calendar" class="tab-toggle"    onclick="switchDashTab('calendar')">&#128197; Calendar</button>
+              <button id="tab_aging"    class="tab-toggle"    onclick="switchDashTab('aging')">&#9888; Aging</button>
             </div>
             <button class="bs gd" style="white-space:nowrap;" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*=&quot;co&quot;]'));},150);">&#128221; New Order</button>
           </div>
@@ -1051,6 +1076,31 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <thead><tr><th class="sortable" onclick="sortTable('adash_today_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('adash_today_tbl',1,'str')">Property / Hub</th><th class="sortable" onclick="sortTable('adash_today_tbl',2,'str')">Unit</th><th class="sortable" onclick="sortTable('adash_today_tbl',3,'str')">Service</th><th class="sortable" onclick="sortTable('adash_today_tbl',4,'date')">Requested</th><th class="sortable" onclick="sortTable('adash_today_tbl',5,'date')">Install Date</th><th class="sortable" onclick="sortTable('adash_today_tbl',6,'str')">Status</th><th>Action</th></tr></thead>
           <tbody id="adash_today_tbody"></tbody>
         </table></div>
+        <!-- Admin Calendar view -->
+        <div id="adash_cal_wrap" style="display:none;margin-bottom:20px;">
+          <div class="cal-wrap">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calNav(-1,'adash_cal')">&#8592;</button>
+              <h3 id="adash_cal_title" style="margin:0;font-size:15px;"></h3>
+              <button class="cal-nav" onclick="calNav(1,'adash_cal')">&#8594;</button>
+            </div>
+            <div class="cal-grid" id="adash_cal_dow"></div>
+            <div class="cal-grid" id="adash_cal_grid"></div>
+          </div>
+        </div>
+        <!-- Admin Aging Report -->
+        <div id="adash_aging_wrap" style="display:none;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+            <div style="font-size:13px;color:var(--gray);">Flag <strong>Requested</strong> orders unconfirmed longer than:</div>
+            <select id="aging_threshold" class="fs" style="width:auto;" onchange="renderAgingReport()">
+              <option value="3">3 days</option>
+              <option value="5" selected>5 days</option>
+              <option value="7">7 days</option>
+              <option value="14">14 days</option>
+            </select>
+          </div>
+          <div id="aging_report_body"></div>
+        </div>
       </div>
 
       <!-- ADMIN ALL ORDERS -->
@@ -1117,7 +1167,17 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </select>
         </div>
         <div class="tw"><table id="aord_tbl">
+          <!-- Bulk action bar -->
+          <div class="bulk-bar" id="bulk_bar">
+            <span class="bulk-count" id="bulk_count">0 selected</span>
+            <button class="bs gd" style="font-size:11px;padding:5px 12px;" onclick="bulkConfirm()">&#10003; Confirm Selected</button>
+            <button class="bs gn" style="font-size:11px;padding:5px 12px;" onclick="bulkComplete()">&#10003; Complete Selected</button>
+            <button class="bs ol" style="font-size:11px;padding:5px 12px;" onclick="bulkExport()">&#8681; Export Selected</button>
+            <button class="bs dn" style="font-size:11px;padding:5px 12px;background:transparent;color:#dc2626;border-color:#fca5a5;" onclick="bulkVoid()">&#128683; Void Selected</button>
+            <button class="bs ol" style="font-size:11px;padding:5px 12px;margin-left:auto;" onclick="clearBulkSelect()">&#10005; Clear</button>
+          </div>
           <thead><tr>
+            <th style="width:32px;"><input type="checkbox" id="bulk_all" title="Select all" onchange="toggleSelectAll(this.checked)" style="cursor:pointer;accent-color:var(--navy);width:14px;height:14px;"></th>
             <th class="sortable" onclick="sortTable('aord_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('aord_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('aord_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('aord_tbl',3,'str')">Unit</th>
             <th class="sortable" onclick="sortTable('aord_tbl',4,'str')">Service</th><th class="sortable" id="aord_date_th" onclick="sortTable('aord_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('aord_tbl',6,'str')">Status</th><th>Actions</th>
           </tr></thead>
@@ -1172,7 +1232,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <th>Role</th><th>Terms &amp; SMS</th><th>Status</th>
             <th style="white-space:nowrap;">Last Login <span id="ucl_count" style="font-weight:400;font-size:10px;color:rgba(255,255,255,.6);"></span></th>
             <th></th>
-          </tr></thead>
+          <th>Activity</th></tr></thead>
           <tbody id="ucl_tbody">
             <!-- rows rendered by renderUserTable() -->
           </tbody>
@@ -1480,11 +1540,23 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <button class="bs gn" id="completebtn" onclick="markOrderComplete(this.dataset.woid)" style="display:none;">&#10003; Complete</button>
         <button class="bs nv" id="editwobtn" onclick="openWoEdit(this.dataset.woid)" style="display:none;">&#9998; Edit Order</button>
         <button class="bs ol" id="logbtn" onclick="exportWoLog(this.dataset.woid)" style="display:none;">&#128220; Export Log</button>
+        <button class="bs nv" id="copybtn" onclick="openCopyOrder(this.dataset.woid)" style="display:none;font-size:11px;">&#128203; Duplicate</button>
         <button class="bs dn" id="voidbtn" onclick="openVoidOrder(this.dataset.woid)" style="display:none;">&#128683; Cancel / Void</button>
         <button class="mx" onclick="closeM('mwo')">&#10005;</button>
       </div>
     </div>
     <div class="mbody" style="padding:0;"><div class="wopp parea" id="woprint"></div></div>
+    <!-- Internal Notes Thread (admin only) -->
+    <div id="wo_notes_section" style="display:none;border-top:1px solid var(--border);padding:16px 24px;background:var(--cream);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--navy);">&#128274; Internal Notes <span style="font-size:10px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;margin-left:4px;">not visible to client</span></div>
+      </div>
+      <div id="wo_notes_list" style="max-height:200px;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:6px;"></div>
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <textarea id="wo_note_input" placeholder="Add a private note..." style="flex:1;min-height:56px;resize:none;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);"></textarea>
+        <button class="bl gd" style="padding:8px 16px;white-space:nowrap;flex-shrink:0;" onclick="addInternalNote()">&#10133; Add</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2104,6 +2176,19 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       </div>
       <div id="eu_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;"></div>
     </div>
+    <!-- Activity Log tab -->
+    <div class="ms" style="margin-bottom:0;">
+      <div class="mst" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>&#128196; Recent Activity</span>
+        <button class="bs ol" style="font-size:10px;padding:3px 10px;" onclick="var el=document.getElementById('medit_activity_body');el.style.display=el.style.display==='none'?'block':'none';if(el.style.display==='block')renderActivityLog(document.getElementById('eu_email').value,'medit_activity_body');">Toggle</button>
+      </div>
+      <div id="medit_activity_body" style="display:none;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;max-height:180px;overflow-y:auto;margin-top:8px;">
+        <div style="display:grid;grid-template-columns:120px 1fr 1fr;background:var(--navy);color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;">
+          <div>Action</div><div>Detail</div><div>Timestamp</div>
+        </div>
+        <div id="medit_activity_inner"></div>
+      </div>
+    </div>
     <div class="mf">
       <button class="bl dn" style="margin-right:auto;padding:10px 20px;font-size:12px;" onclick="deleteUser()">&#128465; Delete User</button>
       <button class="bl ol" onclick="closeM('medit')">Cancel</button>
@@ -2420,7 +2505,92 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
 
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+<!-- ── COPY ORDER MODAL ──────────────────────────────────────────────────── -->
+<div class="mb" id="mcopy" onclick="if(event.target===this)closeM('mcopy')">
+  <div class="modal" style="max-width:520px;">
+    <div class="mh">
+      <div>
+        <h3>&#128203; Duplicate Work Order</h3>
+        <div style="font-size:12px;color:var(--gray);margin-top:3px;">Same property, floor plan &amp; scope — just update the unit and optional PO.</div>
+      </div>
+      <button class="mx" onclick="closeM('mcopy')">&#10005;</button>
+    </div>
+    <div class="mbody">
+      <input type="hidden" id="copy_src_id">
+      <div id="copy_summary" style="background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;margin-bottom:16px;font-size:12px;color:var(--gray);line-height:1.6;"></div>
+      <div class="form-row">
+        <div class="fg">
+          <label>Property</label>
+          <input type="text" id="copy_property" readonly style="background:var(--cream);color:var(--gray);cursor:not-allowed;">
+        </div>
+        <div class="fg">
+          <label>New Unit Number <span style="color:var(--red)">*</span></label>
+          <input type="text" id="copy_unit" placeholder="e.g. 204B" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label>Requested Install Date <span style="color:var(--red)">*</span></label>
+          <input type="date" id="copy_date">
+        </div>
+        <div class="fg">
+          <label>Occupancy <span style="color:var(--red)">*</span></label>
+          <select id="copy_occ">
+            <option value="Vacant">Vacant</option>
+            <option value="Occupied">Occupied</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Purchase Order <span style="font-size:11px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">(Optional)</span></label>
+        <input type="text" id="copy_po" placeholder="e.g. PO-2025-0042">
+      </div>
+      <div id="copy_err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:3px;font-size:13px;margin-top:4px;"></div>
+    </div>
+    <div class="mf">
+      <button class="bl ol" onclick="closeM('mcopy')">Cancel</button>
+      <button class="bl gd" onclick="submitCopiedOrder()">&#128203; Create Duplicate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── COMPLETION PHOTO MODAL ────────────────────────────────────────────── -->
+<div class="mb" id="mcompphoto" onclick="if(event.target===this)closeM('mcompphoto')">
+  <div class="modal" style="max-width:540px;">
+    <div class="mh">
+      <div>
+        <h3>&#9989; Mark as Completed</h3>
+        <div style="font-size:12px;color:var(--gray);margin-top:3px;">Attach before/after photos before saving — optional but recommended.</div>
+      </div>
+      <button class="mx" onclick="closeM('mcompphoto')">&#10005;</button>
+    </div>
+    <div class="mbody">
+      <input type="hidden" id="comp_wo_id">
+      <div id="comp_summary" style="background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;margin-bottom:16px;font-size:12px;color:var(--gray);"></div>
+      <div class="fg" style="margin-bottom:12px;">
+        <label>Completion Photos <span style="font-size:11px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">Optional — up to 5 files, 10 MB each</span></label>
+        <label id="comp_upload_zone" style="display:flex;align-items:center;gap:12px;padding:16px;border:2px dashed var(--border);border-radius:var(--r);cursor:pointer;background:var(--cream);transition:border-color .2s;" onmouseenter="this.style.borderColor='var(--navy)'" onmouseleave="this.style.borderColor='var(--border)'">
+          <span style="font-size:24px;">&#128247;</span>
+          <div style="font-size:13px;color:var(--gray);line-height:1.5;">Click to add photos or videos<br><span style="font-size:11px;">JPG · PNG · WEBP · MP4 — max 10 MB each</span></div>
+          <input type="file" id="comp_photo_input" accept="image/*,video/mp4" multiple style="display:none;" onchange="previewCompPhotos(this)">
+        </label>
+        <div id="comp_photo_preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:0;"></div>
+      </div>
+      <div class="fg">
+        <label>Completion Notes <span style="font-size:11px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">Optional</span></label>
+        <textarea id="comp_notes" placeholder="Notes about the completed installation..." style="min-height:72px;resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="bl ol" onclick="closeM('mcompphoto')">Cancel</button>
+      <button class="bl nv" style="font-size:12px;" onclick="doMarkComplete(false)">Skip Photos &amp; Complete</button>
+      <button class="bl gd" onclick="doMarkComplete(true)">&#9989; Save &amp; Complete</button>
+    </div>
+  </div>
+</div>
+
+
 
 // ── DATA VERSION GUARD ───────────────────────────────────────────────────────
 var PORTAL_DATA_VERSION = '2026-02-v1';
@@ -4685,6 +4855,7 @@ function renderAdminOrders() {
     var vd = (o.status==='completed'||o.status==='requested'||o.status==='scheduled')
       ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
     rows += '<tr onclick="oworder(\''+id+'\')">'+
+      '<td onclick="event.stopPropagation();"><input type="checkbox" class="bulk-cb" data-id="'+id+'" '+(isChecked?'checked':'')+' style="width:14px;height:14px;accent-color:var(--navy);cursor:pointer;" onchange="toggleBulkRow(\''+id+'\',this.checked)"></td>'+
       '<td><strong>#'+o.num+'</strong>'+voidNote+'</td>'+
       '<td>'+o.property+'</td>'+
       '<td>'+hubBadge+'</td>'+
@@ -4816,14 +4987,23 @@ function dashStatClick(type) {
 
 function switchDashTab(tab) {
   _dashTab = tab;
-  document.getElementById('tab_recent').classList.toggle('on', tab === 'recent');
-  document.getElementById('tab_today').classList.toggle('on',  tab === 'today');
-  document.getElementById('adash_recent_wrap').style.display = tab === 'recent' ? '' : 'none';
-  document.getElementById('adash_today_wrap').style.display  = tab === 'today'  ? '' : 'none';
-  var title = tab === 'today' ? "Today's Installs" : 'New Orders — Action Required';
-  document.getElementById('adash_table_title').textContent = title;
-  if (tab === 'today') renderAdashToday();
-  else                 renderAdashRecent();
+  var allTabs = ['recent','today','calendar','aging'];
+  var titles  = {recent:'New Orders — Action Required', today:"Today's Installs", calendar:'Installation Calendar', aging:'Aging Orders — Action Required'};
+  allTabs.forEach(function(t) {
+    var btn  = document.getElementById('tab_'+t);
+    var wrap = document.getElementById('adash_'+t+'_wrap');
+    if (btn)  btn.classList.toggle('on', t === tab);
+    if (wrap) wrap.style.display = t === tab ? '' : 'none';
+  });
+  var titleEl = document.getElementById('adash_table_title');
+  if (titleEl) titleEl.textContent = titles[tab] || '';
+  if (tab === 'today')    renderAdashToday();
+  else if (tab === 'recent') renderAdashRecent();
+  else if (tab === 'aging')  renderAdashAging();
+  else if (tab === 'calendar') {
+    if (!_calState['adash_cal']) initCal('adash_cal');
+    else renderCal('adash_cal');
+  }
 }
 
 function todayStr() {
@@ -4893,9 +5073,65 @@ function sortTable(tableId, colIdx, type) {
 }
 
 function markOrderComplete(id) {
+  // Open photo/notes completion modal instead of direct confirm
   var o = orders[id]; if (!o) return;
-  if (!confirm('Mark work order #'+o.num+' as Completed?')) return;
+  var sumEl = document.getElementById('comp_summary');
+  var idEl  = document.getElementById('comp_wo_id');
+  if (idEl)  idEl.value = id;
+  if (sumEl) sumEl.innerHTML = '<strong>#'+o.num+'</strong> &mdash; '+o.property+', Unit '+o.unit+'<br>'+svcDisplay(o);
+  // Reset form
+  var inp = document.getElementById('comp_photo_input');
+  var prev = document.getElementById('comp_photo_preview');
+  var notes = document.getElementById('comp_notes');
+  if (inp)   inp.value = '';
+  if (prev)  prev.innerHTML = '';
+  if (notes) notes.value = '';
+  // Store pending photos array
+  window._compPhotos = [];
+  openM('mcompphoto');
+}
+function previewCompPhotos(input) {
+  var prev = document.getElementById('comp_photo_preview');
+  if (!prev) return;
+  var files = Array.from(input.files).slice(0,5);
+  window._compPhotos = [];
+  prev.innerHTML = '';
+  files.forEach(function(f) {
+    if (f.size > 10*1024*1024) { toast('File "'+f.name+'" exceeds 10 MB — skipped.'); return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      window._compPhotos.push({name:f.name, type:f.type, data:e.target.result});
+      var isImg = f.type.startsWith('image/');
+      var thumb = document.createElement('div');
+      thumb.style.cssText = 'position:relative;width:72px;height:72px;border-radius:4px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;';
+      if (isImg) {
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        thumb.appendChild(img);
+      } else {
+        thumb.style.background = 'var(--cream)';
+        thumb.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:22px;">&#127916;</div>';
+      }
+      prev.appendChild(thumb);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+function doMarkComplete(withPhotos) {
+  var idEl = document.getElementById('comp_wo_id');
+  var id = idEl ? idEl.value : '';
+  var o = orders[id]; if (!o) return;
   o.status = 'completed';
+  o.completedDate = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  if (withPhotos && window._compPhotos && window._compPhotos.length) {
+    if (!o.compPhotos) o.compPhotos = [];
+    o.compPhotos = o.compPhotos.concat(window._compPhotos);
+  }
+  var notesEl = document.getElementById('comp_notes');
+  if (notesEl && notesEl.value.trim()) {
+    o.compNotes = notesEl.value.trim();
+  }
   if (!o.log) o.log = [];
   o.log.push({
     ts: cstNow(),
@@ -4904,10 +5140,10 @@ function markOrderComplete(id) {
     changes: [{field:'Status', from:'Scheduled', to:'Completed'}]
   });
   saveOrders();
+  closeM('mcompphoto');
   refreshAllOrderViews();
   notifOnCompleted(o);
-  toast('Work order #'+o.num+' marked complete.');
-  // Refresh WO detail if open
+  toast('Work order #'+o.num+' marked complete.'+(withPhotos && window._compPhotos && window._compPhotos.length ? ' ('+window._compPhotos.length+' photo'+(window._compPhotos.length>1?'s':'')+' saved)':''));
   var mwo = document.getElementById('mwo');
   if (mwo && mwo.classList.contains('open')) { oworder(id); }
 }
@@ -5640,9 +5876,9 @@ function go(id) {
   if (el) el.classList.add('on');
 }
 function cnav(pid, el) {
-  if (pid === 'cx') { setTimeout(renderClientDocuments, 50); }
-  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); }
-  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); }
+  if (pid === 'cx') { setTimeout(renderClientDocuments, 50); logClientActivity('view_document',{}); }
+  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); logClientActivity('settings_view',{}); }
+  if (pid === 'cs') { setTimeout(renderClientSettings, 50); setTimeout(renderClientNotifPrefs, 60); logClientActivity('settings_view',{}); }
   if (pid === 'co') {
     // Default install date to tomorrow if blank
     var dateEl = document.getElementById('cinstdate');
@@ -5856,6 +6092,20 @@ function oworder(id) {
     editBtn.textContent   = o.status === 'vd' ? '\u21A9 Restore Order' : '\u270E Edit Order';
     editBtn.className     = o.status === 'vd' ? 'bs gd' : 'bs nv';
   }
+  // Duplicate button — available for any non-voided order to admins
+  var copyBtn = document.getElementById('copybtn');
+  if (copyBtn) {
+    copyBtn.style.display   = (isAdminView && o.status !== 'vd') ? 'inline-flex' : 'none';
+    copyBtn.dataset.woid    = id;
+  }
+  // Internal notes section — admin only
+  var notesSection = document.getElementById('wo_notes_section');
+  if (notesSection) {
+    notesSection.style.display = isAdminView ? 'block' : 'none';
+    if (isAdminView) renderInternalNotes(id);
+  }
+  // Log activity for client users
+  if (!isAdminView && currentUser) logClientActivity('view_order', {orderId: id, orderNum: o.num, property: o.property});
   if (logBtn)  logBtn.style.display   = (isAdminView && o.log && o.log.length) ? 'inline-flex' : 'none';
   openM('mwo');
 }
@@ -6381,6 +6631,7 @@ function submitOrder() {
   };
 
   notifOnRequested(orders[woId]);
+  logClientActivity('submit_order', {orderId:woId, orderNum:orders[woId].num, property:orders[woId].property});
   toast('\u2713 Order submitted! Your request has been received.');
   document.querySelectorAll('#co .field-err').forEach(function(el){ el.classList.remove('field-err'); });
   var _eb = document.getElementById('co_form_err'); if (_eb) { _eb.style.display='none'; _eb.innerHTML=''; }
@@ -7832,6 +8083,7 @@ function csChangePw() {
   var hint = document.getElementById('cs_pw_hint');
   if (bar)  { bar.style.width='0'; }
   if (hint) hint.textContent = '';
+  logClientActivity('pw_change',{});
   csMsg('cs_pw_msg','\u2713 Password updated successfully. Use your new password next time you log in.','ok');
 }
 
@@ -8102,6 +8354,63 @@ function handleStopToggle(prefix) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── CLIENT ACTIVITY LOG ─────────────────────────────────────────────────────
+function getClientActivityLog(email) {
+  var key = 'pf_activity_'+email.replace(/[^a-z0-9]/gi,'_');
+  try { var s=localStorage.getItem(key); return s?JSON.parse(s):[]; } catch(e){ return []; }
+}
+var _activityUserId = null;
+function openActivityLog(uid) {
+  var clients = getUsers();
+  var u = null;
+  for (var i=0;i<clients.length;i++){ if(clients[i].id===uid){u=clients[i];break;} }
+  if (!u) return;
+  _activityUserId = uid;
+  var subtitle = document.getElementById('mactivity_subtitle');
+  if (subtitle) subtitle.textContent = u.name + ' \u2014 ' + u.email;
+  renderActivityLog(u);
+  openM('mactivity');
+}
+function renderActivityLog(u) {
+  var body = document.getElementById('mactivity_body');
+  if (!body) return;
+  var log = getClientActivityLog(u.email);
+  if (!log.length) {
+    body.innerHTML = '<div style="color:var(--gray);font-size:13px;padding:8px 0;">No activity recorded for this user yet.</div>';
+    return;
+  }
+  var ACTION_LABELS = {
+    login:'&#128274; Logged in', logout:'&#128682; Logged out',
+    view_order:'&#128270; Viewed order', submit_order:'&#128221; Submitted order',
+    view_document:'&#128196; Viewed document', settings_view:'&#9881; Viewed settings',
+    settings_change:'&#9881; Changed settings', pw_change:'&#128274; Changed password',
+    terms_accepted:'&#9989; Accepted terms'
+  };
+  var rows = log.map(function(entry) {
+    var label = ACTION_LABELS[entry.action] || ('&#8226; '+entry.action);
+    var meta = '';
+    if (entry.meta) {
+      if (entry.meta.orderNum)  meta += ' <span style="color:var(--gray);">#'+entry.meta.orderNum+'</span>';
+      if (entry.meta.property)  meta += ' &mdash; '+entry.meta.property;
+    }
+    return '<div style="display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--lg);">'
+      +'<div style="font-size:11px;color:var(--gray);white-space:nowrap;min-width:130px;padding-top:1px;">'+entry.ts+'</div>'
+      +'<div style="font-size:13px;color:var(--text);">'+label+meta+'</div>'
+      +'</div>';
+  }).join('');
+  body.innerHTML = '<div style="font-size:11px;color:var(--gray);margin-bottom:10px;">'+log.length+' events (last 200 kept)</div>' + rows;
+}
+function clearActivityLog() {
+  var clients = getUsers(), u = null;
+  for (var i=0;i<clients.length;i++){ if(clients[i].id===_activityUserId){u=clients[i];break;} }
+  if (!u) return;
+  if (!confirm('Clear all activity for '+u.name+'?')) return;
+  try { localStorage.removeItem('pf_activity_'+u.email.replace(/[^a-z0-9]/gi,'_')); } catch(e){}
+  renderActivityLog(u);
+  toast('Activity log cleared.');
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── NOTIFICATION SYSTEM ───────────────────────────────────────────────────────
 
 // ── Extra company emails ──────────────────────────────────────────────────────
@@ -8284,6 +8593,445 @@ function notifOnRequested(o)  { sendPortalNotif('requested', o); }
 function notifOnVoided(o)     { sendPortalNotif('voided', o); }
 // ─────────────────────────────────────────────────────────────────────────────
 
-</script>
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: WORK ORDER DUPLICATION
+// ════════════════════════════════════════════════════════════════════════════
+function openCopyOrder(id) {
+  var o = orders[id]; if (!o) return;
+  document.getElementById('copy_src_id').value   = id;
+  document.getElementById('copy_property').value = o.property || '';
+  document.getElementById('copy_unit').value     = '';
+  document.getElementById('copy_po').value       = '';
+  document.getElementById('copy_occ').value      = o.occ || 'Vacant';
+  // Default install date to tomorrow
+  var tom = new Date(); tom.setDate(tom.getDate()+1);
+  document.getElementById('copy_date').value = tom.getFullYear()+'-'+String(tom.getMonth()+1).padStart(2,'0')+'-'+String(tom.getDate()).padStart(2,'0');
+  document.getElementById('copy_err').style.display = 'none';
+  // Summary of what will be copied
+  var svc = o.service || (o.scope||[]).join(', ') || '';
+  document.getElementById('copy_summary').innerHTML =
+    '<strong>Copying from #'+o.num+'</strong><br>'+
+    '&#127968; '+o.property+' &nbsp;&bull;&nbsp; &#127760; Floor Plan: '+(o.plan||'—')+'<br>'+
+    '&#9785; Service: '+svc;
+  openM('mcopy');
+}
+function submitCopiedOrder() {
+  var errEl = document.getElementById('copy_err');
+  errEl.style.display = 'none';
+  var srcId    = document.getElementById('copy_src_id').value;
+  var unit     = document.getElementById('copy_unit').value.trim();
+  var dateVal  = document.getElementById('copy_date').value;
+  var occ      = document.getElementById('copy_occ').value;
+  var po       = document.getElementById('copy_po').value.trim();
+  var src = orders[srcId];
+  if (!src) { errEl.textContent='Source order not found.'; errEl.style.display='block'; return; }
+  if (!unit)    { errEl.textContent='Unit number is required.'; errEl.style.display='block'; return; }
+  if (!dateVal) { errEl.textContent='Requested install date is required.'; errEl.style.display='block'; return; }
+  // Build new order
+  var hub     = src.hub || 'memphis';
+  var prefix  = hub==='nashville'?'NA':'ME';
+  var existNums = Object.keys(orders).map(function(k){
+    var n = orders[k].num||'';
+    if (n.indexOf(prefix)===0) return parseInt(n.slice(prefix.length),10)||0;
+    return 0;
+  });
+  var nextNum = (existNums.length ? Math.max.apply(null,existNums) : 0) + 1;
+  var woNum   = prefix + String(nextNum).padStart(4,'0');
+  var woId    = 'WO-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  var d = new Date(dateVal+'T12:00:00');
+  var reqDate = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var today   = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  orders[woId] = {
+    num:           woNum,
+    property:      src.property,
+    hub:           hub,
+    unit:          unit,
+    plan:          src.plan     || '',
+    sqft:          src.sqft     || '',
+    occ:           occ,
+    service:       src.service  || '',
+    scope:         (src.scope||[]).slice(),
+    timeWindow:    '',
+    reqDate:       reqDate,
+    confDate:      'Pending',
+    status:        'requested',
+    submittedBy:   (window.currentTeamUser && window.currentTeamUser.name) || (window.currentUser && window.currentUser.name) || 'Portal User',
+    submittedDate: today,
+    email:         (window.currentTeamUser && window.currentTeamUser.email) || (window.currentUser && window.currentUser.email) || '',
+    po:            po,
+    notes:         '',
+    copiedFrom:    src.num,
+    log: [{
+      ts: cstNow(),
+      by: (window.currentTeamUser && window.currentTeamUser.name) || 'Admin',
+      reason: 'Duplicated from #'+src.num,
+      changes: [{field:'Source',from:src.num,to:woNum}]
+    }]
+  };
+  saveOrders();
+  notifOnRequested(orders[woId]);
+  refreshAllOrderViews();
+  closeM('mcopy');
+  toast('\u2713 Order #'+woNum+' created (duplicated from #'+src.num+').');
+  setTimeout(function(){ oworder(woId); }, 300);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: INTERNAL NOTES
+// ════════════════════════════════════════════════════════════════════════════
+function renderInternalNotes(id) {
+  var list = document.getElementById('wo_notes_list');
+  var inp  = document.getElementById('wo_note_input');
+  if (!list) return;
+  inp && (inp.dataset.woid = id);
+  var o = orders[id];
+  var notes = (o && o.internalNotes) || [];
+  if (!notes.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--gray);padding:6px 2px;">No internal notes yet.</div>';
+    return;
+  }
+  list.innerHTML = notes.map(function(n) {
+    return '<div class="inote">'+
+      '<div class="inote-meta">'+n.by+' &mdash; '+n.ts+'</div>'+
+      '<div class="inote-body">'+n.text.replace(/\n/g,'<br>')+'</div>'+
+      '</div>';
+  }).join('');
+  list.scrollTop = list.scrollHeight;
+}
+function addInternalNote() {
+  var inp = document.getElementById('wo_note_input');
+  var id  = inp ? inp.dataset.woid : '';
+  var txt = inp ? inp.value.trim() : '';
+  if (!txt || !id) return;
+  var o = orders[id]; if (!o) return;
+  if (!o.internalNotes) o.internalNotes = [];
+  o.internalNotes.push({
+    ts:   cstNow(),
+    by:   (window.currentTeamUser && window.currentTeamUser.name) || 'Admin',
+    text: txt
+  });
+  inp.value = '';
+  saveOrders();
+  renderInternalNotes(id);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: BULK ORDER ACTIONS
+// ════════════════════════════════════════════════════════════════════════════
+var _bulkSelected = {};
+function toggleSelectAll(checked) {
+  _bulkSelected = {};
+  document.querySelectorAll('#aord_tbody .bulk-cb').forEach(function(cb) {
+    cb.checked = checked;
+    if (checked) _bulkSelected[cb.dataset.id] = true;
+  });
+  updateBulkBar();
+}
+function toggleBulkRow(id, checked) {
+  if (checked) _bulkSelected[id] = true;
+  else delete _bulkSelected[id];
+  updateBulkBar();
+}
+function updateBulkBar() {
+  var ids = Object.keys(_bulkSelected);
+  var bar = document.getElementById('bulk_bar');
+  var cnt = document.getElementById('bulk_count');
+  if (bar) bar.className = 'bulk-bar' + (ids.length ? ' visible' : '');
+  if (cnt) cnt.textContent = ids.length + ' order' + (ids.length !== 1 ? 's' : '') + ' selected';
+  var allCb = document.getElementById('bulk_all');
+  var total = document.querySelectorAll('#aord_tbody .bulk-cb').length;
+  if (allCb) allCb.indeterminate = (ids.length > 0 && ids.length < total);
+}
+function clearBulkSelect() {
+  _bulkSelected = {};
+  document.querySelectorAll('#aord_tbody .bulk-cb, #bulk_all').forEach(function(cb){ cb.checked=false; cb.indeterminate=false; });
+  updateBulkBar();
+}
+function bulkConfirm() {
+  var ids = Object.keys(_bulkSelected).filter(function(id){ return orders[id] && orders[id].status==='requested'; });
+  if (!ids.length) { toast('No Requested orders selected.'); return; }
+  if (!confirm('Confirm '+ids.length+' order(s) with today\'s date as install date?')) return;
+  var today = new Date();
+  var iso = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  ids.forEach(function(id) {
+    var o = orders[id];
+    o.status = 'scheduled'; o.confDate = iso;
+    if (!o.log) o.log = [];
+    o.log.push({ts:cstNow(),by:(window.currentTeamUser&&window.currentTeamUser.name)||'Admin',reason:'Bulk Confirmed',changes:[{field:'Status',from:'Requested',to:'Scheduled'}]});
+    notifOnScheduled(o);
+  });
+  saveOrders(); refreshAllOrderViews(); clearBulkSelect();
+  toast('\u2713 '+ids.length+' order(s) confirmed.');
+}
+function bulkComplete() {
+  var ids = Object.keys(_bulkSelected).filter(function(id){ return orders[id] && orders[id].status==='scheduled'; });
+  if (!ids.length) { toast('No Scheduled orders selected.'); return; }
+  if (!confirm('Mark '+ids.length+' order(s) as Completed?')) return;
+  var today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  ids.forEach(function(id) {
+    var o = orders[id];
+    o.status='completed'; o.completedDate=today;
+    if (!o.log) o.log=[];
+    o.log.push({ts:cstNow(),by:(window.currentTeamUser&&window.currentTeamUser.name)||'Admin',reason:'Bulk Completed',changes:[{field:'Status',from:'Scheduled',to:'Completed'}]});
+    notifOnCompleted(o);
+  });
+  saveOrders(); refreshAllOrderViews(); clearBulkSelect();
+  toast('\u2713 '+ids.length+' order(s) marked complete.');
+}
+function bulkVoid() {
+  var ids = Object.keys(_bulkSelected).filter(function(id){ var s=orders[id]&&orders[id].status; return s==='requested'||s==='scheduled'; });
+  if (!ids.length) { toast('No voidable orders selected.'); return; }
+  var reason = prompt('Reason for voiding '+ids.length+' order(s):');
+  if (!reason) return;
+  ids.forEach(function(id) {
+    var o = orders[id];
+    o.status='vd'; o.voidReason=reason; o.voidDate=new Date().toLocaleDateString('en-US');
+    o.voidBy=(window.currentTeamUser&&window.currentTeamUser.name)||'Admin';
+    if (!o.log) o.log=[];
+    o.log.push({ts:cstNow(),by:o.voidBy,reason:'Bulk Void: '+reason,changes:[{field:'Status',from:o.status,to:'Voided'}]});
+    notifOnVoided(o);
+  });
+  saveOrders(); refreshAllOrderViews(); clearBulkSelect();
+  toast(ids.length+' order(s) voided.');
+}
+function bulkExport() {
+  var ids = Object.keys(_bulkSelected);
+  if (!ids.length) { toast('No orders selected.'); return; }
+  var rows = ids.map(function(id){ var o=orders[id]; return [o.num,o.property,o.unit,o.service||'',o.reqDate||'',o.status].join(','); });
+  var csv = 'WO#,Property,Unit,Service,Requested Date,Status\n'+rows.join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'bulk_export_'+Date.now()+'.csv';
+  a.click();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: CALENDAR VIEW (shared by admin + client)
+// ════════════════════════════════════════════════════════════════════════════
+var _calState = {};
+function initCal(prefix, year, month) {
+  _calState[prefix] = {year: year || new Date().getFullYear(), month: month !== undefined ? month : new Date().getMonth()};
+  renderCal(prefix);
+}
+function calNav(dir, prefix) {
+  var s = _calState[prefix] || {year:new Date().getFullYear(), month:new Date().getMonth()};
+  s.month += dir;
+  if (s.month > 11) { s.month=0; s.year++; }
+  if (s.month < 0)  { s.month=11; s.year--; }
+  _calState[prefix] = s;
+  renderCal(prefix);
+}
+function renderCal(prefix) {
+  var s = _calState[prefix] || {year:new Date().getFullYear(), month:new Date().getMonth()};
+  var year=s.year, month=s.month;
+  var titleEl = document.getElementById(prefix+'_title');
+  var dowEl   = document.getElementById(prefix+'_dow');
+  var gridEl  = document.getElementById(prefix+'_grid');
+  if (!gridEl) return;
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if (titleEl) titleEl.textContent = months[month]+' '+year;
+  // Day-of-week headers
+  if (dowEl) dowEl.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
+  // Build calendar
+  var firstDay = new Date(year, month, 1).getDay();
+  var daysInMonth = new Date(year, month+1, 0).getDate();
+  var prevDays = new Date(year, month, 0).getDate();
+  var today = new Date(); var td=today.getDate(), tm=today.getMonth(), ty=today.getFullYear();
+  // Index orders by confirmed date
+  var byDate = {};
+  var filterProps = null;
+  if (prefix === 'cl_cal' && window.currentUser) filterProps = window.currentUser.props || [];
+  Object.keys(orders).forEach(function(id) {
+    var o = orders[id];
+    if (filterProps && filterProps.indexOf(o.property)===-1) return;
+    if (!o.confDate || o.confDate==='Pending') return;
+    var d = o.confDate; // YYYY-MM-DD
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push({id:id, o:o});
+  });
+  // Also index requested dates for client view
+  var reqByDate = {};
+  if (prefix === 'cl_cal') {
+    Object.keys(orders).forEach(function(id) {
+      var o = orders[id];
+      if (filterProps && filterProps.indexOf(o.property)===-1) return;
+      if (!o.reqDate) return;
+      var d = o.reqDate;
+      if (!reqByDate[d]) reqByDate[d] = [];
+      reqByDate[d].push({id:id, o:o});
+    });
+  }
+  var cells = '';
+  var totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+  for (var i=0; i<totalCells; i++) {
+    var cellDay, cellMonth=month, cellYear=year, otherMonth=false;
+    if (i < firstDay) { cellDay=prevDays-(firstDay-i-1); cellMonth=month-1; if(cellMonth<0){cellMonth=11;cellYear--;} otherMonth=true; }
+    else if (i >= firstDay+daysInMonth) { cellDay=i-firstDay-daysInMonth+1; cellMonth=month+1; if(cellMonth>11){cellMonth=0;cellYear++;} otherMonth=true; }
+    else cellDay = i - firstDay + 1;
+    var isToday = (cellDay===td && cellMonth===tm && cellYear===ty);
+    var isoDate = cellYear+'-'+String(cellMonth+1).padStart(2,'0')+'-'+String(cellDay).padStart(2,'0');
+    var dots = '';
+    (byDate[isoDate]||[]).slice(0,3).forEach(function(item) {
+      var cls = item.o.status==='completed'?'completed':'scheduled';
+      dots += '<div class="cal-dot '+cls+'" onclick="event.stopPropagation();oworder(\''+item.id+'\')" title="#'+item.o.num+' '+item.o.property+' U'+item.o.unit+'">'+
+        '#'+item.o.num+(item.o.unit?' U'+item.o.unit:'')+'</div>';
+    });
+    if (prefix==='cl_cal') {
+      (reqByDate[isoDate]||[]).slice(0,2).forEach(function(item) {
+        if (!(byDate[isoDate]||[]).find(function(x){return x.id===item.id;})) {
+          dots += '<div class="cal-dot requested" onclick="event.stopPropagation();oworder(\''+item.id+'\')" title="#'+item.o.num+' Requested">'+
+            '#'+item.o.num+' req</div>';
+        }
+      });
+    }
+    cells += '<div class="cal-cell'+(otherMonth?' other-month':'')+(isToday?' today':'')+'">'+
+      '<div class="cal-day">'+cellDay+'</div>'+dots+
+      (isToday?'<div class="cal-today-dot"></div>':'')+
+      '</div>';
+  }
+  gridEl.innerHTML = cells;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: AGING REPORT
+// ════════════════════════════════════════════════════════════════════════════
+function renderAgingReport() {
+  var body = document.getElementById('aging_report_body');
+  if (!body) return;
+  var threshold = parseInt((document.getElementById('aging_threshold')||{value:'5'}).value, 10);
+  var now = Date.now();
+  var aged = Object.keys(orders).filter(function(id) {
+    var o = orders[id];
+    if (o.status !== 'requested') return false;
+    // Parse submitted date
+    var sub = o.submittedDate;
+    if (!sub) return false;
+    var d = new Date(sub); if (isNaN(d)) return false;
+    return (now - d.getTime()) / 86400000 >= threshold;
+  }).map(function(id) {
+    var o = orders[id];
+    var days = Math.floor((now - new Date(o.submittedDate).getTime()) / 86400000);
+    return {id:id, o:o, days:days};
+  }).sort(function(a,b){ return b.days-a.days; });
+  if (!aged.length) {
+    body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray);font-size:13px;">&#10003; No aging orders — all requests have been confirmed within '+threshold+' days.</div>';
+    return;
+  }
+  var html = '<div class="tw"><table><thead><tr><th>Work Order</th><th>Property</th><th>Unit</th><th>Service</th><th>Submitted</th><th>Days Waiting</th><th>Actions</th></tr></thead><tbody>';
+  aged.forEach(function(item) {
+    var o=item.o, id=item.id, days=item.days;
+    var badgeCls = days>=14?'age-crit':'age-warn';
+    html += '<tr onclick="oworder(\''+id+'\')" style="cursor:pointer;">'+
+      '<td><strong>#'+o.num+'</strong></td>'+
+      '<td>'+o.property+'</td>'+
+      '<td>'+o.unit+'</td>'+
+      '<td>'+svcDisplay(o)+'</td>'+
+      '<td>'+(o.submittedDate||'—')+'</td>'+
+      '<td><span class="age-warn '+badgeCls+'">'+days+' day'+(days!==1?'s':'')+'</span></td>'+
+      '<td><button class="bs gd" style="font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();openConfirm(\''+id+'\')">&#10003; Confirm</button></td>'+
+      '</tr>';
+  });
+  html += '</tbody></table></div>';
+  body.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: CLIENT ACTIVITY LOG
+// ════════════════════════════════════════════════════════════════════════════
+function logClientActivity(action, meta) {
+  if (!currentUser) return;
+  var key = 'pf_activity_'+currentUser.email.replace(/[^a-z0-9]/gi,'_');
+  var log = [];
+  try { var s=localStorage.getItem(key); log=s?JSON.parse(s):[]; } catch(e){}
+  log.unshift({ts:new Date().toLocaleString('en-US',{timeZone:'America/Chicago'}), action:action, meta:meta||{}});
+  if (log.length>200) log=log.slice(0,200);
+  try { localStorage.setItem(key,JSON.stringify(log)); } catch(e){}
+}
+function getClientActivityLog(email) {
+  var key = 'pf_activity_'+(email||'').replace(/[^a-z0-9]/gi,'_');
+  try { var s=localStorage.getItem(key); return s?JSON.parse(s):[]; } catch(e){ return []; }
+}
+function renderActivityLog(email, containerId) {
+  var log = getClientActivityLog(email);
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (!log.length) { el.innerHTML='<div style="padding:16px;color:var(--gray);font-size:13px;">No activity recorded yet.</div>'; return; }
+  var labels = {view_order:'Viewed Order',submit_order:'Submitted Order',login:'Logged In',view_page:'Viewed Page'};
+  el.innerHTML = log.slice(0,50).map(function(e) {
+    var lbl = labels[e.action]||e.action;
+    var detail = '';
+    if (e.meta.orderNum) detail = ' — #'+e.meta.orderNum+(e.meta.property?' ('+e.meta.property+')':'');
+    else if (e.meta.page) detail = ' — '+e.meta.page;
+    return '<div class="alog-row">'+
+      '<div style="color:var(--navy);font-weight:600;">'+lbl+'</div>'+
+      '<div>'+detail+'</div>'+
+      '<div style="color:var(--gray);">'+e.ts+'</div>'+
+      '<div></div>'+
+      '</div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: DASHBOARD TAB SWITCHING (admin + client)
+// ════════════════════════════════════════════════════════════════════════════
+var _dashTab = 'recent';
+function switchDashTab(tab) {
+  _dashTab = tab;
+  ['recent','today','calendar','aging'].forEach(function(t) {
+    var btn  = document.getElementById('tab_'+t);
+    var wrap = document.getElementById('adash_'+t+'_wrap');
+    if (btn)  btn.className  = 'tab-toggle'+(t===tab?' on':'');
+    if (wrap) wrap.style.display = t===tab?'block':'none';
+  });
+  if (tab==='calendar') {
+    if (!_calState['adash_cal']) initCal('adash_cal');
+    else renderCal('adash_cal');
+  }
+  if (tab==='aging') renderAgingReport();
+}
+function switchClientDashTab(tab) {
+  ['list','cal'].forEach(function(t) {
+    var btn  = document.getElementById('cdash_tab_'+t);
+    var wrap = document.getElementById('cl_'+(t==='list'?'list':'cal')+'_wrap');
+    if (btn)  btn.className  = 'tab-toggle'+(t===tab?' on':'');
+    if (wrap) wrap.style.display = t===tab?'block':'none';
+  });
+  if (tab==='cal') {
+    if (!_calState['cl_cal']) initCal('cl_cal');
+    else renderCal('cl_cal');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FEATURE: BULK CHECKBOX INJECTION into renderAdminOrders rows
+// ════════════════════════════════════════════════════════════════════════════
+// Patch renderAdminOrders to add checkboxes — wrap existing row builder
+var _origRenderAdminOrders = null;
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<!-- ── CLIENT ACTIVITY LOG MODAL ─────────────────────────────────────────── -->
+<div class="mb" id="mactivity" onclick="if(event.target===this)closeM('mactivity')">
+  <div class="modal" style="max-width:640px;">
+    <div class="mh">
+      <div>
+        <h3>&#128196; Client Activity Log</h3>
+        <div id="mactivity_subtitle" style="font-size:12px;color:var(--gray);margin-top:3px;"></div>
+      </div>
+      <button class="mx" onclick="closeM('mactivity')">&#10005;</button>
+    </div>
+    <div class="mbody" style="padding:0;">
+      <div id="mactivity_body" style="max-height:460px;overflow-y:auto;padding:16px 20px;">
+        <div style="color:var(--gray);font-size:13px;">Loading...</div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="bl ol" onclick="closeM('mactivity')">Close</button>
+      <button class="bl dn" onclick="clearActivityLog()" style="margin-right:auto;font-size:12px;">&#128465; Clear Log</button>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
