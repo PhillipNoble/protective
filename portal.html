@@ -880,7 +880,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="fc">
           <h3>&#129520; Additional Service Requests <span style="font-size:13px;font-weight:400;color:var(--gray);">(Service &amp; Scope)</span></h3>
           <div class="fg" style="margin-bottom:20px;"><label>Flooring Service <span style="font-size:11px;font-weight:400;color:var(--gray);">(required if no scope selected)</span></label>
-            <select id="csvc" onchange="onSvcChange(this.value)"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select>
+            <select id="csvc" onchange="onSvcChange(this.value)"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option><option>Other</option></select>
           </div>
           <div class="fg" id="scopegrid_wrap" style="display:none;"><label>Scope of Work <span style="font-size:11px;font-weight:400;color:var(--gray);">(select all areas to be serviced)</span></label>
             <div class="sg" style="margin-top:8px;" id="scopegrid">
@@ -7087,6 +7087,25 @@ function cnav(pid, el) {
       var tmr = new Date(); tmr.setDate(tmr.getDate()+1);
       dateEl.value = tmr.getFullYear()+'-'+String(tmr.getMonth()+1).padStart(2,'0')+'-'+String(tmr.getDate()).padStart(2,'0');
     }
+    // Warn inline if user picks a Sunday
+    if (dateEl && !dateEl._sundayListenerAdded) {
+      dateEl._sundayListenerAdded = true;
+      dateEl.addEventListener('change', function() {
+        var existing = dateEl.parentElement.querySelector('.sunday-warn');
+        if (existing) existing.remove();
+        if (dateEl.value) {
+          var p = dateEl.value.split('-');
+          var d = new Date(p[0], p[1]-1, p[2]);
+          if (d.getDay() === 0) {
+            var warn = document.createElement('div');
+            warn.className = 'sunday-warn';
+            warn.style.cssText = 'font-size:11px;color:#b91c1c;margin-top:4px;';
+            warn.textContent = '\u26a0\ufe0f Sundays are not available. Please choose another day.';
+            dateEl.parentElement.appendChild(warn);
+          }
+        }
+      });
+    }
   }
   if (pid === 'cd') { try { renderClientDash(); } catch(e){} }
   if (pid === 'ch') { try { renderClientHistory(); } catch(e){} }
@@ -7617,7 +7636,7 @@ function addProw() {
   var rooms=['Living Room','Master Bedroom','Bedroom 2','Bedroom 3','Bedroom 4','Kitchen','Bathroom 1','Bathroom 2','Hallway','Dining Area','Laundry Room','Entry','Entryway','Stairs'];
   var tags=rooms.map(function(r){return '<span class="prt" onclick="this.classList.toggle(\'on\')">"+r+"</span>';}).join('');
   var row=document.createElement('div');row.className='prow';
-  row.innerHTML='<div class="form-row" style="margin-bottom:10px;"><div class="fg" style="margin-bottom:0;"><label>Preset Name *</label><input type="text" placeholder="e.g. Vinyl Wet+Dining"></div><div class="fg" style="margin-bottom:0;"><label>Default Service</label><select><option value="">-- Any --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select></div></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+tags+'</div><div style="margin-top:12px;text-align:right;"><button class="bs dn" onclick="this.closest(\'.prow\').remove()">Remove</button></div>';
+  row.innerHTML='<div class="form-row" style="margin-bottom:10px;"><div class="fg" style="margin-bottom:0;"><label>Preset Name *</label><input type="text" placeholder="e.g. Vinyl Wet+Dining"></div><div class="fg" style="margin-bottom:0;"><label>Default Service</label><select><option value="">-- Any --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option><option>Other</option></select></div></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+tags+'</div><div style="margin-top:12px;text-align:right;"><button class="bs dn" onclick="this.closest(\'.prow\').remove()">Remove</button></div>';
   document.getElementById('prowcont').appendChild(row);
   row.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -8002,6 +8021,11 @@ function submitOrder() {
   if (!unitVal)  markErr(unitEl,   'Unit number is required.');
   if (!planVal)  markErr(planSel,  'Floor Plan is required.');
   if (!dateVal)  markErr(dateEl,   'Requested install date is required.');
+  if (dateVal) {
+    var _parts = dateVal.split('-');
+    var _d = new Date(_parts[0], _parts[1]-1, _parts[2]);
+    if (_d.getDay() === 0) markErr(dateEl, 'Sundays are not available for scheduling. Please select another day.');
+  }
   if (!svcVal && selectedScopes.length === 0) {
     markErr(svcEl, 'Select a Flooring Service and/or at least one scope.');
   }
