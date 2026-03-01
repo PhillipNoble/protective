@@ -166,6 +166,7 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 .prt{display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--lg);color:var(--gray);transition:all .2s;margin:3px;}
 .prt.on{background:var(--navy);border-color:var(--navy);color:var(--white);}
 .prt:hover{border-color:var(--gold);}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* UPLOAD */
 .uz{border:2px dashed var(--border);border-radius:var(--r);padding:36px;text-align:center;cursor:pointer;transition:all .2s;background:var(--off);}
@@ -339,6 +340,13 @@ tr:hover td{background:var(--navy-lt);cursor:pointer;}
 .pr-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto;}
 .pr-actions{display:flex;gap:6px;flex-shrink:0;margin-left:8px;}
 .pr-chevron{font-size:10px;color:var(--gray);margin-left:8px;transition:transform .25s;flex-shrink:0;}
+  .notif-toggle{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;}
+  .notif-toggle input{opacity:0;width:0;height:0;position:absolute;}
+  .nt-track{position:absolute;inset:0;background:#d1d5db;border-radius:11px;cursor:pointer;transition:background .2s;}
+  .nt-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+  .notif-toggle input:checked + .nt-track{background:var(--navy);}
+  .notif-toggle input:checked + .nt-track .nt-thumb{transform:translateX(18px);}
+  .notif-toggle input:disabled + .nt-track{opacity:.4;cursor:not-allowed;}
 .pr-card.open .pr-chevron{transform:rotate(180deg);}
 .pr-body{display:none;border-top:1px solid var(--border);padding:20px;}
 .pr-card.open .pr-body{display:block;}
@@ -645,6 +653,24 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
     <div class="fg"><label>Email Address</label><input type="email" id="lemail" placeholder="you@example.com" autocomplete="username" value="manager@cherrycreek.com" onkeydown="if(event.key==='Enter')document.getElementById('lpw').focus();"></div>
     <div class="fg"><label>Password</label><input type="password" id="lpw" placeholder="Password" autocomplete="current-password" value="Cherry2025!" onkeydown="if(event.key==='Enter')doLogin();"></div>
     <button class="btn-pri" onclick="doLogin()" style="margin-top:6px;">Sign In</button>
+    <div style="text-align:center;margin-top:14px;">
+      <a href="#" onclick="showForgotPw();return false;" style="font-size:13px;color:var(--gray);text-decoration:none;border-bottom:1px solid var(--border);">Forgot your password?</a>
+    </div>
+    <!-- Forgot password panel (hidden by default) -->
+    <div id="forgot_pw_panel" style="display:none;margin-top:20px;padding:18px 20px;background:var(--cream);border:1px solid var(--border);border-radius:var(--r);">
+      <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;">&#128274; Reset Your Password</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:14px;line-height:1.6;">Enter your email address. If an account exists, a temporary password will be generated and shown here — share it with your admin to confirm, or log in and change it immediately.</p>
+      <div id="forgot_pw_err" style="display:none;padding:8px 12px;background:#fef2f2;border-radius:3px;font-size:12px;color:#b91c1c;margin-bottom:12px;"></div>
+      <div id="forgot_pw_ok" style="display:none;padding:12px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:3px;font-size:13px;color:#166534;margin-bottom:12px;line-height:1.7;"></div>
+      <div class="fg" style="margin-bottom:12px;">
+        <label style="font-size:12px;">Email Address</label>
+        <input type="email" id="forgot_pw_email" placeholder="you@example.com" style="font-size:13px;" onkeydown="if(event.key==='Enter')doForgotPw();">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="bl gd" onclick="doForgotPw()" style="font-size:12px;min-width:140px;">&#10003; Get Temp Password</button>
+        <button class="bl ol" onclick="hideForgotPw()" style="font-size:12px;">Cancel</button>
+      </div>
+    </div>
     <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray);">Need access? <a href="#" style="color:var(--gold);font-weight:600;" onclick="toast('Contact info+@+protectiveflooring.com to request an account.')">Contact us</a></div>
     <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--gray);"><a href="#" style="color:var(--gray);text-decoration:underline;" onclick="resetPortalData();return false;">Reset portal data</a> &mdash; clears saved changes and restores defaults</div>
   </div>
@@ -724,11 +750,15 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </div>
           <div class="sc sc-link" id="cstat_done"   onclick="cstatFilter('done')"   title="View completed orders">
             <div class="si gr">&#10003;</div>
-            <div><div class="snum" id="cstat_done_n">—</div><div class="slbl">Completed</div></div>
+            <div><div class="snum" id="cstat_done_n">—</div><div class="slbl">Completed (YTD)</div></div>
           </div>
           <div class="sc sc-link" id="cstat_attn"   onclick="cstatFilter('attn')"   title="View orders needing attention">
             <div class="si rd">&#9888;</div>
-            <div><div class="snum" id="cstat_attn_n">—</div><div class="slbl">Needs Attention</div></div>
+            <div>
+              <div class="snum" id="cstat_attn_n">—</div>
+              <div class="slbl">Needs Attention</div>
+              <div id="cstat_attn_hint" style="display:none;font-size:10px;color:var(--gold);margin-top:2px;font-weight:600;">Tap to view &amp; follow up</div>
+            </div>
           </div>
         </div>
         <div class="shd">
@@ -785,8 +815,13 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <div class="form-row" style="margin-bottom:16px;">
             <div class="fg">
               <div class="fg" style="margin-bottom:12px;"><label>Property *</label>
-                <select id="cpropsel" onchange="updatePropFloorPlans(this.value)">
+                <select id="cpropsel" onchange="onClientPropChange(this.value)">
                   <option value="">-- Select Property --</option>
+                </select>
+              </div>
+              <div class="fg" id="csubprop_wrap" style="margin-bottom:12px;display:none;"><label>Sub-Property / Phase</label>
+                <select id="csubpropsel" onchange="updatePropFloorPlans(document.getElementById('cpropsel').value)">
+                  <option value="">-- Select Sub-Property --</option>
                 </select>
               </div>
               <div class="fg" style="margin-bottom:12px;"><label>Unit Number *</label>
@@ -843,7 +878,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </div>
         </div>
         <div class="fc">
-          <h3>&#129520; Service &amp; Scope <span style="font-size:13px;font-weight:400;color:var(--gray);">(Additional Services)</span></h3>
+          <h3>&#129520; Additional Service Requests <span style="font-size:13px;font-weight:400;color:var(--gray);">(Service &amp; Scope)</span></h3>
           <div class="fg" style="margin-bottom:20px;"><label>Flooring Service <span style="font-size:11px;font-weight:400;color:var(--gray);">(required if no scope selected)</span></label>
             <select id="csvc" onchange="onSvcChange(this.value)"><option value="">-- Select Service --</option><option>Carpet Installation</option><option>Luxury Vinyl Plank (LVP)</option><option>Sheet Vinyl</option><option>Tile Installation</option><option>Pet Seal Treatment</option><option>Subfloor Repair</option><option>Repair</option><option>Call Back</option></select>
           </div>
@@ -898,13 +933,16 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <input type="text" id="ch_search" placeholder="Search orders, units, services..." oninput="renderClientHistory()">
           </div>
           <select class="fs" id="ch_status_filter" onchange="renderClientHistory()">
-            <option value="">All Statuses</option>
+            <option value="" selected>All Statuses</option>
             <option value="requested">Requested</option>
             <option value="scheduled">Scheduled</option>
             <option value="completed">Completed</option>
           </select>
           <select class="fs" id="ch_prop_filter" onchange="renderClientHistory()">
             <option value="">All Properties</option>
+          </select>
+          <select class="fs" id="ch_subprop_filter" onchange="renderClientHistory()" style="display:none;">
+            <option value="">All Sub-Properties</option>
           </select>
           <select class="fs" id="ch_hub_filter" onchange="renderClientHistory()">
             <option value="">All Hubs</option>
@@ -1235,6 +1273,9 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           <select class="fs" id="aord_prop" onchange="renderAdminOrders()">
             <option value="">All Properties</option>
           </select>
+          <select class="fs" id="aord_subprop" onchange="renderAdminOrders()" style="display:none;">
+            <option value="">All Sub-Properties</option>
+          </select>
           <select class="fs" id="aord_status" onchange="renderAdminOrders()">
             <option value="">All Statuses</option>
             <option value="requested">Requested</option>
@@ -1283,7 +1324,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="tw"><table id="aord_tbl">
           <thead><tr>
             <th style="width:32px;"><input type="checkbox" id="bulk_all" title="Select all" onchange="toggleSelectAll(this.checked)" style="cursor:pointer;accent-color:var(--navy);width:14px;height:14px;"></th>
-            <th class="sortable" onclick="sortTable('aord_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('aord_tbl',1,'str')">Property</th><th class="sortable" onclick="sortTable('aord_tbl',2,'str')">Hub</th><th class="sortable" onclick="sortTable('aord_tbl',3,'str')">Unit</th>
+            <th class="sortable" onclick="sortTable('aord_tbl',0,'str')">Work Order</th><th class="sortable" onclick="sortTable('aord_tbl',1,'str')">Property</th><th class="sortable" id="aord_th_subprop" onclick="sortTable('aord_tbl',2,'str')" style="display:none;">Sub-Property</th><th class="sortable" onclick="sortTable('aord_tbl',3,'str')">Hub</th><th class="sortable" onclick="sortTable('aord_tbl',4,'str')">Unit</th>
             <th class="sortable" onclick="sortTable('aord_tbl',4,'str')">Service</th><th class="sortable" id="aord_date_th" onclick="sortTable('aord_tbl',5,'date')">Requested</th><th class="sortable" onclick="sortTable('aord_tbl',6,'str')">Status</th><th>Actions</th>
           </tr></thead>
           <tbody id="aord_tbody"></tbody>
@@ -1294,7 +1335,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
       <div class="panel" id="aprops">
         <div class="shd"><h2>Properties</h2>
           <div style="display:flex;gap:8px;">
-            <button class="bs ol" onclick="goClientPortalFromChooser();setTimeout(function(){go('cl');cnav('co',document.querySelector('#cl .ni[onclick*="co"]'));},150);">&#128221; Place Order</button>
+            <button class="bs ol" onclick="adminPlaceOrder()">&#128221; Place Order</button>
             <button class="bs gd" onclick="openAddPropModal()">+ Add Property</button>
           </div></div>
         <div class="fb" style="margin-bottom:16px;">
@@ -1624,6 +1665,32 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
           </div>
         </div>
 
+        <!-- ── CLIENT CANCELLATION REQUESTS ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>&#128683; Client Cancellation Requests</span>
+            <label class="notif-toggle" style="flex-shrink:0;">
+              <input type="checkbox" id="set_cancel_master" onchange="toggleCancelMaster(this)">
+              <span class="nt-track"><span class="nt-thumb"></span></span>
+            </label>
+          </div>
+          <p style="font-size:13px;color:var(--gray);margin-top:8px;line-height:1.6;">
+            When enabled, clients can submit cancellation requests on <strong>Requested</strong> and <strong>Scheduled</strong> orders. You can also disable this per-property from the Properties tab. Turn off globally here to disable for all clients at once.
+          </p>
+        </div>
+
+        <!-- ── CSV IMPORT TEMPLATE ── -->
+        <div class="ms" style="margin-bottom:28px;">
+          <div class="mst">&#128229; Work Order Import Template</div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:14px;line-height:1.6;">
+            Use this template to import historical work orders for any property. Fill it out in Excel or Google Sheets, then upload it from the property card in the <strong>Properties</strong> tab.
+          </p>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button class="bs nv" onclick="downloadCsvTemplate()">&#11015; Download CSV Template</button>
+            <span style="font-size:12px;color:var(--gray);">order_num, legacy_ref, sub_property, unit, plan, service, scope, req_date, conf_date, completed_date, status, submitted_by, notes, po</span>
+          </div>
+        </div>
+
         <div class="fa" style="padding-top:8px;">
           <button class="bl gd" onclick="savePortalSettings()">&#10003; Save Settings</button>
         </div>
@@ -1648,10 +1715,18 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <button class="bs ol" id="logbtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="exportWoLog(this.dataset.woid)">&#128220; Export Log</button>
         <button class="bs nv" id="copybtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openCopyOrder(this.dataset.woid)">&#128203; Duplicate</button>
         <button class="bs dn" id="voidbtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openVoidOrder(this.dataset.woid)">&#128683; Cancel / Void</button>
+        <button class="bs dn" id="cancelreqbtn" style="font-size:11px;padding:4px 10px;display:none;" onclick="openCancelRequest(this.dataset.woid)">&#128683; Request Cancellation</button>
         <button class="mx" onclick="closeM('mwo')">&#10005;</button>
       </div>
     </div>
     <div class="mbody" style="padding:0;">
+      <!-- Cancellation request alert (admin view) -->
+      <div id="wo_cancel_req_banner" style="display:none;padding:12px 18px;background:#fef3c7;border-bottom:2px solid #f59e0b;font-size:13px;color:#92400e;">
+        <strong>&#9888; Cancellation Requested by Client</strong>
+        <span id="wo_cancel_req_detail" style="margin-left:8px;"></span>
+        <button class="bs dn" style="font-size:11px;padding:3px 10px;margin-left:12px;" onclick="voidFromCancelRequest()">&#10003; Approve &amp; Void</button>
+        <button class="bs ol" style="font-size:11px;padding:3px 10px;margin-left:4px;" onclick="dismissCancelRequest()">Dismiss</button>
+      </div>
       <!-- PO inline editor (client-only) -->
       <div id="wo_po_bar" style="display:none;padding:10px 18px;background:#fffbeb;border-bottom:1px solid #fde68a;display:none;align-items:center;gap:10px;flex-wrap:wrap;">
         <span style="font-size:12px;font-weight:600;color:#78350f;">&#128203; Purchase Order #</span>
@@ -1781,6 +1856,23 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         </div>
 
       </div><!-- .madd-cols -->
+
+      <!-- SUB-PROPERTIES SECTION -->
+      <div id="madd_subprop_section" class="ms" style="margin-top:0;">
+        <div class="mst" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>&#127970; Portfolio / Sub-Properties <span style="font-size:11px;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;">&mdash; optional</span></span>
+        </div>
+        <p style="font-size:12px;color:var(--gray);margin-bottom:12px;line-height:1.6;">
+          Use this for portfolio properties with distinct phases or sections (e.g. Phase I, Phase II). Floor plans are assigned per sub-property.
+        </p>
+        <div id="madd_subprop_list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="madd_subprop_inp" placeholder="e.g. Phase I, Building A..." maxlength="60"
+            style="flex:1;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addSubPropInline();}">
+          <button class="bs gd" onclick="addSubPropInline()">+ Add</button>
+        </div>
+      </div>
 
       <!-- FLOOR PLANS SECTION (shown when editing an existing property) -->
       <div id="madd_fp_section" style="display:none;">
@@ -2340,6 +2432,8 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="form-row">
           <div class="fg" style="flex:2;"><label>Property</label>
             <select id="woedit_prop" onchange="woeditPropChange()"></select></div>
+          <div class="fg" id="woedit_subprop_wrap" style="display:none;"><label>Sub-Property / Phase</label>
+            <select id="woedit_subprop"><option value="">-- None --</option></select></div>
           <div class="fg"><label>Unit Number</label>
             <input type="text" id="woedit_unit" placeholder="e.g. 214"></div>
         </div>
@@ -3087,8 +3181,10 @@ function renderPropList() {
       ? '<span class="b ac">Active</span>'
       : '<span class="b in">Inactive</span>';
     var pid = prop.id;
+    var _importBtn = '<button class="bs ol import-btn" style="display:none;" onclick="openImportModal(\'' + pid + '\');event.stopPropagation();">&#128229; Import History</button>';
     var actionBtns = prop.status==='active'
       ? '<button class="bs ol" onclick="openEditProp(\'' + pid + '\');event.stopPropagation();">Edit</button>'
+        +_importBtn
         +'<button class="bs dn" onclick="deactivateProp(\'' + pid + '\');event.stopPropagation();">Deactivate</button>'
       : '<button class="bs gd" onclick="reactivateProp(\'' + pid + '\');event.stopPropagation();">Reactivate</button>'
         +'<button class="bs ol" onclick="openEditProp(\'' + pid + '\');event.stopPropagation();">Edit</button>';
@@ -3140,7 +3236,7 @@ function renderPropList() {
     card.dataset.mgmt = (prop.mgmt||'').toLowerCase();
     card.dataset.status = prop.status || 'active';
     card.innerHTML =
-      '<div class="pr-header" onclick="openEditProp(\''+prop.id+'\');event.stopPropagation();" style="cursor:pointer;">'
+      '<div class="pr-header" onclick="this.closest(\'.pr-card\').classList.toggle(\'open\');" style="cursor:pointer;">'
         +'<div class="pr-avatar">'+initials+'</div>'
         +'<div class="pr-info">'
           +'<div class="pr-name">'+prop.name+'</div>'
@@ -3159,10 +3255,21 @@ function renderPropList() {
           +'<tbody>'+fpRows+'</tbody>'
         +'</table></div>'
         +'<button class="bs gd" data-prop="' + prop.id + '" onclick="addFpClick(this)">+ Add Floor Plan</button>'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px;border-top:1px solid var(--border);margin-top:14px;">'
+          +'<div>'
+            +'<div style="font-size:12px;font-weight:600;color:var(--navy);">&#128683; Client Cancellation Requests</div>'
+            +'<div style="font-size:11px;color:var(--gray);margin-top:2px;">Allow clients to request cancellations on this property</div>'
+          +'</div>'
+          +'<label class="notif-toggle" onclick="event.stopPropagation();">'
+            +'<input type="checkbox" class="prop-cancel-toggle" '+(prop.allowCancel!==false?'checked':'')+(getCancelMasterEnabled()?'':' disabled style="opacity:.4"')+' onchange="togglePropCancel(\''+prop.id+'\',this)">'
+            +'<span class="nt-track"><span class="nt-thumb"></span></span>'
+          +'</label>'
+        +'</div>'
       +'</div>';
     list.appendChild(card);
   });
   filterProps();
+  applyImportBtnVisibility();
 }
 
 // ── PROPERTY CRUD ──
@@ -3188,6 +3295,8 @@ function openAddPropModal() {
   document.getElementById('madd_err').style.display = 'none';
   document.getElementById('madd_delbtn').style.display = 'none';
   document.getElementById('madd_fp_section').style.display = 'none';
+  var _spList = document.getElementById('madd_subprop_list');
+  if (_spList) _spList.innerHTML = '<div style="font-size:12px;color:var(--gray);padding:4px 0;">No sub-properties yet.</div>';
   openM('madd');
 }
 
@@ -3220,6 +3329,7 @@ function openEditProp(propId) {
   document.getElementById('madd_fp_section').style.display = 'block';
   document.getElementById('madd_fp_addbtn').dataset.prop = propId;
   renderInlineFpList(propId);
+  renderSubPropList(propId);
   openM('madd');
 }
 function saveProperty() {
@@ -3251,15 +3361,21 @@ function saveProperty() {
     notes:(document.getElementById('madd_notes').value||'').trim(),
     propNotes:(document.getElementById('madd_propnotes').value||'').trim(),
     created: isNew ? new Date().toISOString().slice(0,10) : null,
-    deletedAt: null
+    deletedAt: null,
+    subprops: isNew ? [] : null  // preserved below for existing
   };
   if (!isNew) {
-    // preserve created date
+    // preserve created date and subprops
     for(var i=0;i<props.length;i++){
-      if(props[i].id===id){ obj.created=props[i].created; break; }
+      if(props[i].id===id){
+        obj.created = props[i].created;
+        obj.subprops = props[i].subprops || [];
+        break;
+      }
     }
     props = props.map(function(pr){ return pr.id===id ? obj : pr; });
   } else {
+    obj.subprops = [];
     props.push(obj);
   }
   saveProps(props);
@@ -4103,6 +4219,495 @@ function getNotifSettings() {
   });
   return out;
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WORK ORDER CSV IMPORT
+// ══════════════════════════════════════════════════════════════════════════════
+
+var _importPropId   = null;
+var _importPropName = null;
+var _importRows     = [];   // parsed preview rows
+
+var IMPORT_COLS = [
+  'order_num','legacy_ref','sub_property','unit','plan','service','scope',
+  'req_date','conf_date','completed_date','status','submitted_by','notes','po'
+];
+var IMPORT_COL_LABELS = {
+  order_num:'Order #', legacy_ref:'Legacy Ref #', sub_property:'Sub-Property',
+  unit:'Unit', plan:'Floor Plan', service:'Service', scope:'Scope (comma-sep)',
+  req_date:'Req. Date', conf_date:'Conf. Date', completed_date:'Completed Date',
+  status:'Status', submitted_by:'Submitted By', notes:'Notes', po:'PO #'
+};
+
+// ── CSV template download ──────────────────────────────────────────────────
+function downloadCsvTemplate() {
+  var header = IMPORT_COLS.join(',');
+  var example = [
+    '','CC-2024-001','Phase I','214','2 Bed / 2 Bath',
+    'Carpet Installation','Living Room,Bedroom',
+    '01/15/2025','01/15/2025','01/15/2025',
+    'completed','Jessica Lane','Standard turnover',''
+  ].join(',');
+  var csv = header + '\n' + example + '\n';
+  var blob = new Blob([csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pf_import_template.csv';
+  a.click();
+}
+
+// ── Open the import modal for a property ──────────────────────────────────
+function openImportModal(propId) {
+  _importPropId = propId;
+  var prop = null;
+  getActiveProps().forEach(function(pr){ if(pr.id===propId) prop=pr; });
+  _importPropName = prop ? prop.name : '';
+  _importRows = [];
+  document.getElementById('mimport_title').textContent    = 'Import Work Order History';
+  document.getElementById('mimport_subtitle').textContent = _importPropName;
+  document.getElementById('mimport_step1').style.display  = '';
+  document.getElementById('mimport_step2').style.display  = 'none';
+  document.getElementById('mimport_step3').style.display  = 'none';
+  document.getElementById('mimport_file').value           = '';
+  document.getElementById('mimport_file_err').style.display = 'none';
+  openM('mimport');
+}
+
+function handleImportDrop(e) {
+  var file = e.dataTransfer.files[0];
+  if (file) parseImportFile(file);
+}
+function handleImportFile(inp) {
+  if (inp.files[0]) parseImportFile(inp.files[0]);
+}
+
+// ── Parse uploaded CSV ─────────────────────────────────────────────────────
+function parseImportFile(file) {
+  if (!file.name.match(/\.csv$/i)) {
+    showImportErr('Please upload a .csv file.'); return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var rows = parseCsvText(e.target.result);
+      if (!rows || rows.length < 2) {
+        showImportErr('The file appears empty or has no data rows.'); return;
+      }
+      var headers = rows[0].map(function(h){ return h.trim().toLowerCase().replace(/\s+/g,'_'); });
+      var dataRows = rows.slice(1).filter(function(r){ return r.some(function(c){ return (c||'').trim(); }); });
+      if (!dataRows.length) { showImportErr('No data rows found after the header row.'); return; }
+      _importRows = dataRows.map(function(row, ri) {
+        var obj = { _ri: ri };
+        IMPORT_COLS.forEach(function(col) {
+          var hi = headers.indexOf(col);
+          obj[col] = (hi >= 0 && row[hi] !== undefined) ? row[hi].trim() : '';
+        });
+        // Defaults
+        if (!obj.status) obj.status = 'completed';
+        if (!obj.property) obj.property = _importPropName;
+        return obj;
+      });
+      showImportPreview();
+    } catch(ex) {
+      showImportErr('Could not parse CSV: ' + ex.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function showImportErr(msg) {
+  var el = document.getElementById('mimport_file_err');
+  el.textContent = msg; el.style.display = '';
+}
+
+// ── Robust CSV parser (handles quoted fields) ──────────────────────────────
+function parseCsvText(text) {
+  var rows = [], row = [], cur = '', inQ = false;
+  text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  for (var i=0; i<text.length; i++) {
+    var c = text[i];
+    if (inQ) {
+      if (c==='"') { if (text[i+1]==='"') { cur+='"'; i++; } else inQ=false; }
+      else cur+=c;
+    } else {
+      if (c==='"') { inQ=true; }
+      else if (c===',') { row.push(cur); cur=''; }
+      else if (c==='\n') { row.push(cur); rows.push(row); row=[]; cur=''; }
+      else cur+=c;
+    }
+  }
+  if (cur||row.length) { row.push(cur); rows.push(row); }
+  return rows.filter(function(r){ return r.length > 0; });
+}
+
+// ── Render preview table ───────────────────────────────────────────────────
+// ── VALIDATION & FUZZY MATCHING ─────────────────────────────────────────────
+
+// Normalise a string for fuzzy comparison
+function _normStr(s) {
+  return (s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
+// Find best matching service name (returns matched name or '')
+function matchService(raw) {
+  if (!raw) return '';
+  var svcs = loadServices().map(function(s){ return s.name; });
+  var norm = _normStr(raw);
+  // Exact match first
+  for (var i=0; i<svcs.length; i++) { if (_normStr(svcs[i])===norm) return svcs[i]; }
+  // Substring match
+  for (var i=0; i<svcs.length; i++) {
+    if (_normStr(svcs[i]).indexOf(norm)>=0 || norm.indexOf(_normStr(svcs[i]))>=0) return svcs[i];
+  }
+  // Common abbreviations
+  var aliases = {
+    'lvp':'Luxury Vinyl Plank (LVP)', 'luxuryvinyl':'Luxury Vinyl Plank (LVP)',
+    'vinyl':'Luxury Vinyl Plank (LVP)', 'carpet':'Carpet Installation',
+    'tile':'Tile Installation', 'petseal':'Pet Seal Treatment',
+    'pettreatment':'Pet Seal Treatment', 'subfloor':'Subfloor Repair',
+    'turnover':'Full Turnover Package', 'callback':'Call Back',
+    'sheeting':'Sheet Vinyl', 'sheetvinyl':'Sheet Vinyl'
+  };
+  if (aliases[norm]) return aliases[norm];
+  return '';
+}
+
+// Find best matching floor plan name for a property (returns matched name or '')
+function matchPlan(raw, propId) {
+  if (!raw) return '';
+  var fps = loadFpForProp(propId);
+  var norm = _normStr(raw);
+  // Exact match
+  for (var i=0; i<fps.length; i++) { if (_normStr(fps[i].name)===norm) return fps[i].name; }
+  // Substring match
+  for (var i=0; i<fps.length; i++) {
+    if (_normStr(fps[i].name).indexOf(norm)>=0 || norm.indexOf(_normStr(fps[i].name))>=0) return fps[i].name;
+  }
+  // Bed/bath pattern: "2BR/2BA" → "2 Bed / 2 Bath", "3b2b" → "3 Bed / 2 Bath"
+  var bm = norm.match(/(\d)b[a-z]*\/?(\d)b/);
+  if (bm) {
+    var beds=bm[1], baths=bm[2];
+    for (var i=0; i<fps.length; i++) {
+      if (String(fps[i].beds)===beds && String(fps[i].baths)===baths) return fps[i].name;
+    }
+  }
+  return '';
+}
+
+// Validate all rows, set row._svcWarning and row._planWarning
+function validateImportRows() {
+  var svcs = loadServices().map(function(s){ return s.name; });
+  var fps  = loadFpForProp(_importPropId);
+  _importRows.forEach(function(row) {
+    // ── Service ──
+    row._svcWarning  = false;
+    row._svcMatched  = '';
+    if (row.service) {
+      var matched = matchService(row.service);
+      if (!matched) {
+        row._svcWarning = true;   // unrecognised
+      } else if (_normStr(matched) !== _normStr(row.service)) {
+        row._svcMatched = matched; // auto-correctable
+      }
+    }
+    // ── Plan ──
+    row._planWarning  = false;
+    row._planMatched  = '';
+    if (row.plan) {
+      var pm = matchPlan(row.plan, _importPropId);
+      if (!pm) {
+        row._planWarning = true;
+      } else if (_normStr(pm) !== _normStr(row.plan)) {
+        row._planMatched = pm;
+      }
+    }
+    // ── Completed date ──
+    row._compDateWarning = false;
+    var st = (row.status||'completed').trim().toLowerCase();
+    if (st === 'completed' && !normaliseImportDate(row.completed_date)) {
+      row._compDateWarning = true;
+    }
+    // ── Sub-property ──
+    row._subpropWarning = false;
+    row._subpropMatched = '';
+    if (row.sub_property) {
+      var prop = null;
+      getActiveProps().forEach(function(pr){ if(pr.id===_importPropId) prop=pr; });
+      var sps = prop ? (prop.subprops||[]) : [];
+      var spNorm = _normStr(row.sub_property);
+      var spMatch = null;
+      for (var si=0; si<sps.length; si++) {
+        if (_normStr(sps[si].name)===spNorm) { spMatch=sps[si].name; break; }
+      }
+      if (!spMatch) {
+        // Try substring
+        for (var si=0; si<sps.length; si++) {
+          if (_normStr(sps[si].name).indexOf(spNorm)>=0 || spNorm.indexOf(_normStr(sps[si].name))>=0) { spMatch=sps[si].name; break; }
+        }
+      }
+      if (!spMatch) {
+        row._subpropWarning = true;
+      } else if (_normStr(spMatch) !== _normStr(row.sub_property)) {
+        row._subpropMatched = spMatch;
+      }
+    }
+  });
+}
+
+function showImportPreview() {
+  document.getElementById('mimport_step1').style.display = 'none';
+  document.getElementById('mimport_step2').style.display = '';
+
+  // Validate before rendering
+  validateImportRows();
+
+  // Check for existing order_nums that will be overwritten
+  var overwrites=0, svcWarnings=0, planWarnings=0, subpropWarnings=0, compDateWarnings=0, autoFixed=0;
+  _importRows.forEach(function(row){
+    if (row.order_num && orders[row.order_num]) overwrites++;
+    if (row._svcWarning)      svcWarnings++;
+    if (row._planWarning)     planWarnings++;
+    if (row._subpropWarning)  subpropWarnings++;
+    if (row._compDateWarning) compDateWarnings++;
+    if (row._svcMatched || row._planMatched || row._subpropMatched) autoFixed++;
+  });
+
+  var countEl = document.getElementById('mimport_preview_count');
+  countEl.textContent = _importRows.length + ' row' + (_importRows.length===1?'':'s') + ' ready to import';
+
+  // Build warning banner
+  var warns = [];
+  if (overwrites)    warns.push('&#9888; <strong>'+overwrites+'</strong> row'+(overwrites===1?' has':'s have')+' an order_num that already exists and will be overwritten.');
+  if (autoFixed)     warns.push('&#10004; <strong>'+autoFixed+'</strong> service/plan value'+(autoFixed===1?' was':'s were')+' auto-corrected to match portal names. Review highlighted cells.');
+  if (svcWarnings)   warns.push('&#9888; <strong>'+svcWarnings+'</strong> service value'+(svcWarnings===1?' does':'s do')+' not match any portal service type. Use the dropdown to correct it or leave as custom text.');
+  if (planWarnings)  warns.push('&#9888; <strong>'+planWarnings+'</strong> floor plan value'+(planWarnings===1?' does':'s do')+' not match any floor plan for this property. Use the dropdown to correct it or leave as-is.');
+  if (subpropWarnings)   warns.push('&#9888; <strong>'+subpropWarnings+'</strong> sub-property value'+(subpropWarnings===1?' does':'s do')+' not match this property\'s sub-properties. Use the dropdown to select the correct one or clear it to leave blank.');
+  if (compDateWarnings)  warns.push('&#9888; <strong>'+compDateWarnings+'</strong> completed row'+(compDateWarnings===1?' is':'s are')+' missing a <strong>completed_date</strong>. These orders will not appear in date-filtered dashboard and order views. Enter a date in the cell or leave blank to accept.');
+  var wEl = document.getElementById('mimport_warn');
+  if (warns.length) {
+    wEl.innerHTML = warns.join('<br>');
+    wEl.style.display = '';
+  } else {
+    wEl.style.display = 'none';
+  }
+
+  // Build header row
+  var thead = document.getElementById('mimport_thead_row');
+  thead.innerHTML = IMPORT_COLS.map(function(col){
+    return '<th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:var(--navy);border-bottom:2px solid var(--border);white-space:nowrap;">'+IMPORT_COL_LABELS[col]+'</th>';
+  }).join('') + '<th style="padding:7px 8px;border-bottom:2px solid var(--border);"></th>';
+
+  // Build editable body rows
+  var tbody = document.getElementById('mimport_tbody');
+  tbody.innerHTML = '';
+  var svcs = loadServices().map(function(s){ return s.name; });
+  var fps  = loadFpForProp(_importPropId).map(function(f){ return f.name; });
+
+  _importRows.forEach(function(row, ri) {
+    // Apply auto-corrections silently
+    if (row._svcMatched)     { row.service      = row._svcMatched;     row._svcMatched=''; }
+    if (row._planMatched)    { row.plan          = row._planMatched;    row._planMatched=''; }
+    if (row._subpropMatched) { row.sub_property  = row._subpropMatched; row._subpropMatched=''; }
+
+    var tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--lg)';
+
+    IMPORT_COLS.forEach(function(col) {
+      var td = document.createElement('td');
+      td.style.cssText = 'padding:3px 5px;';
+
+      var isService  = (col === 'service');
+      var isPlan     = (col === 'plan');
+      var isSubprop  = (col === 'sub_property');
+      var hasWarn    = (isService && row._svcWarning) || (isPlan && row._planWarning) || (isSubprop && row._subpropWarning);
+
+      if ((isService || isPlan || isSubprop) && (row[col] || hasWarn)) {
+        // Render as a mini-select + text fallback
+        var _spPropForOpts = null;
+      getActiveProps().forEach(function(pr){ if(pr.id===_importPropId) _spPropForOpts=pr; });
+      var spNames = (_spPropForOpts && _spPropForOpts.subprops) ? _spPropForOpts.subprops.map(function(s){ return s.name; }) : [];
+      var options = isService ? svcs : (isPlan ? fps : spNames);
+      var colLabel = isService ? 'Service' : (isPlan ? 'Plan' : 'Sub-Property');
+        var curVal  = row[col] || '';
+        var sel = document.createElement('select');
+        sel.style.cssText = 'width:100%;min-width:120px;font-size:11px;padding:3px 5px;border:1px solid '+(hasWarn?'#f59e0b':'var(--border)')+';border-radius:3px;background:'+(hasWarn?'#fffbeb':'var(--cream)')+';';
+        sel.dataset.col = col; sel.dataset.ri = ri;
+
+        // Always allow free-text option first
+        var blankOpt = document.createElement('option');
+        blankOpt.value = ''; blankOpt.textContent = '-- '+colLabel+' --';
+        sel.appendChild(blankOpt);
+
+        // "Keep as-is" option when value doesn't match
+        if (hasWarn && curVal) {
+          var keepOpt = document.createElement('option');
+          keepOpt.value = curVal; keepOpt.textContent = '📝 Keep: '+curVal;
+          keepOpt.selected = true;
+          sel.appendChild(keepOpt);
+        }
+
+        options.forEach(function(name) {
+          var opt = document.createElement('option');
+          opt.value = name; opt.textContent = name;
+          if (_normStr(name) === _normStr(curVal)) opt.selected = true;
+          sel.appendChild(opt);
+        });
+
+        sel.onchange = function() {
+          _importRows[parseInt(this.dataset.ri)][this.dataset.col] = this.value;
+          this.style.borderColor = 'var(--border)';
+          this.style.background  = 'var(--cream)';
+        };
+        td.appendChild(sel);
+      } else {
+        var inp = document.createElement('input');
+        inp.type = 'text'; inp.value = row[col] || '';
+        var _cdWarn = (col==='completed_date' && row._compDateWarning);
+        inp.style.cssText = 'width:100%;min-width:65px;font-size:11px;padding:3px 5px;border:1px solid '+(_cdWarn?'#f59e0b':'var(--border)')+';border-radius:3px;background:'+(_cdWarn?'#fffbeb':'var(--cream)')+';';
+        if (_cdWarn) inp.placeholder = 'e.g. 01/15/2025';
+        inp.dataset.col = col; inp.dataset.ri = ri;
+        inp.oninput = function() { _importRows[parseInt(this.dataset.ri)][this.dataset.col] = this.value; };
+        td.appendChild(inp);
+      }
+      tr.appendChild(td);
+    });
+
+    // Delete row button
+    var tdDel = document.createElement('td');
+    tdDel.style.cssText = 'padding:3px 5px;';
+    var btn = document.createElement('button');
+    btn.className='bs dn'; btn.style.cssText='font-size:10px;padding:2px 7px;white-space:nowrap;';
+    btn.textContent='✕'; btn.dataset.ri=ri;
+    btn.onclick = function() { _importRows.splice(parseInt(this.dataset.ri),1); showImportPreview(); };
+    tdDel.appendChild(btn);
+    tr.appendChild(tdDel);
+    tbody.appendChild(tr);
+  });
+}
+
+
+function mimportBack() {
+  document.getElementById('mimport_step1').style.display = '';
+  document.getElementById('mimport_step2').style.display = 'none';
+  document.getElementById('mimport_warn').style.display  = 'none';
+}
+
+// ── Normalise a date string → YYYY-MM-DD ──────────────────────────────────
+function normaliseImportDate(s) {
+  if (!s) return '';
+  s = s.trim();
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // MM/DD/YYYY or M/D/YYYY
+  var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return m[3]+'-'+m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0');
+  return '';
+}
+
+// ── Commit the import ──────────────────────────────────────────────────────
+function confirmImport() {
+  // Show spinner, hide table and buttons
+  var btnEl     = document.getElementById('mimport_confirm_btn');
+  var spinEl    = document.getElementById('mimport_spinner');
+  var tblWrap   = document.getElementById('mimport_preview_tbl');
+  var warnEl    = document.getElementById('mimport_warn');
+  var backBtn   = document.querySelector('#mimport_step2 .bs.ol');
+  if (btnEl)   btnEl.style.display  = 'none';
+  if (backBtn) backBtn.style.display = 'none';
+  if (warnEl)  warnEl.style.display  = 'none';
+  if (tblWrap) tblWrap.closest('div').style.display = 'none';
+  if (spinEl) {
+    var msgEl = document.getElementById('mimport_spinner_msg');
+    if (msgEl) msgEl.textContent = 'Importing ' + _importRows.length + ' order' + (_importRows.length===1?'':'s') + '…';
+    spinEl.style.display = '';
+  }
+  // Defer actual import to let spinner render
+  setTimeout(function() { _doImport(); }, 60);
+}
+function _doImport() {
+  var imported = 0, overwritten = 0;
+  var prop = null;
+  getActiveProps().forEach(function(pr){ if(pr.id===_importPropId) prop=pr; });
+
+  _importRows.forEach(function(row) {
+    var propName  = _importPropName;
+    var orderNum  = (row.order_num||'').trim();
+
+    // Resolve hub from property
+    var hub = 'Memphis';
+    if (prop) {
+      var m = getMarket ? getMarket(prop.hub) : null;
+      hub = m ? m.label : (prop.hub ? prop.hub.charAt(0).toUpperCase()+prop.hub.slice(1) : 'Memphis');
+    }
+
+    // Generate or use existing order number as key
+    var woId  = orderNum || nextWoNum(hub);
+    var woNum = orderNum || woId;
+    var isOverwrite = !!orders[woId];
+    if (isOverwrite) overwritten++;
+
+    var reqDate   = normaliseImportDate(row.req_date);
+    var confDate  = normaliseImportDate(row.conf_date)  || reqDate  || '';
+    var compDate  = normaliseImportDate(row.completed_date) || confDate || reqDate || '';
+    var status    = (row.status||'completed').trim().toLowerCase();
+    var scopeArr  = row.scope ? row.scope.split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
+
+    // Resolve subprop name
+    var subpropName = (row.sub_property||'').trim();
+
+    orders[woId] = {
+      num:           woNum,
+      property:      propName,
+      subprop:       subpropName,
+      hub:           hub,
+      unit:          (row.unit||'').trim(),
+      plan:          (row.plan||'').trim(),
+      sqft:          '',
+      occ:           'Vacant',
+      service:       (row.service||'').trim() || (scopeArr.length ? scopeArr.join(', ') : ''),
+      scope:         scopeArr,
+      reqDate:       reqDate,
+      confDate:      confDate || 'Pending',
+      completedDate: compDate,
+      status:        status,
+      submittedBy:   (row.submitted_by||'').trim(),
+      submittedDate: reqDate ? (function(d){ var p=d.split('-'); return p[1]+'/'+p[2]+'/'+p[0]; })(reqDate) : '',
+      email:         '',
+      po:            (row.po||'').trim(),
+      legacyRef:     (row.legacy_ref||'').trim(),
+      notes:         (row.notes||'').trim() || 'No additional notes.',
+      timeWindow:    '',
+      photos:        false,
+      source:        'import',
+      importedAt:    new Date().toISOString()
+    };
+    imported++;
+  });
+
+  saveOrders();
+  refreshAllOrderViews();
+
+  var msgEl = document.getElementById('mimport_success_msg');
+  msgEl.textContent = imported + ' order' + (imported===1?'':'s') + ' imported' +
+    (overwritten ? ' (' + overwritten + ' updated)' : '') + ' successfully.';
+  document.getElementById('mimport_step2').style.display = 'none';
+  document.getElementById('mimport_step3').style.display = '';
+}
+
+// ── Show/hide Import History button based on role ──────────────────────────
+function applyImportBtnVisibility() {
+  var role = window._portalRole || 'viewer';
+  var show = (role === 'admin' || role === 'superadmin');
+  document.querySelectorAll('.import-btn').forEach(function(btn){
+    btn.style.display = show ? '' : 'none';
+  });
+}
+
+
+function loadCancelMasterToggle() {
+  var el = document.getElementById('set_cancel_master');
+  if (el) el.checked = getCancelMasterEnabled();
+}
 function savePortalSettings() {
   var notifEmail = (document.getElementById('set_notif_email')||{value:''}).value.trim();
   if (notifEmail) try { localStorage.setItem('pf_notif_email', notifEmail); } catch(e){}
@@ -4339,6 +4944,14 @@ function renderInlineFpList(propId) {
       +   '<button class="bs nv" style="font-size:11px;" data-fp="'+fp.id+'" data-prop="'+propId+'" onclick="addCustomScopeInline(this)">+ Add</button>'
       + '</div>';
 
+    // Sub-property selector for this floor plan
+    var propObj = null;
+    getActiveProps().forEach(function(pr){ if(pr.id===propId) propObj=pr; });
+    var spList = propObj ? (propObj.subprops||[]) : [];
+    var spSelectHtml = '';
+    if (spList.length) {
+      spSelectHtml = '<div class="fp-inline-section" style="padding-top:12px;border-top:1px solid var(--border);margin-top:4px;">'        + '<div class="fp-inline-section-title">Sub-Property Assignment</div>'        + '<select style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);" data-fp="'+fp.id+'" data-prop="'+propId+'" onchange="assignFpSubprop(this)">'        + '<option value="">(All / No specific sub-property)</option>'        + spList.map(function(sp){ return '<option value="'+sp.id+'"'+(fp.subpropId===sp.id?' selected':'')+'>'+sp.name+'</option>'; }).join('')        + '</select>'        + '<div style="font-size:11px;color:var(--gray);margin-top:4px;">Floor plans assigned to a sub-property only appear for orders in that sub-property.</div>'        + '</div>';    }
+
     var card = document.createElement('div');
     card.className = 'fp-inline-card';
     card.id = 'fpic_' + fp.id;
@@ -4366,6 +4979,7 @@ function renderInlineFpList(propId) {
           + scopesHtml
           + customScopesHtml
         + '</div>'
+        + spSelectHtml
       + '</div>';
 
     list.appendChild(card);
@@ -4592,6 +5206,7 @@ function openWoEdit(id) {
   document.getElementById('woedit_timewindow').value  = o.timeWindow || 'To be confirmed';
   document.getElementById('woedit_po').value           = o.po || '';
   document.getElementById('woedit_notes').value       = o.notes !== 'No additional notes.' ? (o.notes||'') : '';
+  woeditPopulateSubprops(o.property, o.subprop||'');
   document.getElementById('woedit_reason_sel').value  = '';
   document.getElementById('woedit_reason_other').style.display = 'none';
   document.getElementById('woedit_reason_other').value = '';
@@ -4605,6 +5220,7 @@ function openWoEdit(id) {
 function woeditPropChange() {
   var propName = document.getElementById('woedit_prop').value;
   woeditPopulatePlans(propName, '');
+  woeditPopulateSubprops(propName, '');
 }
 
 function woeditPopulatePlans(propName, currentPlan) {
@@ -4614,6 +5230,12 @@ function woeditPopulatePlans(propName, currentPlan) {
   getActiveProps().forEach(function(pr) { if (pr.name === propName) prop = pr; });
   if (!prop) return;
   var fps = loadFpForProp(prop.id);
+  // Filter by selected sub-property
+  var woeditSpSel = document.getElementById('woedit_subprop');
+  var woeditSpId  = woeditSpSel ? woeditSpSel.value : '';
+  if (woeditSpId) {
+    fps = fps.filter(function(fp){ return !fp.subpropId || fp.subpropId===woeditSpId; });
+  }
   fps.forEach(function(fp) {
     var opt = document.createElement('option');
     var label = fp.name;
@@ -4683,7 +5305,7 @@ function saveWoEdit() {
 
   // Build diff log
   var FIELD_LABELS = {
-    property:'Property', unit:'Unit', plan:'Floor Plan', occ:'Occupancy',
+    property:'Property', subprop:'Sub-Property', unit:'Unit', plan:'Floor Plan', occ:'Occupancy',
     hub:'Hub', status:'Status', service:'Service', scope:'Scope',
     reqDate:'Requested Date', confDate:'Confirmed Date',
     timeWindow:'Time Window', notes:'Notes', po:'Purchase Order'
@@ -4702,7 +5324,8 @@ function saveWoEdit() {
     confDate:   newConf,
     timeWindow: document.getElementById('woedit_timewindow').value,
     notes:      document.getElementById('woedit_notes').value.trim() || 'No additional notes.',
-    po:         document.getElementById('woedit_po').value.trim()
+    po:         document.getElementById('woedit_po').value.trim(),
+    subprop:    (document.getElementById('woedit_subprop')||{value:''}).value
   };
 
   Object.keys(FIELD_LABELS).forEach(function(key) {
@@ -4937,6 +5560,7 @@ function renderAdminOrders() {
       propSel.appendChild(o2);
     });
     propSel.value = curPropVal;
+    updateSubpropFilter();
   }
 
   var q         = (document.getElementById('aord_search')     ||{value:''}).value.trim().toLowerCase();
@@ -4950,11 +5574,22 @@ function renderAdminOrders() {
   var ids = Object.keys(orders).filter(function(id){
     var o = orders[id];
     if (prop && o.property !== prop) return false;
+    var subpropF = (document.getElementById('aord_subprop')||{value:''}).value;
+    if (subpropF) {
+      // subpropF is a sub-property ID; match against order's subprop name via prop lookup
+      var _spPropF = null;
+      getActiveProps().forEach(function(pr){ if(pr.name===o.property) _spPropF=pr; });
+      var _spMatch = _spPropF && _spPropF.subprops
+        ? _spPropF.subprops.find(function(s){ return s.id===subpropF; })
+        : null;
+      var _spName = _spMatch ? _spMatch.name : '';
+      if ((o.subprop||'') !== _spName) return false;
+    }
     if (st) { if (o.status !== st) return false; }
     else { if (o.status === 'vd') return false; }
     if (hub && (o.hub||'') !== hub) return false;
     if (q) {
-      var hay = (o.num+' '+o.property+' '+o.unit+' '+svcDisplay(o)+' '+(o.plan||'')).toLowerCase();
+      var hay = (o.num+' '+(o.legacyRef||'')+' '+o.property+' '+(o.subprop||'')+' '+o.unit+' '+svcDisplay(o)+' '+(o.plan||'')).toLowerCase();
       if (hay.indexOf(q) === -1) return false;
     }
     if (drBounds) {
@@ -4986,6 +5621,7 @@ function renderAdminOrders() {
     var sb = '<span class="b '+o.status+'">'+(slab[o.status]||o.status)+'</span>';
     var voidNote = o.status==='vd'
       ? '<div style="font-size:11px;color:#7f1d1d;margin-top:2px;">'+(o.voidReason||'')+'</div>' : '';
+    var cancelNote = (o.cancelRequest && o.status==='requested') ? '<div style="font-size:10px;color:#92400e;font-weight:600;">&#9888; Cancel requested</div>' : '';
     var effDate = resolveOrderDate(o);
     var isChecked = !!(_bulkSelected && _bulkSelected[id]);
     var view     = '<button class="bs ol" onclick="event.stopPropagation();oworder(\''+id+'\')">View</button>';
@@ -4997,8 +5633,9 @@ function renderAdminOrders() {
       ? ' <button class="bs dn" onclick="event.stopPropagation();openVoidOrder(\''+id+'\')">Void</button>' : '';
     rows += '<tr onclick="oworder(\''+id+'\')">'+
       '<td onclick="event.stopPropagation();"><input type="checkbox" class="bulk-cb" data-id="'+id+'" '+(isChecked?'checked':'')+' style="width:14px;height:14px;accent-color:var(--navy);cursor:pointer;" onchange="toggleBulkRow(\''+id+'\',this.checked)"></td>'+
-      '<td><strong>#'+o.num+'</strong>'+voidNote+'</td>'+
-      '<td>'+o.property+'</td>'+
+      '<td><strong>#'+o.num+'</strong>'+(o.legacyRef?'<div style="font-size:10px;color:var(--gray);margin-top:1px;">Ref: '+o.legacyRef+'</div>':'')+voidNote+cancelNote+(o.source==='import'?'<div style="font-size:10px;color:#6b7280;margin-top:1px;">&#128229; Imported</div>':'')+'</td>'+
+      '<td>'+o.property+(o.subprop?'<div style="font-size:11px;color:var(--gray);margin-top:1px;">'+o.subprop+'</div>':'')+'</td>'+
+      '<td style="display:'+(document.getElementById('aord_th_subprop')&&document.getElementById('aord_th_subprop').style.display===''?'':'none')+';">'+(o.subprop||'<span style="color:var(--gray);">—</span>')+'</td>'+
       '<td>'+hubBadge+'</td>'+
       '<td>'+o.unit+'</td>'+
       '<td>'+svcDisplay(o)+'</td>'+
@@ -5365,7 +6002,7 @@ function renderAdashRecent() {
     var hub = hubBadgeHtml(o.hub);
     html += '<tr onclick="oworder(\''+id+'\')">'+
       '<td><strong>#'+o.num+'</strong></td>'+
-      '<td>'+o.property+'<br>'+hub+'</td>'+
+      '<td>'+o.property+(o.subprop?'<div style="font-size:11px;color:var(--gray);margin-top:1px;">'+o.subprop+'</div>':'')+'<br>'+hub+'</td>'+
       '<td>'+o.unit+'</td>'+
       '<td>'+svcDisplay(o)+'</td>'+
       '<td>'+fmtDate(o.reqDate)+'</td>'+
@@ -5483,7 +6120,12 @@ function renderClientDash(filterMode) {
     return d && new Date(d).getFullYear() === thisYear;
   }).length;
   var cntActive = ids.filter(function(id){ var s=orders[id].status; return s==='scheduled'||s==='requested'; }).length;
-  var cntDone   = ids.filter(function(id){ return orders[id].status==='completed'; }).length;
+  var cntDone   = ids.filter(function(id){
+    var o = orders[id];
+    if (o.status !== 'completed') return false;
+    var d = o.completedDate || o.confDate || o.reqDate || '';
+    return d && new Date(d).getFullYear() === thisYear;
+  }).length;
   var cntAttn   = ids.filter(function(id){ var s=orders[id].status; return s==='requested'; }).length;
 
   // Update stat cards
@@ -5492,6 +6134,9 @@ function renderClientDash(filterMode) {
   _sn('cstat_active_n', cntActive);
   _sn('cstat_done_n',   cntDone);
   _sn('cstat_attn_n',   cntAttn);
+  // Show/hide "Tap to view & follow up" hint
+  var attnHint = document.getElementById('cstat_attn_hint');
+  if (attnHint) attnHint.style.display = cntAttn > 0 ? '' : 'none';
 
   // Urgent styling on Needs Attention card
   var attnCard = document.getElementById('cstat_attn');
@@ -5514,7 +6159,11 @@ function renderClientDash(filterMode) {
   var filtered = ids.filter(function(id) {
     var s = orders[id].status;
     if (mode === 'active') return s === 'scheduled' || s === 'requested';
-    if (mode === 'done')   return s === 'completed';
+    if (mode === 'done') {
+      if (s !== 'completed') return false;
+      var _dc = orders[id].completedDate || orders[id].confDate || orders[id].reqDate || '';
+      return _dc && new Date(_dc).getFullYear() === thisYear;
+    }
     if (mode === 'attn')   return s === 'requested';
     // 'all' = year-to-date
     var _d = orders[id].submittedDate || orders[id].reqDate || '';
@@ -5535,7 +6184,7 @@ function renderClientDash(filterMode) {
     var _q = id.replace(/'/g,"&#39;");
     html += '<tr onclick="oworder(&quot;'+_q+'&quot;)" style="cursor:pointer;">'
       +'<td><strong>#'+o.num+'</strong></td>'
-      +'<td>Unit '+o.unit+'</td>'
+      +'<td>'+(o.subprop?'<span style="font-size:11px;color:var(--gray);">'+o.subprop+' &mdash; </span>':'')+'Unit '+o.unit+'</td>'
       +'<td>'+svcDisplay(o)+'</td>'
       +'<td>'+fmtDate(o.reqDate)+'</td>'
       +'<td>'+statusBadge(o.status)+'</td>'
@@ -5543,6 +6192,24 @@ function renderClientDash(filterMode) {
       +'</tr>';
   });
 
+  // Needs Attention banner
+  var attnBanner = document.getElementById('cd_attn_banner');
+  if (!attnBanner) {
+    attnBanner = document.createElement('div');
+    attnBanner.id = 'cd_attn_banner';
+    attnBanner.style.cssText = 'display:none;margin-bottom:16px;padding:12px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:var(--r);font-size:13px;color:#92400e;line-height:1.6;';
+    var tblParent = tbody ? tbody.closest('.tw') || tbody.parentNode : null;
+    if (tblParent) tblParent.insertBefore(attnBanner, tblParent.firstChild);
+  }
+  if (mode === 'attn' && cntAttn > 0) {
+    attnBanner.innerHTML = '<strong>&#9888; ' + cntAttn + ' order' + (cntAttn===1?' is':'s are') + ' awaiting confirmation.</strong> '
+      + 'These orders have been received but not yet scheduled. If you need to follow up, contact your Protective Flooring coordinator: '
+      + '<a href="mailto:info@protectiveflooring.com" style="color:var(--navy);font-weight:600;">info@protectiveflooring.com</a> '
+      + 'or call <a href="tel:+16155550100" style="color:var(--navy);font-weight:600;">(615) 555-0100</a>.';
+    attnBanner.style.display = '';
+  } else {
+    attnBanner.style.display = 'none';
+  }
   tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px;">'
     + (mode === 'all'
                 ? 'No orders yet. <a href="#" onclick="cnav(&quot;co&quot;,document.querySelectorAll(&quot;#cl .ni&quot;)[1])">Submit your first order.</a>'
@@ -5624,6 +6291,29 @@ function renderClientHistory() {
   var chQ      = (document.getElementById('ch_search')       ||{value:''}).value.trim().toLowerCase();
   var chSt     = (document.getElementById('ch_status_filter')||{value:''}).value;
   var chPr     = (document.getElementById('ch_prop_filter')  ||{value:''}).value;
+  var chSp     = (document.getElementById('ch_subprop_filter')||{value:''}).value;
+  // Populate + show/hide sub-property filter
+  (function() {
+    var spSel = document.getElementById('ch_subprop_filter');
+    if (!spSel) return;
+    var prop = null;
+    getActiveProps().forEach(function(pr){ if(pr.name===chPr) prop=pr; });
+    var sps = prop ? (prop.subprops||[]) : [];
+    if (chPr && sps.length) {
+      var curSp = spSel.value;
+      spSel.innerHTML = '<option value="">All Sub-Properties</option>';
+      sps.forEach(function(sp){
+        var opt=document.createElement('option'); opt.value=sp.id; opt.textContent=sp.name;
+        if(sp.id===curSp) opt.selected=true;
+        spSel.appendChild(opt);
+      });
+      spSel.style.display='';
+    } else {
+      spSel.innerHTML='<option value="">All Sub-Properties</option>';
+      spSel.value='';
+      spSel.style.display='none';
+    }
+  }());
   var chHub    = (document.getElementById('ch_hub_filter')   ||{value:''}).value;
   var chSrt    = (document.getElementById('ch_sort')         ||{value:'newest'}).value;
   var chDR     = (document.getElementById('ch_date_range')   ||{value:''}).value;
@@ -5641,11 +6331,19 @@ function renderClientHistory() {
   var ids = Object.keys(orders).filter(function(id){
     var o = orders[id];
     if (!isAdm && userProps.indexOf(o.property) === -1) return false;
-    if (chSt  && o.status !== chSt) return false;
+    if (chSt) { if (o.status !== chSt) return false; }
+    else { if (o.status === 'vd') return false; }
     if (chPr  && o.property !== chPr) return false;
+    if (chSp) {
+      var _spPropH = null;
+      getActiveProps().forEach(function(pr){ if(pr.name===o.property) _spPropH=pr; });
+      var _spMatchH = _spPropH && _spPropH.subprops
+        ? _spPropH.subprops.find(function(s){ return s.id===chSp; }) : null;
+      if ((o.subprop||'') !== (_spMatchH?_spMatchH.name:'')) return false;
+    }
     if (chHub && (o.hub||'').toLowerCase() !== chHub) return false;
     if (chQ) {
-      var hay = (o.num+' '+o.property+' '+o.unit+' '+svcDisplay(o)+' '+(o.plan||'')).toLowerCase();
+      var hay = (o.num+' '+(o.legacyRef||'')+' '+o.property+' '+o.unit+' '+svcDisplay(o)+' '+(o.plan||'')).toLowerCase();
       if (hay.indexOf(chQ) === -1) return false;
     }
     if (chBounds) {
@@ -5719,7 +6417,7 @@ function renderClientHistory() {
     var eff = resolveOrderDate(o);
     var rowId = id;
     html += "<tr onclick=\"oworder('"+rowId+"')\">" +
-      "<td><strong>#"+o.num+"</strong></td>" +
+      "<td><strong>#"+o.num+"</strong>"+(o.legacyRef?"<div style='font-size:10px;color:var(--gray);margin-top:1px;'>Ref: "+o.legacyRef+"</div>":"")+"</td>" +
       "<td>"+o.property+"</td>" +
       "<td>"+o.unit+"</td>" +
       "<td>"+svcDisplay(o)+"</td>" +
@@ -5751,6 +6449,163 @@ function refreshAllOrderViews() {
 }
 
 // ── AUTH ──
+
+// ── FORGOT PASSWORD ────────────────────────────────────────────────────────
+function showForgotPw() {
+  var panel = document.getElementById('forgot_pw_panel');
+  if (panel) { panel.style.display = ''; document.getElementById('forgot_pw_email').focus(); }
+}
+function hideForgotPw() {
+  var panel = document.getElementById('forgot_pw_panel');
+  if (panel) panel.style.display = 'none';
+  var errEl = document.getElementById('forgot_pw_err');
+  var okEl  = document.getElementById('forgot_pw_ok');
+  if (errEl) errEl.style.display = 'none';
+  if (okEl)  okEl.style.display  = 'none';
+  var inp = document.getElementById('forgot_pw_email');
+  if (inp) inp.value = '';
+}
+
+// ── CLIENT CANCELLATION REQUEST ────────────────────────────────────────────
+var _cancelReqWoId = null;
+
+
+function voidFromCancelRequest() {
+  if (!_currentWoId) return;
+  var o = orders[_currentWoId];
+  if (!o || !o.cancelRequest) return;
+  // Pre-fill void reason from cancel request then open void modal
+  openVoidOrder(_currentWoId);
+  setTimeout(function() {
+    var reasonSel = document.getElementById('void_reason_sel');
+    var notesEl   = document.getElementById('void_notes');
+    if (reasonSel) reasonSel.value = 'Client Request';
+    if (notesEl && o.cancelRequest.notes) notesEl.value = o.cancelRequest.notes;
+  }, 100);
+}
+
+function dismissCancelRequest() {
+  if (!_currentWoId) return;
+  var o = orders[_currentWoId];
+  if (!o) return;
+  o.cancelRequest = null;
+  saveOrders();
+  var crBanner = document.getElementById('wo_cancel_req_banner');
+  if (crBanner) crBanner.style.display = 'none';
+  toast('Cancellation request dismissed.');
+}
+
+
+// ── CANCELLATION REQUESTS TOGGLE ──────────────────────────────────────────
+function getCancelMasterEnabled() {
+  try { return localStorage.getItem('pf_cancel_requests') !== 'false'; } catch(e) { return true; }
+}
+function saveCancelMaster(val) {
+  try { localStorage.setItem('pf_cancel_requests', val ? 'true' : 'false'); } catch(e) {}
+}
+function getCancelRequestsEnabled(propName) {
+  // Master must be on first
+  if (!getCancelMasterEnabled()) return false;
+  // Then check property-level override
+  var props = getActiveProps();
+  for (var i=0; i<props.length; i++) {
+    if (props[i].name === propName) {
+      // allowCancel: undefined/true = allowed, false = disabled
+      return props[i].allowCancel !== false;
+    }
+  }
+  return true; // default on
+}
+function toggleCancelMaster(chk) {
+  saveCancelMaster(chk.checked);
+  var propToggles = document.querySelectorAll('.prop-cancel-toggle');
+  propToggles.forEach(function(t){ t.disabled = !chk.checked; t.style.opacity = chk.checked ? '' : '.4'; });
+}
+function togglePropCancel(propId, chk) {
+  var props = getProps();
+  for (var i=0; i<props.length; i++) {
+    if (props[i].id === propId) { props[i].allowCancel = chk.checked; break; }
+  }
+  saveProps(props);
+}
+
+function openCancelRequest(woId) {
+  _cancelReqWoId = woId;
+  document.getElementById('cancelreq_reason').value = '';
+  document.getElementById('cancelreq_notes').value  = '';
+  document.getElementById('cancelreq_err').style.display = 'none';
+  openM('mcancelreq');
+}
+
+function submitCancelRequest() {
+  var reason = document.getElementById('cancelreq_reason').value;
+  var notes  = document.getElementById('cancelreq_notes').value.trim();
+  var errEl  = document.getElementById('cancelreq_err');
+  errEl.style.display = 'none';
+  if (!reason) { errEl.textContent = 'Please select a reason.'; errEl.style.display=''; return; }
+
+  var o = orders[_cancelReqWoId];
+  if (!o) { closeM('mcancelreq'); return; }
+
+  // Flag the order with a cancellation request
+  o.cancelRequest = {
+    reason:      reason,
+    notes:       notes,
+    requestedBy: currentUser ? currentUser.name : 'Client',
+    requestedAt: cstNow()
+  };
+  saveOrders();
+
+  // Log activity
+  logClientActivity('cancel_request', { orderId: _cancelReqWoId, orderNum: o.num, reason: reason });
+
+  // Notify company via notification system
+  sendPortalNotif('cancel_request', o);
+
+  closeM('mcancelreq');
+  closeM('mwo');
+  toast('&#128683; Cancellation request submitted for #' + o.num + '. Our team will follow up shortly.');
+  refreshAllOrderViews();
+}
+
+function doForgotPw() {
+  var email = (document.getElementById('forgot_pw_email').value||'').trim().toLowerCase();
+  var errEl = document.getElementById('forgot_pw_err');
+  var okEl  = document.getElementById('forgot_pw_ok');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display=''; return; }
+  // Look up client user
+  var clients = getUsers();
+  var found = null;
+  for (var i=0; i<clients.length; i++) {
+    if (clients[i].email.toLowerCase() === email && clients[i].status !== 'inactive') { found = clients[i]; break; }
+  }
+  if (!found) {
+    // Intentionally vague for security
+    okEl.innerHTML = '&#10003; If an account exists for <strong>'+email+'</strong>, a temporary password has been generated.<br><span style="font-size:12px;">Contact your Protective Flooring coordinator to receive it. Once logged in, change your password immediately in Account Settings.</span>';
+    okEl.style.display = '';
+    return;
+  }
+  // Generate a temp password
+  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  var tmp = '';
+  for (var j=0; j<10; j++) tmp += chars[Math.floor(Math.random()*chars.length)];
+  tmp = tmp.slice(0,4) + '-' + tmp.slice(4,7) + '-' + tmp.slice(7);
+  found.password = tmp;
+  found.tempPw   = true;
+  found.tempPwDate = new Date().toLocaleDateString('en-US');
+  for (var i=0; i<clients.length; i++) {
+    if (clients[i].email.toLowerCase() === email) { clients[i] = found; break; }
+  }
+  saveUsers(clients);
+  // Show admin-visible temp password (in production this would email the admin)
+  okEl.innerHTML = '&#10003; Temporary password generated for <strong>'+email+'</strong>.<br>'
+    + '<div style="margin:10px 0 4px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#166534;">Temporary Password</div>'
+    + '<div style="font-family:monospace;font-size:18px;font-weight:700;letter-spacing:3px;color:#166534;padding:8px 12px;background:#dcfce7;border-radius:3px;display:inline-block;">'+tmp+'</div>'
+    + '<div style="font-size:11px;color:#15803d;margin-top:8px;">&#9888; Share this with the client securely. In production, this is emailed to your admin address. The client must change their password after logging in.</div>';
+  okEl.style.display = '';
+}
+
 function doLogin() {
   var email = document.getElementById('lemail').value.trim().toLowerCase();
   var pw = document.getElementById('lpw').value;
@@ -5857,6 +6712,18 @@ function editFpClick(btn) {
 function addFpClick(btn) {
   var propId = btn.getAttribute('data-prop');
   openAddFpForProp(propId);
+}
+
+function adminPlaceOrder() {
+  goClientPortalFromChooser();
+  // Wait for client portal to fully render before navigating
+  setTimeout(function() {
+    go('cl');
+    var navItems = document.querySelectorAll('#cl .ni');
+    var coNav = null;
+    navItems.forEach(function(n){ if (n.getAttribute('onclick') && n.getAttribute('onclick').indexOf("'co'") >= 0) coNav = n; });
+    cnav('co', coNav);
+  }, 250);
 }
 
 function goClientPortalFromChooser() {
@@ -6045,6 +6912,12 @@ function updatePropFloorPlans(propId) {
   document.getElementById('fppreview').style.display = 'none';
   if (!propId) return;
   var fps = loadFpForProp(propId);
+  // Filter by selected sub-property if any
+  var subSel = document.getElementById('csubpropsel');
+  var selSpId = subSel ? subSel.value : '';
+  if (selSpId) {
+    fps = fps.filter(function(fp){ return !fp.subpropId || fp.subpropId === selSpId; });
+  }
   fps.forEach(function(fp) {
     var opt = document.createElement('option');
     opt.value = fp.id;
@@ -6333,7 +7206,9 @@ function oworder(id) {
       (function(){ var _m=getMarket(o.hub); return '<p>Protective Services Company, Inc. dba Protective Flooring<br>'+(_m&&_m.address?_m.address:'3846 Delp Street, Memphis, TN 38118')+'<br>'+(_m&&_m.phone?_m.phone:'(901) 794-4101')+' &mdash; info&#64;protectiveflooring.com</p>'; }())+
       '</div>'+
       '<div class="wor">'+
-        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">'+o.num+'</div>'+
+        '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Work Order</span><br>'+
+        '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px;letter-spacing:.3px;">#'+o.num+'</div>'+
+        (o.legacyRef ? '<div style="font-size:10px;color:var(--gray);margin-bottom:10px;">Legacy Ref: '+o.legacyRef+'</div>' : '<div style="margin-bottom:10px;"></div>')+
         '<table style="border-collapse:collapse;text-align:right;">'+
           '<tr><td style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:2px 10px 2px 0;">Submitted</td>'+
               '<td style="font-size:13px;font-weight:600;color:var(--text);padding:2px 0;">'+(o.submittedDate||'&#8212;')+'</td></tr>'+
@@ -6371,7 +7246,7 @@ function oworder(id) {
             '</div>'+
             '<div>'+
               '<div class="wofl" style="margin-bottom:8px;">Service Address</div>'+
-              '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Unit '+_unit+'</div>'+
+              '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">'+(o.subprop ? o.subprop+' &mdash; ' : '')+'Unit '+_unit+'</div>'+
               '<div style="font-size:12px;color:var(--gray);margin-bottom:4px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Floor Plan</span><br>'+_plan+'</div>'+
               '<div style="margin-top:6px;"><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid '+_occColor+';color:'+_occColor+';">'+_occ+'</span></div>'+
               (o.timeWindow && o.timeWindow !== 'To be confirmed' && o.timeWindow !== 'TBD' && o.timeWindow !== 'No Preference' && o.timeWindow !== 'No preference' ? '<div style="margin-top:10px;"><span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);">Preferred Time</span>'+
@@ -6402,6 +7277,28 @@ function oworder(id) {
     '<div class="wofoot"><span>Protective Services Company, Inc. dba Protective Flooring</span><span>#'+o.num+' -- '+today+'</span><span>"We Stand on Our Word"</span></div>';
   _currentWoId = id;
   var isAdminView = !!(window.currentTeamUser);
+  // Cancel request button: client only, requested status only
+  var cancelReqBtn = document.getElementById('cancelreqbtn');
+  if (cancelReqBtn) {
+    // Show cancel request btn for client on requested OR scheduled status
+    // Check master + property-level cancellation toggle
+    var _cancelAllowed = getCancelRequestsEnabled(o.property);
+    cancelReqBtn.style.display = (!isAdminView && (o.status === 'requested' || o.status === 'scheduled') && _cancelAllowed) ? 'inline-flex' : 'none';
+    cancelReqBtn.dataset.woid = id;
+  }
+  // Cancel request banner (admin view)
+  var crBanner = document.getElementById('wo_cancel_req_banner');
+  var crDetail = document.getElementById('wo_cancel_req_detail');
+  if (crBanner) {
+    if (isAdminView && o.cancelRequest && o.status === 'requested') {
+      crDetail.textContent = '— ' + o.cancelRequest.reason
+        + (o.cancelRequest.notes ? ': ' + o.cancelRequest.notes : '')
+        + ' (' + (o.cancelRequest.requestedBy||'Client') + ', ' + (o.cancelRequest.requestedAt||'') + ')';
+      crBanner.style.display = '';
+    } else {
+      crBanner.style.display = 'none';
+    }
+  }
   // PO button: show for clients (non-admin), label changes if PO already set
   var poBtn = document.getElementById('pobtn');
   if (poBtn) {
@@ -6479,6 +7376,178 @@ function saveWoPo() {
   if (poBtn) poBtn.textContent = val ? '\u00A0\u{1F4CB} Edit PO #' : '\u{1F4CB} Add PO #';
   toast(val ? 'PO # saved: ' + val : 'PO # removed.');
 }
+
+// ── SUB-PROPERTY HELPERS ──────────────────────────────────────────────────
+
+// Get sub-properties for a property object
+function getPropSubprops(prop) {
+  return (prop && prop.subprops) ? prop.subprops : [];
+}
+
+// Render the inline sub-prop list in the Add/Edit Property modal
+function renderSubPropList(propId) {
+  var list = document.getElementById('madd_subprop_list');
+  if (!list) return;
+  var props = getProps();
+  var prop = null;
+  for (var i=0; i<props.length; i++) { if (props[i].id===propId) { prop=props[i]; break; } }
+  var subprops = prop ? (prop.subprops||[]) : [];
+  if (!subprops.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--gray);padding:4px 0;">No sub-properties yet.</div>';
+    return;
+  }
+  list.innerHTML = subprops.map(function(sp, idx) {
+    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--cream);border:1px solid var(--border);border-radius:var(--r);">'
+      + '<span style="flex:1;font-size:13px;font-weight:600;color:var(--navy);">'+sp.name+'</span>'
+      + '<button class="bs dn" style="font-size:10px;padding:2px 8px;" onclick="deleteSubProp('+idx+')">&#10005; Remove</button>'
+      + '</div>';
+  }).join('');
+}
+
+
+// ── ASSIGN FLOOR PLAN TO SUB-PROPERTY ─────────────────────────────────────
+function assignFpSubprop(sel) {
+  var propId = sel.dataset.prop;
+  var fpId   = sel.dataset.fp;
+  var spId   = sel.value;
+  var fps = loadFpForProp(propId);
+  var changed = false;
+  fps.forEach(function(fp) {
+    if (fp.id === fpId) { fp.subpropId = spId || ''; changed = true; }
+  });
+  if (changed) {
+    try { localStorage.setItem('pf_fp_'+propId, JSON.stringify(fps)); } catch(e){}
+    rebuildLegacy();
+    toast(spId ? 'Floor plan assigned to sub-property.' : 'Floor plan unassigned (available for all).');
+  }
+}
+
+function addSubPropInline() {
+  var inp = document.getElementById('madd_subprop_inp');
+  if (!inp) return;
+  var name = inp.value.trim();
+  if (!name) { toast('Enter a sub-property name.'); inp.focus(); return; }
+  var propId = document.getElementById('madd_id').value;
+  if (!propId) { toast('Save the property first before adding sub-properties.'); return; }
+  var props = getProps();
+  for (var i=0; i<props.length; i++) {
+    if (props[i].id===propId) {
+      if (!props[i].subprops) props[i].subprops = [];
+      // Prevent duplicates
+      var dup = props[i].subprops.some(function(sp){ return sp.name.toLowerCase()===name.toLowerCase(); });
+      if (dup) { toast('Sub-property "'+name+'" already exists.'); return; }
+      props[i].subprops.push({id:'sp-'+Date.now().toString(36), name:name});
+      saveProps(props);
+      inp.value = '';
+      renderSubPropList(propId);
+      toast('Sub-property "'+name+'" added.');
+      return;
+    }
+  }
+}
+
+function deleteSubProp(idx) {
+  var propId = document.getElementById('madd_id').value;
+  if (!propId) return;
+  var props = getProps();
+  for (var i=0; i<props.length; i++) {
+    if (props[i].id===propId) {
+      if (!props[i].subprops) return;
+      var name = props[i].subprops[idx] ? props[i].subprops[idx].name : '';
+      if (!confirm('Remove sub-property "'+name+'"? Floor plans tagged to it will remain but lose the sub-property link.')) return;
+      props[i].subprops.splice(idx, 1);
+      saveProps(props);
+      renderSubPropList(propId);
+      toast('Sub-property removed.');
+      return;
+    }
+  }
+}
+
+// ── FLOOR PLAN SUB-PROP ASSIGNMENT ───────────────────────────────────────────
+// Get sub-property name for a floor plan (stored as fp.subpropId on the FP object)
+function getFpSubpropName(fp, prop) {
+  if (!fp || !fp.subpropId || !prop || !prop.subprops) return '';
+  var sp = prop.subprops.find(function(s){ return s.id===fp.subpropId; });
+  return sp ? sp.name : '';
+}
+
+// ── CLIENT PLACE ORDER: property change handler ───────────────────────────────
+function onClientPropChange(propId) {
+  // Populate sub-property dropdown if the property has sub-properties
+  var subWrap = document.getElementById('csubprop_wrap');
+  var subSel  = document.getElementById('csubpropsel');
+  if (!subWrap || !subSel) return;
+  var prop = null;
+  getActiveProps().forEach(function(pr){ if(pr.id===propId) prop=pr; });
+  var sps = prop ? (prop.subprops||[]) : [];
+  if (sps.length) {
+    subSel.innerHTML = '<option value="">-- Select Sub-Property --</option>';
+    sps.forEach(function(sp) {
+      var opt = document.createElement('option');
+      opt.value = sp.id; opt.textContent = sp.name;
+      subSel.appendChild(opt);
+    });
+    subWrap.style.display = '';
+  } else {
+    subSel.innerHTML = '<option value="">-- None --</option>';
+    subWrap.style.display = 'none';
+  }
+  updatePropFloorPlans(propId);
+}
+
+// ── WOEDIT: populate sub-prop dropdown when property changes ─────────────────
+function woeditPopulateSubprops(propName, currentSubprop) {
+  var wrap = document.getElementById('woedit_subprop_wrap');
+  var sel  = document.getElementById('woedit_subprop');
+  if (!wrap || !sel) return;
+  var prop = null;
+  getActiveProps().forEach(function(pr){ if(pr.name===propName) prop=pr; });
+  var sps = prop ? (prop.subprops||[]) : [];
+  if (sps.length) {
+    sel.innerHTML = '<option value="">-- None --</option>';
+    sps.forEach(function(sp) {
+      var opt = document.createElement('option');
+      opt.value = sp.id; opt.textContent = sp.name;
+      if (sp.id===currentSubprop || sp.name===currentSubprop) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    wrap.style.display = '';
+  } else {
+    sel.innerHTML = '<option value="">-- None --</option>';
+    wrap.style.display = 'none';
+  }
+}
+
+// ── ADMIN ORDERS: populate sub-prop filter when property filter changes ────────
+function updateSubpropFilter() {
+  var propSel    = document.getElementById('aord_prop');
+  var subSel     = document.getElementById('aord_subprop');
+  var subTh      = document.getElementById('aord_th_subprop');
+  if (!propSel || !subSel) return;
+  var propName   = propSel.value;
+  var prop = null;
+  getActiveProps().forEach(function(pr){ if(pr.name===propName) prop=pr; });
+  var sps = prop ? (prop.subprops||[]) : [];
+  if (propName && sps.length) {
+    var cur = subSel.value;
+    subSel.innerHTML = '<option value="">All Sub-Properties</option>';
+    sps.forEach(function(sp) {
+      var opt = document.createElement('option');
+      opt.value = sp.id; opt.textContent = sp.name;
+      if (sp.id===cur) opt.selected = true;
+      subSel.appendChild(opt);
+    });
+    subSel.style.display = '';
+    if (subTh) subTh.style.display = '';
+  } else {
+    subSel.innerHTML = '<option value="">All Sub-Properties</option>';
+    subSel.style.display = 'none';
+    subSel.value = '';
+    if (subTh) subTh.style.display = 'none';
+  }
+}
+
 
 function togPhotos() {
   photosOn = !photosOn;
@@ -6877,7 +7946,7 @@ function nextWoNum(hub) {
       if (!isNaN(n) && n > max) max = n;
     }
   });
-  return prefix + String(max + 1).padStart(4, '0');
+  return prefix + String(max + 1).padStart(6, '0');
 }
 
 function submitOrder() {
@@ -6971,9 +8040,22 @@ function submitOrder() {
   var woNum = nextWoNum(_woHub);
   var woId  = woNum;
 
+  var _subpropSel = document.getElementById('csubpropsel');
+  var _subpropId  = _subpropSel ? _subpropSel.value : '';
+  var _subpropName = '';
+  if (_subpropId) {
+    var _spProp = null;
+    getActiveProps().forEach(function(pr){ if(pr.id===propVal) _spProp=pr; });
+    if (_spProp && _spProp.subprops) {
+      var _spMatch = _spProp.subprops.find(function(s){ return s.id===_subpropId; });
+      if (_spMatch) _subpropName = _spMatch.name;
+    }
+  }
+
   orders[woId] = {
     num:           woNum,
     property:      propName,
+    subprop:       _subpropName,
     hub:           _woHub,
     unit:          unitVal,
     plan:          planName,
@@ -7401,6 +8483,11 @@ function applyRoleRestrictions(role) {
     document.querySelectorAll('[onclick*="aset"]').forEach(function(el){ el.style.display='none'; });
   }
 
+  // Apply import button visibility
+  applyImportBtnVisibility();
+  // Load cancel master toggle state
+  loadCancelMasterToggle();
+
   // ── HEADER BADGE ──
   var badge = document.querySelector('.abadge');
   if (badge) {
@@ -7506,7 +8593,7 @@ function renderUserTable() {
         + '<div style="font-size:11px;color:'+daysColor+';margin-top:1px;cursor:default;" title="'+daysTitle+'">('+daysLabel+')</div>';
     }
     return '<tr>'
-      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + '</strong>'
+      + '<td><strong style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(2,10,91,.25);" onclick="openEditUser(\'' + u.id + '\')" title="Click to edit">' + u.name + (u.tempPw ? ' <span style="font-size:10px;background:#fef9c3;color:#854d0e;border:1px solid #fde68a;border-radius:3px;padding:1px 6px;font-weight:600;">Temp PW</span>' : '') + '</strong>'
       + (u.smsPhone ? '<div style="font-size:10px;margin-top:2px;">' + smsStatusChip(u) + '</div>' : '') + '</td>'
       + '<td style="font-size:12px;color:var(--gray);">' + u.email + '</td>'
       + '<td>' + pwCell(u.id, u.password, 'ucl') + '</td>'
@@ -8070,9 +9157,12 @@ function csChangePw() {
     return;
   }
 
-  // Save new password
-  clients[idx].password = nw;
-  currentUser.password  = nw;
+  // Save new password, clear temp pw flag
+  clients[idx].password  = nw;
+  clients[idx].tempPw    = false;
+  clients[idx].tempPwDate = '';
+  currentUser.password   = nw;
+  currentUser.tempPw     = false;
   saveUsers(clients);
 
   // Clear fields
@@ -8525,10 +9615,11 @@ function sendPortalNotif(event, o) {
   // ── Build notification record ────────────────────────────────────────────
   var now = cstNow();
   var eventLabels = {
-    requested:  'Order Requested',
-    scheduled:  'Order Confirmed & Scheduled',
-    completed:  'Installation Completed',
-    voided:     'Order Voided / Cancelled'
+    requested:      'Order Requested',
+    scheduled:      'Order Confirmed & Scheduled',
+    completed:      'Installation Completed',
+    voided:         'Order Voided / Cancelled',
+    cancel_request: 'Cancellation Requested by Client'
   };
   var label = eventLabels[event] || event;
 
@@ -9019,5 +10110,120 @@ function calDayClick(isoDate, prefix) {
 }
 
 </script>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       IMPORT HISTORY MODAL
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="mo" id="mimport">
+    <div class="mb" style="max-width:820px;width:95%;">
+      <div class="mh">
+        <div>
+          <div class="mt" id="mimport_title">Import Work Order History</div>
+          <div class="ms2" id="mimport_subtitle" style="font-size:13px;color:var(--gray);margin-top:2px;"></div>
+        </div>
+        <button class="mx" onclick="closeM('mimport')">&#10005;</button>
+      </div>
+      <div class="mc" style="padding:24px;">
+
+        <!-- Step 1: Upload -->
+        <div id="mimport_step1">
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:16px 20px;margin-bottom:20px;">
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;">&#128161; Tips</div>
+            <ul style="font-size:12px;color:var(--gray);line-height:1.8;margin:0;padding-left:18px;">
+              <li>CSV columns: <code>order_num, legacy_ref, sub_property, unit, plan, service, scope, req_date, conf_date, completed_date, status, submitted_by, notes, po</code></li>
+              <li><strong>Service values</strong> are auto-matched to portal options — abbreviations like "LVP", "carpet", "vinyl" work. Unrecognised values get a ⚠ dropdown to correct before import.</li>
+              <li><strong>Plan values</strong> are auto-matched to floor plan names — "2BR/2BA" matches "2 Bed / 2 Bath". No exact match? A dropdown lets you pick the right plan per row.</li>
+              <li><strong>Sub-property</strong> is auto-matched to this property's phases. Unrecognised values show a dropdown — or leave blank if unknown (common for repair/BMS records).</li>
+              <li><code>req_date</code> and <code>conf_date</code> may be left blank. <code>completed_date</code> should be provided for completed orders &mdash; without it the order won&rsquo;t appear in date-filtered dashboard and order history views.</li>
+              <li><code>status</code> defaults to <strong>completed</strong> if blank. All other fields are optional.</li>
+              <li>Dates accepted as <strong>MM/DD/YYYY</strong> or <strong>YYYY-MM-DD</strong>.</li>
+              <li>Re-uploading a row with the same <code>order_num</code> <strong>overwrites</strong> that record.</li>
+              <li>Download the template from <strong>Portal Settings → Work Order Import Template</strong>.</li>
+            </ul>
+          </div>
+          <div id="mimport_dropzone" style="border:2px dashed var(--border);border-radius:6px;padding:36px;text-align:center;cursor:pointer;transition:border-color .2s;" onclick="document.getElementById('mimport_file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--navy)';" ondragleave="this.style.borderColor='';" ondrop="event.preventDefault();this.style.borderColor='';handleImportDrop(event);">
+            <div style="font-size:32px;margin-bottom:10px;">&#128229;</div>
+            <div style="font-weight:600;color:var(--navy);font-size:14px;">Click to upload CSV or drag &amp; drop</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:4px;">.csv files only</div>
+            <input type="file" id="mimport_file" accept=".csv,text/csv" style="display:none;" onchange="handleImportFile(this)">
+          </div>
+          <div id="mimport_file_err" style="display:none;color:#b91c1c;font-size:13px;margin-top:10px;padding:10px;background:#fef2f2;border-radius:4px;"></div>
+        </div>
+
+        <!-- Step 2: Preview -->
+        <div id="mimport_step2" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--navy);" id="mimport_preview_count"></div>
+              <div style="font-size:12px;color:var(--gray);margin-top:2px;">Review rows below. Edit any cell inline before importing.</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="bs ol" onclick="mimportBack()">&#8592; Back</button>
+              <button class="bl gd" id="mimport_confirm_btn" onclick="confirmImport()">&#10003; Import All</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;" id="mimport_preview_tbl">
+              <thead style="position:sticky;top:0;background:#f8f8f6;z-index:1;">
+                <tr id="mimport_thead_row"></tr>
+              </thead>
+              <tbody id="mimport_tbody"></tbody>
+            </table>
+          </div>
+          <div id="mimport_spinner" style="display:none;text-align:center;padding:28px 16px;">
+            <div style="display:inline-block;width:36px;height:36px;border:3px solid var(--lg);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px;"></div>
+            <div style="font-size:13px;color:var(--gray);" id="mimport_spinner_msg">Importing orders…</div>
+          </div>
+          <div id="mimport_warn" style="display:none;margin-top:10px;padding:10px 14px;background:#fffbeb;border-left:3px solid var(--gold);border-radius:3px;font-size:12px;color:#78350f;line-height:1.8;"></div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div id="mimport_step3" style="display:none;text-align:center;padding:32px 16px;">
+          <div style="font-size:48px;margin-bottom:16px;">&#10003;</div>
+          <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px;" id="mimport_success_msg"></div>
+          <div style="font-size:13px;color:var(--gray);margin-bottom:24px;">Orders are now visible in All Orders, the client portal, and work order previews.</div>
+          <button class="bs gd" onclick="closeM('mimport');renderPropList();renderAdminOrders();">Done</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       REQUEST CANCELLATION MODAL (client-facing)
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="mo" id="mcancelreq">
+    <div class="mb" style="max-width:480px;width:95%;">
+      <div class="mh">
+        <div class="mt">Request Cancellation</div>
+        <button class="mx" onclick="closeM('mcancelreq')">&#10005;</button>
+      </div>
+      <div class="mc" style="padding:24px;">
+        <p style="font-size:13px;color:var(--gray);margin-bottom:18px;line-height:1.6;">
+          Let us know why you'd like to cancel this order. Our team will review your request and follow up to confirm. If your installation is already scheduled, our team will follow up to confirm before taking action.
+        </p>
+        <div class="fg" style="margin-bottom:16px;">
+          <label>Reason for Cancellation <span style="color:var(--red);">*</span></label>
+          <select id="cancelreq_reason" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--cream);">
+            <option value="">-- Select a reason --</option>
+            <option>Unit has been re-let</option>
+            <option>Work no longer needed</option>
+            <option>Scheduling conflict</option>
+            <option>Wrong unit submitted</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:20px;">
+          <label>Additional Notes <span style="font-size:11px;color:var(--gray);font-weight:400;">(optional)</span></label>
+          <textarea id="cancelreq_notes" rows="3" placeholder="Any additional context for our team…" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--cream);resize:vertical;font-family:inherit;"></textarea>
+        </div>
+        <div id="cancelreq_err" style="display:none;padding:8px 12px;background:#fef2f2;border-radius:3px;font-size:12px;color:#b91c1c;margin-bottom:14px;"></div>
+        <div class="fa">
+          <button class="bl ol" onclick="closeM('mcancelreq')">Keep Order</button>
+          <button class="bl dn" onclick="submitCancelRequest()">&#128683; Submit Cancellation Request</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
