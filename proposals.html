@@ -453,16 +453,15 @@ tr:hover td{background:var(--navy-lt);}
 /* Sticky save bar for pricing menus */
 #pricing-sticky-save {
   position: fixed;
-  bottom: 24px;
-  right: 32px;
-  z-index: 9999;
-  display: none;
-  align-items: center;
+  bottom: 28px;
+  right: 36px;
+  z-index: 500;
 }
 #pricing-sticky-save button {
-  box-shadow: 0 4px 20px rgba(2,10,91,.25);
-  padding: 12px 28px;
+  box-shadow: 0 4px 24px rgba(2,10,91,.3);
+  padding: 13px 28px;
   font-size: 13px;
+  font-weight: 700;
   letter-spacing: .8px;
 }
 </style>
@@ -500,7 +499,6 @@ tr:hover td{background:var(--navy-lt);}
 
 <!-- LOGIN SCREEN -->
 <div id="pp-app" style="display:none;">
-<div id="pricing-sticky-save"><button class="bs gd" onclick="savePricingMenus()">💾 Save Pricing</button></div>
 
 
 <!-- MAIN APP -->
@@ -522,6 +520,7 @@ tr:hover td{background:var(--navy-lt);}
       <div class="ni" onclick="nav('history',this)"><span class="ic">📋</span> Proposal History</div>
       <div class="nlabel">Tools</div>
       <div class="ni" onclick="nav('calculator',this)"><span class="ic">📐</span> SY Calculator</div>
+      <a href="portal.html" class="ni" style="text-decoration:none;color:rgba(255,255,255,.5);" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'"><span class="ic">🏠</span> Order Portal</a>
       <div class="nlabel" id="nav-admin-label" style="display:none;">Admin</div>
       <div class="ni" id="nav-pricing" style="display:none;" onclick="nav('pricing',this)"><span class="ic">💲</span> Pricing Menus</div>
       <div class="ni" id="nav-users" style="display:none;" onclick="nav('users',this)"><span class="ic">👥</span> Team Users</div>
@@ -536,9 +535,9 @@ tr:hover td{background:var(--navy-lt);}
     <div class="topbar">
       <span class="tbtitle" id="tbtitle">Dashboard</span>
       <div class="tbr" style="display:flex;align-items:center;gap:10px;">
-        <button class="bs ol" onclick="ppLogout()" style="font-size:12px;padding:5px 12px;margin-right:6px;" title="Sign Out">⎋ Sign Out</button>
         <button class="btn-export" onclick="exportData()" title="Export all pricing & settings to a file">⬇ Export Data</button>
         <label class="btn-export" style="cursor:pointer;" title="Import previously exported data">⬆ Import Data<input type="file" accept=".json" style="display:none;" onchange="importData(this)"></label>
+        <a href="portal.html" class="tbadge" style="text-decoration:none;background:rgba(2,10,91,.12);border:1px solid rgba(2,10,91,.25);color:var(--navy);" title="Switch to Order Portal">🏠 Order Portal</a>
         <span class="tbadge">Proposals</span>
         <span id="tb-hub-badge" style="font-size:12px;font-weight:600;color:var(--gray);"></span>
       </div>
@@ -804,26 +803,71 @@ tr:hover td{background:var(--navy-lt);}
   <div class="modal wide">
     <div class="mhd"><h3>📧 Send Proposal</h3><button class="mcl" onclick="closeModal('m-send')">✕</button></div>
     <div class="mbody">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-        <div class="fg"><label>To (Client Email)</label><input type="email" id="send-to" placeholder="client@property.com"></div>
-        <div class="fg"><label>CC</label><input type="email" id="send-cc" placeholder="optional"></div>
+
+      <!-- RECIPIENTS BLOCK -->
+      <div style="background:var(--off);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Recipients</div>
+        <div id="send-recipient-list" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;"></div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">CC always includes: <strong>info@protectiveflooring.com</strong> + you</div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">Add a recipient manually:</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="text" id="send-add-name" placeholder="Name (optional)" style="width:150px;padding:6px 9px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;">
+          <input type="email" id="send-add-email" placeholder="Email address…" style="flex:1;padding:6px 9px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;" onkeydown="if(event.key==='Enter'){addExtraRecipient();event.preventDefault();}">
+          <button class="bs ol" style="padding:5px 12px;font-size:12px;white-space:nowrap;" onclick="addExtraRecipient()">+ Add</button>
+        </div>
+        <div id="send-extra-list" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
       </div>
+
       <div class="fg"><label>Subject</label><input type="text" id="send-subject"></div>
       <div class="fg"><label>Message</label><textarea id="send-body" rows="5"></textarea></div>
+
       <div style="background:var(--off);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-top:8px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Layout Style</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button type="button" id="lt-classic" onclick="setLayoutType('classic')"
+            style="flex:1;padding:8px 6px;font-size:12px;font-weight:600;border-radius:var(--r);border:2px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer;transition:all .2s;">
+            Option A – Classic
+          </button>
+          <button type="button" id="lt-modern" onclick="setLayoutType('modern')"
+            style="flex:1;padding:8px 6px;font-size:12px;font-weight:600;border-radius:var(--r);border:2px solid var(--border);background:var(--white);color:var(--text);cursor:pointer;transition:all .2s;">
+            Option B – Modern
+          </button>
+        </div>
         <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Include Documents</div>
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:12px;cursor:pointer;">
-          <input type="checkbox" id="inc-summary" checked> <strong>Summary Proposal</strong> — all floor plans &amp; pricing on one page
-        </label>
-        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Line Item Sheets (select individual)</div>
-        <div style="margin-bottom:8px;"><label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="inc-lineitems-all" onchange="toggleAllSheets(this)"> <em>Select / Deselect All</em></label></div>
-        <div class="sheet-selector" id="sheet-selector-list"></div>
+        <!-- hidden checkboxes kept for compatibility -->
+        <input type="checkbox" id="inc-summary" checked style="display:none;">
+        <div style="display:flex;gap:8px;margin-bottom:12px;" id="doc-type-btns">
+          <button type="button" id="dt-summary" onclick="setDocType('summary')"
+            style="flex:1;padding:9px 6px;font-size:12px;font-weight:600;border-radius:var(--r);border:2px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer;transition:all .2s;">
+            📄 Summary Only
+          </button>
+          <button type="button" id="dt-both" onclick="setDocType('both')"
+            style="flex:1;padding:9px 6px;font-size:12px;font-weight:600;border-radius:var(--r);border:2px solid var(--border);background:var(--white);color:var(--text);cursor:pointer;transition:all .2s;">
+            📄+📋 Both
+          </button>
+          <button type="button" id="dt-lineitems" onclick="setDocType('lineitems')"
+            style="flex:1;padding:9px 6px;font-size:12px;font-weight:600;border-radius:var(--r);border:2px solid var(--border);background:var(--white);color:var(--text);cursor:pointer;transition:all .2s;">
+            📋 Line Items Only
+          </button>
+        </div>
+        <div id="lineitems-selector-wrap" style="display:none;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Select Line Item Sheets</div>
+          <div style="margin-bottom:8px;"><label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="inc-lineitems-all" onchange="toggleAllSheets(this)" checked> <em>Select / Deselect All</em></label></div>
+          <div class="sheet-selector" id="sheet-selector-list"></div>
+        </div>
+      </div>
+
+      <!-- PDF REMINDER -->
+      <div style="margin-top:12px;padding:10px 14px;background:#fffbeb;border:1px solid #f59e0b;border-radius:var(--r);font-size:12px;color:#92400e;line-height:1.6;">
+        <strong>📎 How to send with the PDF attached:</strong><br>
+        <strong style="color:#b45309;">Step 1</strong> — Click <strong>🖨 Save PDF</strong> below → save the file to your computer.<br>
+        <strong style="color:#b45309;">Step 2</strong> — Click <strong>📧 Open Gmail</strong> → attach the saved PDF in the Gmail window before sending.
       </div>
     </div>
     <div class="mft">
       <button class="bs ol" onclick="closeModal('m-send')">Cancel</button>
-      <button class="bs nv" onclick="previewProposalPDF()">👁 Preview PDF</button>
-      <button class="bs gd" onclick="sendProposalGmail()">📧 Send via Gmail</button>
+      <button class="bs nv" onclick="printProposalFromSend()" style="font-weight:700;">① 🖨 Save PDF</button>
+      <button class="bs gd" onclick="sendProposalGmail()" style="font-weight:700;">② 📧 Open Gmail →</button>
     </div>
   </div>
 </div>
@@ -966,9 +1010,6 @@ var DEFAULT_PRICING = {
       {id:'l1',name:'Gallatin - Woodland Taupe',unitPrice:2.89,unit:'SF'},
       {id:'l2',name:'Premium LVP',unitPrice:3.50,unit:'SF'}
     ],
-    underlayment:[
-      {id:'u1',name:'Standard Underlayment',unitPrice:0.18,unit:'SF'}
-    ],
     vinyl:[
       {id:'v1',name:'Standard Sheet Vinyl',unitPrice:1.95,unit:'SY'}
     ],
@@ -981,10 +1022,10 @@ var DEFAULT_PRICING = {
         {id:'lc4', name:'Carpet - Floor Removal',           unitPrice:0.50, unit:'SY', minPrice:0}
       ],
       vinyl:[
-        {id:'lv1', name:'Sheet Vinyl - Vacant Installation',unitPrice:1.25, unit:'SF', minPrice:85.00},
-        {id:'lv2', name:'Sheet Vinyl - Occupied Installation',unitPrice:1.60,unit:'SF', minPrice:85.00},
-        {id:'lv3', name:'Sheet Vinyl - Floor Removal',      unitPrice:0.35, unit:'SF', minPrice:0},
-        {id:'lv4', name:'Sheet Vinyl - Floor Prep',         unitPrice:0.30, unit:'SF', minPrice:0}
+        {id:'lv1', name:'Sheet Vinyl - Vacant Installation',unitPrice:1.25, unit:'SY', minPrice:85.00},
+        {id:'lv2', name:'Sheet Vinyl - Occupied Installation',unitPrice:1.60,unit:'SY', minPrice:85.00},
+        {id:'lv3', name:'Sheet Vinyl - Floor Removal',      unitPrice:0.35, unit:'SY', minPrice:0},
+        {id:'lv4', name:'Sheet Vinyl - Floor Prep',         unitPrice:0.30, unit:'SY', minPrice:0}
       ],
       lvp:[
         {id:'ll1', name:'LVP - Vacant Installation',        unitPrice:1.85, unit:'SF', minPrice:85.00},
@@ -1048,15 +1089,15 @@ function mergePricingWithDefaults(saved, hub) {
     }
   });
 
-  // Labor: ensure every service sub-key exists. Only fill in keys that are
-  // completely MISSING from the saved data — never overwrite keys the user
-  // has explicitly edited (even if they cleared all items).
+  // Labor: always ensure every service sub-key exists and has items.
+  // Stale saves from before labor was in the schema may have labor:{} or missing keys.
   var defLabor = def.labor || {};
   if (!merged.labor || typeof merged.labor !== 'object') {
     merged.labor = JSON.parse(JSON.stringify(defLabor));
   } else {
     Object.keys(defLabor).forEach(function(svcKey) {
-      if (merged.labor[svcKey] === undefined || merged.labor[svcKey] === null) {
+      var savedArr = merged.labor[svcKey];
+      if (!savedArr || !Array.isArray(savedArr) || savedArr.length === 0) {
         merged.labor[svcKey] = JSON.parse(JSON.stringify(defLabor[svcKey]));
       }
     });
@@ -1134,9 +1175,9 @@ function nav(panelId, el) {
   document.getElementById('p-'+panelId).classList.add('on');
   var titles = {dashboard:'Dashboard',builder:'New Proposal',history:'Proposal History',calculator:'SY Calculator',pricing:'Pricing Menus',users:'Team Users'};
   document.getElementById('tbtitle').textContent = titles[panelId]||panelId;
-  var _ss=document.getElementById('pricing-sticky-save');
-  if (_ss) _ss.style.display = (panelId==='pricing') ? 'flex' : 'none';
   if (panelId==='history') renderHistory();
+  var _ss=document.getElementById('pricing-sticky-save');
+  if (_ss) _ss.style.display = (panelId==='pricing') ? '' : 'none';
   if (panelId==='pricing') { renderHubButtons(); renderPricingMenus(); }
   if (panelId==='users') renderUsers();
 }
@@ -1352,8 +1393,17 @@ function renderStep2() {
     '</div>';
   }).join('');
 
-  return '<div class="fc"><h3>' + builder.prop.name + ' — Select Floor Plans &amp; Services</h3>' +
-    '<div style="font-size:12px;color:var(--gray);margin-bottom:16px;">Check each floor plan to include it in this proposal, then confirm its scopes and quantities.</div>' +
+  var allChecked = fps.length > 0 && fps.every(function(fp){ return !!builder.fps.find(function(f){ return f.fpId===fp.id; }); });
+  var someChecked = fps.some(function(fp){ return !!builder.fps.find(function(f){ return f.fpId===fp.id; }); });
+
+  return '<div class="fc"><h3>' + builder.prop.name + ' \u2014 Select Floor Plans &amp; Services</h3>' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">' +
+      '<label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;user-select:none;">' +
+        '<input type="checkbox" id="fp-select-all" ' + (allChecked ? 'checked' : '') + ' style="accent-color:var(--navy);width:16px;height:16px;" onchange="selectAllFps(this)">' +
+        'Select All' +
+      '</label>' +
+      '<span style="font-size:12px;color:var(--gray);">(' + builder.fps.length + ' of ' + fps.length + ' selected)</span>' +
+    '</div>' +
     '<div>' + cards + '</div>' +
     '<div class="fa">' +
       '<button class="bs ol" onclick="builder.step=1;renderBuilderStep()">← Back</button>' +
@@ -1400,6 +1450,25 @@ function updateScopeRowQty(el) {
       setScopeDefaultQty(builder.prop.id, fpId, presetId, row.qty);
     }
   }
+}
+
+function selectAllFps(checkbox) {
+  var fps = loadFpForProp(builder.prop.id);
+  if (checkbox.checked) {
+    fps.forEach(function(fp) {
+      if (!builder.fps.find(function(f){ return f.fpId===fp.id; })) {
+        var presets = getPresetsForFp(builder.prop.id, fp.id);
+        var scopeRows = presets.map(function(ps){
+          return {presetId:ps.id, scopeName:ps.name, serviceKey:ps.serviceKey, qty:ps.qty||0, unit:ps.unit||'SY'};
+        });
+        builder.fps.push({fpId:fp.id, fpName:fp.name, sqft:fp.sqft||0, beds:fp.beds||0, scopes:[], sy:0, scopeRows:scopeRows});
+      }
+    });
+  } else {
+    builder.fps = [];
+  }
+  var body = document.getElementById('builder-body');
+  if (body) body.innerHTML = renderStep2();
 }
 
 function toggleFp(fpId, checkbox) {
@@ -1535,7 +1604,6 @@ function buildDefaultLines(pricing, scopeId, fp) {
     carpet: (pricing.carpet||[]).slice(0,1),
     pad:    (pricing.pad||[]).slice(0,1),
     lvp:    (pricing.lvp||[]).slice(0,1),
-    underlayment: (pricing.underlayment||[]).slice(0,1),
     vinyl:  (pricing.vinyl||[]).slice(0,1)
   };
 
@@ -1551,9 +1619,8 @@ function buildDefaultLines(pricing, scopeId, fp) {
     (propMats.pad||[]).forEach(function(m){    lines.push({name:m.name, qty:sy, unit:'SY', unitPrice:m.unitPrice}); });
   } else if (scopeId === 'lvp' || scopeId === 'floating_lvp') {
     (propMats.lvp||[]).forEach(function(m){ lines.push({name:m.name, qty:sf, unit:'SF', unitPrice:m.unitPrice}); });
-    (propMats.underlayment||[]).forEach(function(m){ lines.push({name:m.name, qty:sf, unit:'SF', unitPrice:m.unitPrice}); });
   } else if (scopeId === 'vinyl') {
-    (propMats.vinyl||[]).forEach(function(m){ lines.push({name:m.name, qty:sy, unit:'SY', unitPrice:m.unitPrice}); });
+    (propMats.vinyl||[]).forEach(function(m){ lines.push({name:m.name, qty:Math.ceil(sf/9*10)/10, unit:'SY', unitPrice:m.unitPrice}); });
   }
 
   // ── Core labor lines (all items specific to this service) ──
@@ -1621,7 +1688,11 @@ function addPriceLine(fpKey) {
 // ─── LINE ITEM SHEET BUILDER ───────────────────
 // Generates one sheet per floor plan/scope, matching the Protective Flooring PDF format
 
-function buildLineItemSheetHTML(ps, prop, repName, repEmail, num, date) {
+var LOGO_SRC = (function(){
+  try { return localStorage.getItem('pf_logo_src') || ''; } catch(e) { return ''; }
+})();
+
+function buildLineItemSheetHTML(ps, prop, repName, repEmail, num, date, repTitle) {
   var total = ps.lines.reduce(function(s,l){ return s+lineEffectiveTotal(l); },0);
   var hub = prop ? prop.hub : 'memphis';
   var mkt = loadMarkets().find(function(m){ return m.key===hub; });
@@ -1645,8 +1716,7 @@ function buildLineItemSheetHTML(ps, prop, repName, repEmail, num, date) {
     // Header
     '<div class="li-sheet-header">'+
       '<div>'+
-        '<div class="li-sheet-logo">Protective<br>Flooring</div>'+
-        '<div style="font-size:10px;color:var(--gray);margin-top:6px;line-height:1.5;">Since 1976</div>'+
+        (LOGO_SRC ? '<img src="'+LOGO_SRC+'" style="display:block;height:60px;width:auto;border-radius:10px;" alt="Protective Flooring">' : '<div class="li-sheet-logo">Protective<br>Flooring</div><div style="font-size:10px;color:var(--gray);margin-top:6px;line-height:1.5;">Since 1976</div>')+
       '</div>'+
       '<div style="text-align:center;flex:1;padding:0 20px;">'+
         '<div class="li-sheet-title">Flooring Proposal</div>'+
@@ -1703,7 +1773,7 @@ function buildLineItemSheetHTML(ps, prop, repName, repEmail, num, date) {
   '</div>';
 }
 
-function buildSummarySheetHTML(prop, pricingMap, repName, repEmail, num, date, pricing) {
+function buildSummarySheetHTML(prop, pricingMap, repName, repEmail, num, date, pricing, repTitle) {
   var grandTotal = 0;
   var summaryRows = '';
   Object.values(pricingMap).forEach(function(ps){
@@ -1737,12 +1807,13 @@ function buildSummarySheetHTML(prop, pricingMap, repName, repEmail, num, date, p
 
   return '<div class="proposal-preview" id="final-preview">'+
     '<div class="pp-header">'+
-      '<div><div class="pp-logo-box">Protective<br>Flooring</div><div style="font-size:10px;color:var(--gray);margin-top:4px;">Since 1976</div></div>'+
+      (LOGO_SRC ? '<div style="padding:18px 0 10px;"><img src="'+LOGO_SRC+'" style="display:block;margin:0 auto;height:70px;width:auto;border-radius:12px;" alt="Protective Flooring"></div>' : '<div><div class="pp-logo-box">Protective<br>Flooring</div><div style="font-size:10px;color:var(--gray);margin-top:4px;">Since 1976</div></div>')+
       '<div style="flex:1;"></div>'+
       '<div class="pp-address">'+escHtml(mktAddr)+'<br>'+escHtml(mktPhone)+'</div>'+
     '</div>'+
     '<div class="pp-title">Flooring Proposal</div>'+
     '<div class="pp-meta">'+
+      (repTitle ? '<div class="pp-meta-item"><span class="pp-meta-label">Title</span><span class="pp-meta-value">'+escHtml(repTitle)+'</span></div>' : '')+
       '<div class="pp-meta-item"><span class="pp-meta-label">Date</span><span class="pp-meta-value">'+date+'</span></div>'+
       '<div class="pp-meta-item"><span class="pp-meta-label">Salesperson</span><span class="pp-meta-value">'+escHtml(repName)+'</span></div>'+
       '<div class="pp-meta-item"><span class="pp-meta-label">Customer</span><span class="pp-meta-value">'+escHtml(prop?prop.name:'')+'</span></div>'+
@@ -1767,6 +1838,221 @@ function buildSummarySheetHTML(prop, pricingMap, repName, repEmail, num, date, p
   '</div>';
 }
 
+
+// ─── LAYOUT V2 — MODERN ───────────────────────────────────────────────────────
+
+function buildSummarySheetHTML_v2(prop, pricingMap, repName, repEmail, repPhone, num, date, pricing, repTitle) {
+  var grandTotal = 0;
+  var colTotals = [];
+  // Gather pricing rows
+  var rows = [];
+  Object.values(pricingMap).forEach(function(ps){
+    var t = ps.lines.reduce(function(s,l){ return s+lineEffectiveTotal(l); },0);
+    grandTotal += t;
+    rows.push({fpName:ps.fpName, scopeLabel:ps.scopeLabel, total:t});
+  });
+
+  var summaryRows = rows.map(function(r){
+    return '<tr style="border-left:4px solid #020A5B;">'+
+      '<td style="padding:9px 12px;font-size:13px;">'+escHtml(r.fpName)+'</td>'+
+      '<td style="padding:9px 12px;font-size:13px;">'+escHtml(r.scopeLabel)+'</td>'+
+      '<td style="padding:9px 12px;font-size:13px;text-align:right;font-weight:600;">'+fmtMoney(r.total)+'</td>'+
+    '</tr>';
+  }).join('');
+
+  // Materials
+  var hub = prop ? prop.hub : 'memphis';
+  var mkt = loadMarkets().find(function(m){ return m.key===hub; });
+  var mktAddr = mkt ? mkt.address : '3349 Ambrose Avenue, Nashville, TN 37207';
+  var mktPhone = mkt ? mkt.phone : '(615) 853-1737';
+  var propId = prop ? prop.id : null;
+  var propMats = propId ? getPropSelectedMaterials(propId, hub) : null;
+  var carpetItems = (propMats && propMats.carpet.length) ? propMats.carpet : (pricing.carpet||[]).slice(0,1);
+  var padItems    = (propMats && propMats.pad.length)    ? propMats.pad    : (pricing.pad||[]).slice(0,1);
+  var lvpItems    = (propMats && propMats.lvp.length)    ? propMats.lvp    : (pricing.lvp||[]).slice(0,1);
+
+  var matRows = '';
+  carpetItems.forEach(function(c){ matRows += '<tr><td style="padding:7px 10px;font-size:12px;color:#555;">Carpet</td><td style="padding:7px 10px;font-size:12px;font-weight:600;">'+escHtml(c.name)+'</td></tr>'; });
+  padItems.forEach(function(p){    matRows += '<tr><td style="padding:7px 10px;font-size:12px;color:#555;">Pad</td><td style="padding:7px 10px;font-size:12px;font-weight:600;">'+escHtml(p.name)+'</td></tr>'; });
+  lvpItems.forEach(function(l){    matRows += '<tr><td style="padding:7px 10px;font-size:12px;color:#555;">Vinyl Plank</td><td style="padding:7px 10px;font-size:12px;font-weight:600;">'+escHtml(l.name)+'</td></tr>'; });
+
+  var addonRows = (pricing.addons||[]).filter(function(a){ return a.unitPrice > 0; }).slice(0,6).map(function(a){
+    return '<tr><td style="padding:7px 10px;font-size:12px;color:#555;">'+escHtml(a.name)+'</td><td style="padding:7px 10px;font-size:12px;font-weight:600;">'+fmtMoney(a.unitPrice)+'/'+escHtml(a.unit)+'</td></tr>';
+  }).join('');
+
+  // Scope pills
+  var scopes = Object.values(pricingMap).map(function(ps){ return ps.scopeLabel; }).filter(function(s,i,a){ return a.indexOf(s)===i; });
+  var scopePills = scopes.map(function(s){
+    return '<span style="display:inline-block;padding:3px 10px;margin:2px 3px;background:#eef0fa;border:1px solid #c5caea;border-radius:20px;font-size:11px;color:#020A5B;font-weight:600;">'+escHtml(s)+'</span>';
+  }).join('');
+
+  // Rep contact
+  var repContactParts = [];
+  if (repTitle) repContactParts.push('<span style="font-weight:700;">'+escHtml(repTitle)+'</span>');
+  if (repName)  repContactParts.push(escHtml(repName));
+  if (repPhone) repContactParts.push(escHtml(repPhone));
+  if (repEmail) repContactParts.push('<a href="mailto:'+escHtml(repEmail)+'" style="color:#020A5B;">'+escHtml(repEmail)+'</a>');
+  var repContact = repContactParts.join(' &nbsp;·&nbsp; ');
+
+  var propAddr = prop ? escHtml(prop.addr+', '+prop.city+', '+prop.state) : '';
+
+  return '<div style="font-family:Helvetica Neue,Arial,sans-serif;max-width:780px;margin:0 auto;background:#fff;">'+
+    // Navy header band
+    '<div style="background:#020A5B;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;">'+
+      '<div>'+(LOGO_SRC?'<img src="'+LOGO_SRC+'" style="height:56px;width:auto;border-radius:8px;" alt="Protective Flooring">':'<div style="color:#fff;font-size:22px;font-weight:800;letter-spacing:-0.5px;">Protective<br>Flooring</div>')+'</div>'+
+      '<div style="text-align:right;color:rgba(255,255,255,0.85);font-size:12px;line-height:1.7;">'+
+        '<div style="font-weight:700;font-size:13px;color:#fff;">Protective Services Co., Inc.</div>'+
+        '<div>'+escHtml(mktAddr)+'</div>'+
+        '<div>'+escHtml(mktPhone)+'</div>'+
+      '</div>'+
+    '</div>'+
+    // Property + rep strip
+    '<div style="background:#f3f2ee;padding:14px 28px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #e5e2d9;">'+
+      '<div>'+
+        '<div style="font-size:15px;font-weight:700;color:#020A5B;">'+escHtml(prop?prop.name:'')+'</div>'+
+        '<div style="font-size:12px;color:#555;margin-top:2px;">'+propAddr+'</div>'+
+        '<div style="margin-top:8px;">'+scopePills+'</div>'+
+      '</div>'+
+      '<div style="text-align:right;font-size:12px;color:#555;line-height:1.7;">'+
+        '<div style="font-weight:700;color:#020A5B;font-size:13px;">Flooring Proposal</div>'+
+        '<div>Proposal #'+num+'</div>'+
+        '<div>'+date+'</div>'+
+      '</div>'+
+    '</div>'+
+    // Pricing table
+    '<div style="padding:20px 28px 10px;">'+
+      '<table style="width:100%;border-collapse:collapse;">'+
+        '<thead><tr style="background:#020A5B;">'+
+          '<th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Floor Plan</th>'+
+          '<th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Scope</th>'+
+          '<th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Total</th>'+
+        '</tr></thead>'+
+        '<tbody>'+summaryRows+'</tbody>'+
+        '<tfoot><tr style="background:#020A5B;">'+
+          '<td colspan="2" style="padding:11px 12px;font-size:13px;font-weight:700;color:#fff;">GRAND TOTAL</td>'+
+          '<td style="padding:11px 12px;text-align:right;font-size:16px;font-weight:800;color:#fff;">'+fmtMoney(grandTotal)+'</td>'+
+        '</tr></tfoot>'+
+      '</table>'+
+    '</div>'+
+    // Materials + Addons side by side
+    '<div style="padding:10px 28px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">'+
+      '<div style="background:#fafaf8;border:1px solid #e5e2d9;border-radius:6px;overflow:hidden;">'+
+        '<div style="padding:8px 12px;background:#e5e2d9;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#020A5B;">Material Selections</div>'+
+        '<table style="width:100%;border-collapse:collapse;">'+matRows+'</table>'+
+      '</div>'+
+      '<div style="background:#fafaf8;border:1px solid #e5e2d9;border-radius:6px;overflow:hidden;">'+
+        '<div style="padding:8px 12px;background:#e5e2d9;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#020A5B;">Additional Services</div>'+
+        '<table style="width:100%;border-collapse:collapse;">'+(addonRows||'<tr><td style="padding:10px;font-size:12px;color:#999;">None listed</td></tr>')+'</table>'+
+      '</div>'+
+    '</div>'+
+    // Notes
+    '<div style="padding:0 28px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">'+
+      '<div style="background:#fafaf8;border:1px solid #e5e2d9;border-radius:6px;padding:12px 14px;">'+
+        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#020A5B;margin-bottom:6px;">Notes</div>'+
+        '<div style="font-size:11px;color:#555;line-height:1.6;">Thank you for the opportunity to quote your property for new flooring and vacant installation. The carpet proposal includes pricing for new carpet, pad, bedroom(s) installation, custom stairs and all applicable taxes.</div>'+
+      '</div>'+
+      '<div style="background:#fafaf8;border:1px solid #e5e2d9;border-radius:6px;padding:12px 14px;">'+
+        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#020A5B;margin-bottom:6px;">Terms</div>'+
+        '<div style="font-size:11px;color:#555;line-height:1.6;">The vinyl plank proposal includes new vinyl plank, vacant installation, floor removal, floor prep, shoe mold, tub strips, caulk and all applicable taxes. Pricing valid for 30 days.</div>'+
+      '</div>'+
+    '</div>'+
+    // Footer
+    '<div style="padding:12px 28px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid #020A5B;">'+
+      '<div style="font-size:11px;color:#555;font-style:italic;">Protective Services Co., Inc. dba Protective Flooring</div>'+
+      '<div style="font-size:11px;color:#555;">Proposal #'+num+'</div>'+
+    '</div>'+
+    // Contact bar
+    '<div style="background:#eef0fa;border-left:4px solid #020A5B;padding:10px 28px;font-size:12px;">'+
+      repContact+
+    '</div>'+
+  '</div>';
+}
+
+function buildLineItemSheetHTML_v2(ps, prop, repName, repEmail, repPhone, num, date, repTitle) {
+  var total = ps.lines.reduce(function(s,l){ return s+lineEffectiveTotal(l); },0);
+  var hub = prop ? prop.hub : 'memphis';
+  var mkt = loadMarkets().find(function(m){ return m.key===hub; });
+  var mktAddr = mkt ? mkt.address : '3349 Ambrose Avenue, Nashville, TN 37207';
+  var mktPhone = mkt ? mkt.phone : '(615) 853-1737';
+
+  var lineRows = ps.lines.map(function(line, i){
+    var eff = lineEffectiveTotal(line);
+    var hasMin = lineHasMin(line);
+    var nameCell = escHtml(line.name)+(hasMin?' <span style="font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:rgba(200,149,42,.2);color:#7a5c1a;border:1px solid rgba(200,149,42,.4);border-radius:2px;padding:1px 4px;margin-left:4px;">MIN</span>':'');
+    var bg = (i%2===0)?'#fff':'#fafaf8';
+    return '<tr style="background:'+bg+';border-left:3px solid '+(hasMin?'#b45309':'#020A5B')+';">'+
+      '<td style="padding:8px 12px;font-size:12px;">'+nameCell+'</td>'+
+      '<td style="padding:8px 12px;font-size:12px;text-align:right;">'+fmtQty(line.qty)+'</td>'+
+      '<td style="padding:8px 12px;font-size:12px;text-align:right;">'+escHtml(line.unit)+'</td>'+
+      '<td style="padding:8px 12px;font-size:12px;text-align:right;">'+fmtMoney(line.unitPrice)+'</td>'+
+      '<td style="padding:8px 12px;font-size:12px;text-align:right;font-weight:'+(hasMin?'700':'400')+';">'+fmtMoney(eff)+'</td>'+
+    '</tr>';
+  }).join('');
+
+  var propAddr = prop ? escHtml(prop.addr+', '+prop.city+', '+prop.state) : '';
+  var repContactParts = [];
+  if (repTitle) repContactParts.push('<strong>'+escHtml(repTitle)+'</strong>');
+  if (repName)  repContactParts.push(escHtml(repName));
+  if (repPhone) repContactParts.push(escHtml(repPhone));
+  if (repEmail) repContactParts.push('<a href="mailto:'+escHtml(repEmail)+'" style="color:#020A5B;">'+escHtml(repEmail)+'</a>');
+
+  return '<div style="font-family:Helvetica Neue,Arial,sans-serif;max-width:780px;margin:0 auto;background:#fff;">'+
+    '<div style="background:#020A5B;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;">'+
+      '<div>'+(LOGO_SRC?'<img src="'+LOGO_SRC+'" style="height:56px;width:auto;border-radius:8px;" alt="Protective Flooring">':'<div style="color:#fff;font-size:22px;font-weight:800;">Protective<br>Flooring</div>')+'</div>'+
+      '<div style="text-align:right;color:rgba(255,255,255,0.85);font-size:12px;line-height:1.7;">'+
+        '<div style="font-weight:700;font-size:13px;color:#fff;">Line Item Detail</div>'+
+        '<div>Proposal #'+num+' &nbsp;·&nbsp; '+date+'</div>'+
+        '<div>'+escHtml(mktAddr)+' &nbsp;·&nbsp; '+escHtml(mktPhone)+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:#f3f2ee;padding:12px 28px;display:flex;justify-content:space-between;border-bottom:1px solid #e5e2d9;">'+
+      '<div>'+
+        '<div style="font-size:14px;font-weight:700;color:#020A5B;">'+escHtml(prop?prop.name:'')+'</div>'+
+        '<div style="font-size:12px;color:#555;margin-top:2px;">'+propAddr+'</div>'+
+      '</div>'+
+      '<div style="text-align:right;font-size:12px;color:#555;">'+
+        '<div style="font-weight:700;color:#020A5B;">'+escHtml(ps.fpName)+'</div>'+
+        '<div>'+escHtml(ps.scopeLabel)+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="padding:16px 28px 8px;">'+
+      '<table style="width:100%;border-collapse:collapse;">'+
+        '<thead><tr style="background:#020A5B;">'+
+          '<th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Item</th>'+
+          '<th style="padding:9px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Qty</th>'+
+          '<th style="padding:9px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Unit</th>'+
+          '<th style="padding:9px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Unit Price</th>'+
+          '<th style="padding:9px 12px;text-align:right;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">Total</th>'+
+        '</tr></thead>'+
+        '<tbody>'+lineRows+'</tbody>'+
+        '<tfoot><tr style="background:#020A5B;">'+
+          '<td colspan="4" style="padding:10px 12px;font-size:13px;font-weight:700;color:#fff;">TOTAL</td>'+
+          '<td style="padding:10px 12px;text-align:right;font-size:15px;font-weight:800;color:#fff;">'+fmtMoney(total)+'</td>'+
+        '</tr></tfoot>'+
+      '</table>'+
+    '</div>'+
+    '<div style="padding:8px 28px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">'+
+      '<div style="background:#fafaf8;border:1px solid #e5e2d9;border-radius:6px;padding:12px 14px;">'+
+        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#020A5B;margin-bottom:6px;">Notes</div>'+
+        '<div style="font-size:11px;color:#555;line-height:1.6;">Thank you for the opportunity to quote your property for new flooring and vacant installation. All pricing includes materials, labor, and applicable taxes.</div>'+
+      '</div>'+
+      '<div style="background:#fafaf8;border:1px solid #e5e2d9;border-radius:6px;padding:12px 14px;">'+
+        '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#020A5B;margin-bottom:6px;">Terms</div>'+
+        '<div style="font-size:11px;color:#555;line-height:1.6;">Pricing valid for 30 days. Final quantities subject to field measurement. Work order required prior to scheduling.</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="padding:12px 28px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid #020A5B;">'+
+      '<div style="font-size:11px;color:#555;font-style:italic;">Protective Services Co., Inc. dba Protective Flooring</div>'+
+      '<div style="font-size:11px;color:#555;">Proposal #'+num+'</div>'+
+    '</div>'+
+    '<div style="background:#eef0fa;border-left:4px solid #020A5B;padding:10px 28px;font-size:12px;">'+
+      repContactParts.join(' &nbsp;·&nbsp; ')+
+    '</div>'+
+  '</div>';
+}
+
+// ─── END LAYOUT V2 ────────────────────────────────────────────────────────────
+
 // ─── STEP 4 ────────────────────────────────────
 
 function renderStep4() {
@@ -1787,16 +2073,16 @@ function renderStep4() {
   tabsHtml += '</div>';
 
   // Summary tab content
-  var summaryHTML = buildSummarySheetHTML(builder.prop, builder.pricing, currentUser.name, currentUser.email, num, date, pricing);
+  var summaryHTML = buildSummarySheetHTML(builder.prop, builder.pricing, currentUser.name, currentUser.email, num, date, pricing, currentUser.jobTitle||"");
 
   // Line item sheet tab contents
   var liSheetsHtml = pricingEntries.map(function(entry){
-    return buildLineItemSheetHTML(entry[1], builder.prop, currentUser.name, currentUser.email, num, date);
+    return buildLineItemSheetHTML(entry[1], builder.prop, currentUser.name, currentUser.email, num, date, currentUser.jobTitle||"");
   }).join('');
 
   var tabBodies = '<div class="preview-tab-body on" id="ptab-0">'+summaryHTML+'</div>';
   pricingEntries.forEach(function(entry, i){
-    tabBodies += '<div class="preview-tab-body" id="ptab-'+(i+1)+'">'+buildLineItemSheetHTML(entry[1], builder.prop, currentUser.name, currentUser.email, num, date)+'</div>';
+    tabBodies += '<div class="preview-tab-body" id="ptab-'+(i+1)+'">'+buildLineItemSheetHTML(entry[1], builder.prop, currentUser.name, currentUser.email, num, date, currentUser.jobTitle||'')+'</div>';
   });
 
   return '<div class="fc"><h3>Review & Send — Proposal #'+num+'</h3>'+
@@ -1892,22 +2178,40 @@ function builderNext() {
 }
 
 function openSendModal(num) {
+  // Populate recipients from property contacts
+  var recipientList = document.getElementById('send-recipient-list');
+  var extraList = document.getElementById('send-extra-list');
+  if (extraList) extraList.innerHTML = '';
+  var recipients = [];
+  if (builder.prop && builder.prop.email) {
+    recipients.push({name: builder.prop.name||'', email: builder.prop.email});
+  }
+  if (recipientList) {
+    recipientList.innerHTML = recipients.map(function(r, i){
+      return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;background:var(--white);">'+
+        '<input type="checkbox" class="rcpt-checkbox" data-email="'+escHtml(r.email)+'" data-name="'+escHtml(r.name)+'" checked>'+
+        '<span><strong>'+escHtml(r.name||r.email)+'</strong>'+(r.name&&r.email?' <span style="color:var(--gray);font-size:11px;">'+escHtml(r.email)+'</span>':'')+'</span>'+
+      '</label>';
+    }).join('') || '<div style="font-size:12px;color:var(--gray);">No contacts on file for this property.</div>';
+  }
   document.getElementById('send-subject').value = 'Flooring Proposal — '+builder.prop.name+' — #'+num;
-  document.getElementById('send-body').value = 'Dear '+builder.prop.name+',\n\nPlease find attached your flooring proposal from Protective Flooring.\n\nThank you for the opportunity to quote your property. Please don\'t hesitate to reach out with any questions.\n\nBest regards,\n'+currentUser.name+'\n'+currentUser.email;
-  document.getElementById('send-to').value = builder.prop.email||'';
+  document.getElementById('send-body').value = 'Dear '+builder.prop.name+',\n\nPlease find attached your flooring proposal from Protective Flooring.\n\nThank you for the opportunity to quote your property. Please don\'t hesitate to reach out with any questions.\n\nBest regards,\n'+(currentUser.jobTitle?currentUser.jobTitle+'\n':'')+currentUser.name+'\n'+currentUser.email+(currentUser.phone?'\n'+currentUser.phone:'');
   // Build sheet selector checkboxes
   var selectorEl = document.getElementById('sheet-selector-list');
-  var html = '';
+  var sheetHtml = '';
   Object.entries(builder.pricing).forEach(function(entry){
     var ps = entry[1];
     var key = entry[0];
-    html += '<label class="sheet-check-item on" style="display:flex;align-items:center;gap:8px;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;">'+
+    sheetHtml += '<label class="sheet-check-item on" style="display:flex;align-items:center;gap:8px;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;">'+
       '<input type="checkbox" class="sheet-checkbox" data-key="'+key+'" checked> '+
       escHtml(ps.fpName)+' — '+escHtml(ps.scopeLabel)+
     '</label>';
   });
-  selectorEl.innerHTML = html || '<div style="font-size:12px;color:var(--gray);">No line item sheets available.</div>';
+  selectorEl.innerHTML = sheetHtml || '<div style="font-size:12px;color:var(--gray);">No line item sheets available.</div>';
   document.getElementById('inc-lineitems-all').checked = true;
+  // Reset selectors to defaults
+  setDocType('summary');
+  setLayoutType('classic');
   document.getElementById('m-send').classList.add('on');
 }
 
@@ -1915,8 +2219,89 @@ function toggleAllSheets(masterCb) {
   document.querySelectorAll('.sheet-checkbox').forEach(function(cb){ cb.checked = masterCb.checked; });
 }
 
+function addExtraRecipient() {
+  var nameEl = document.getElementById('send-add-name');
+  var emailEl = document.getElementById('send-add-email');
+  if (!emailEl) return;
+  var email = emailEl.value.trim();
+  var name = nameEl ? nameEl.value.trim() : '';
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { toast('Enter a valid email address.','err'); return; }
+  var listEl = document.getElementById('send-extra-list');
+  if (!listEl) return;
+  var id = 'extra-'+Date.now();
+  var item = document.createElement('div');
+  item.id = id;
+  item.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--white);';
+  var spanEl = document.createElement('span');
+  spanEl.style.flex = '1';
+  spanEl.innerHTML = '<strong>'+(name||email)+'</strong>'+(name?' <span style="color:var(--gray);font-size:11px;">'+escHtml(email)+'</span>':'');
+  var removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.style.cssText = 'background:none;border:none;color:var(--gray);cursor:pointer;font-size:16px;line-height:1;padding:0 4px;';
+  removeBtn.textContent = '\u00d7';
+  removeBtn.addEventListener('click', (function(el){ return function(){ el.remove(); }; })(item));
+  item.appendChild(spanEl);
+  item.appendChild(removeBtn);
+  item.dataset.email = email;
+  item.dataset.name = name;
+  listEl.appendChild(item);
+  emailEl.value = '';
+  if (nameEl) nameEl.value = '';
+}
+
+function getCheckedRecipientEmails() {
+  var emails = [];
+  document.querySelectorAll('.rcpt-checkbox:checked').forEach(function(cb){ if(cb.dataset.email) emails.push(cb.dataset.email); });
+  document.querySelectorAll('#send-extra-list > div[data-email]').forEach(function(el){ if(el.dataset.email) emails.push(el.dataset.email); });
+  return emails;
+}
+
+var _docType = 'summary';
+function setDocType(type) {
+  _docType = type;
+  var btns = {summary:'dt-summary', lineitems:'dt-lineitems', both:'dt-both'};
+  Object.keys(btns).forEach(function(k) {
+    var btn = document.getElementById(btns[k]);
+    if (!btn) return;
+    if (k === type) {
+      btn.style.border = '2px solid var(--navy)'; btn.style.background = 'var(--navy)'; btn.style.color = '#fff';
+    } else {
+      btn.style.border = '2px solid var(--border)'; btn.style.background = 'var(--white)'; btn.style.color = 'var(--text)';
+    }
+  });
+  var wrap = document.getElementById('lineitems-selector-wrap');
+  if (wrap) wrap.style.display = (type === 'lineitems' || type === 'both') ? '' : 'none';
+  var sumCb = document.getElementById('inc-summary');
+  if (sumCb) sumCb.checked = (type === 'summary' || type === 'both');
+  if (type === 'lineitems' || type === 'both') {
+    document.querySelectorAll('.sheet-checkbox').forEach(function(cb){ cb.checked = true; });
+    var allCb = document.getElementById('inc-lineitems-all');
+    if (allCb) allCb.checked = true;
+  }
+}
+
+var _layoutType = 'classic';
+function setLayoutType(type) {
+  _layoutType = type;
+  var btns = {classic:'lt-classic', modern:'lt-modern'};
+  Object.keys(btns).forEach(function(k) {
+    var btn = document.getElementById(btns[k]);
+    if (!btn) return;
+    if (k === type) {
+      btn.style.border = '2px solid var(--navy)'; btn.style.background = 'var(--navy)'; btn.style.color = '#fff';
+    } else {
+      btn.style.border = '2px solid var(--border)'; btn.style.background = 'var(--white)'; btn.style.color = 'var(--text)';
+    }
+  });
+}
+
 function sendProposalGmail() {
-  var to = document.getElementById('send-to').value;
+  // Auto-flush any email typed but not added
+  var pendingEmailEl = document.getElementById('send-add-email');
+  if (pendingEmailEl && pendingEmailEl.value.trim()) addExtraRecipient();
+  var toList = getCheckedRecipientEmails();
+  if (!toList.length) { toast('Select at least one recipient.','err'); return; }
+  var to = toList.join(',');
   var subj = document.getElementById('send-subject').value;
   var body = document.getElementById('send-body').value;
   if (!to) { toast('Please enter recipient email.','err'); return; }
@@ -1984,15 +2369,40 @@ function previewProposalPDF() {
   var selectedKeys = [];
   document.querySelectorAll('.sheet-checkbox:checked').forEach(function(cb){ selectedKeys.push(cb.dataset.key); });
   var html = '';
-  if (incSummary) html += buildSummarySheetHTML(builder.prop, builder.pricing, currentUser.name, currentUser.email, num, date, pricing);
+  if (incSummary) html += buildSummarySheetHTML(builder.prop, builder.pricing, currentUser.name, currentUser.email, num, date, pricing, currentUser.jobTitle||"");
   selectedKeys.forEach(function(key){
     var ps = builder.pricing[key];
-    if (ps) html += '<hr style="border:none;border-top:2px dashed var(--border);margin:20px 0;"><div class="no-print" style="text-align:center;font-size:11px;color:var(--gray);margin-bottom:12px;">— Line Item Sheet: '+escHtml(ps.fpName)+' / '+escHtml(ps.scopeLabel)+' —</div>'+buildLineItemSheetHTML(ps, builder.prop, currentUser.name, currentUser.email, num, date);
+    if (ps) html += '<hr style="border:none;border-top:2px dashed var(--border);margin:20px 0;"><div class="no-print" style="text-align:center;font-size:11px;color:var(--gray);margin-bottom:12px;">— Line Item Sheet: '+escHtml(ps.fpName)+' / '+escHtml(ps.scopeLabel)+' —</div>'+buildLineItemSheetHTML(ps, builder.prop, currentUser.name, currentUser.email, num, date, currentUser.jobTitle||"");
   });
   if (!html) { toast('Please select at least one document.','err'); return; }
   document.getElementById('preview-body').innerHTML = html;
   closeModal('m-send');
   document.getElementById('m-preview').classList.add('on');
+}
+
+function printProposalFromSend() {
+  var proposals = loadProposals();
+  var num = 1000 + proposals.length + 1;
+  var date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var hub = builder.prop ? builder.prop.hub : 'memphis';
+  var pricing = builder.prop ? getEffectivePricing(builder.prop.id, hub) : loadPricing(hub);
+  var useMod = (_layoutType === 'modern');
+  var incSummary = document.getElementById('inc-summary').checked;
+  var selectedKeys = [];
+  if (_docType === 'lineitems' || _docType === 'both') {
+    document.querySelectorAll('.sheet-checkbox:checked').forEach(function(cb){ selectedKeys.push(cb.dataset.key); });
+  }
+  var html = '';
+  if (incSummary) html += (useMod ? buildSummarySheetHTML_v2 : buildSummarySheetHTML)(builder.prop, builder.pricing, currentUser.name, currentUser.email, (currentUser.phone||''), num, date, pricing, currentUser.jobTitle||'');
+  selectedKeys.forEach(function(key){
+    var ps = builder.pricing[key];
+    if (ps) html += '<div style="page-break-before:always;"></div>'+(useMod ? buildLineItemSheetHTML_v2 : buildLineItemSheetHTML)(ps, builder.prop, currentUser.name, currentUser.email, num, date, currentUser.jobTitle||'');
+  });
+  if (!html) { toast('Select at least one document type above.','err'); return; }
+  var w = window.open('','_blank');
+  w.document.write(getPrintStyles()+'<body>'+html+'</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 600);
 }
 
 function printProposal() {
@@ -2226,7 +2636,7 @@ function getEffectivePricing(propId, hub) {
   var ov  = loadPropPricing(propId);
   var merged = JSON.parse(JSON.stringify(def));
   // Material and other category overrides
-  ['carpet','pad','lvp','underlayment','vinyl','addons','waste'].forEach(function(k){
+  ['carpet','pad','lvp','vinyl','addons','waste'].forEach(function(k){
     if (ov[k] !== undefined) merged[k] = ov[k];
   });
   // Labor rate overrides: stored as laborRates[svcKey] = [{name,unit,unitPrice}...]
@@ -2268,7 +2678,7 @@ function switchPriceLevel(level, el) {
   if (propSec) propSec.style.display = level==='property'  ? '' : 'none';
   if (scpSec)  scpSec.style.display  = level==='scopes'    ? '' : 'none';
   var stickySave = document.getElementById('pricing-sticky-save');
-  if (stickySave) stickySave.style.display = 'flex';
+  if (stickySave) stickySave.style.display = '';
   if (level==='materials') {
     curPricingGroup = 'materials';
     renderHubButtons();
@@ -2280,7 +2690,11 @@ function switchPriceLevel(level, el) {
     renderPricingMenus();
   }
   if (level==='property') populatePropPricingSelect();
-  if (level==='scopes') renderScopePropTiles();
+  if (level==='scopes') {
+    renderScopePropTiles();
+    // Auto-load panel if a property is already selected from Property Selections tab
+    if (_curScopePropId) loadScopePresetsPanel(_curScopePropId);
+  }
 }
 
 function populatePricingHubSelect() {
@@ -2412,6 +2826,7 @@ function filterPropTiles() {
 
 function selectPropTile(propId) {
   curPropPricingId = propId;
+  _curScopePropId = propId; // keep Scope Preview in sync
   document.querySelectorAll('#pp-tile-grid .pp-tile').forEach(function(t) {
     t.classList.toggle('on', t.dataset.id === propId);
   });
@@ -2431,21 +2846,22 @@ function switchPricingGroup(group) {
 
 function switchPropTab(tab) {
   curPropTab = tab;
-  var matSec   = document.getElementById('prop-sec-materials');
-  var laborSec = document.getElementById('prop-sec-labor');
-  if (matSec)   matSec.style.display   = tab === 'materials' ? '' : 'none';
-  if (laborSec) laborSec.style.display = tab === 'labor'     ? '' : 'none';
-  // Update tab buttons
-  var matBtn   = document.getElementById('ptab-mat');
-  var laborBtn = document.getElementById('ptab-lab');
-  if (matBtn) {
-    matBtn.style.borderBottomColor = tab==='materials' ? 'var(--navy)' : 'transparent';
-    matBtn.style.color = tab==='materials' ? 'var(--navy)' : 'var(--gray)';
-  }
-  if (laborBtn) {
-    laborBtn.style.borderBottomColor = tab==='labor' ? 'var(--navy)' : 'transparent';
-    laborBtn.style.color = tab==='labor' ? 'var(--navy)' : 'var(--gray)';
-  }
+  ['prop-sec-materials','prop-sec-labor','prop-sec-shared'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  var active = document.getElementById(
+    tab==='materials' ? 'prop-sec-materials' : tab==='labor' ? 'prop-sec-labor' : 'prop-sec-shared'
+  );
+  if (active) active.style.display = '';
+  // Update tab button styles
+  [['ptab-mat','materials'],['ptab-lab','labor'],['ptab-shared','shared']].forEach(function(pair) {
+    var btn = document.getElementById(pair[0]);
+    if (btn) {
+      btn.style.borderBottomColor = tab===pair[1] ? 'var(--navy)' : 'transparent';
+      btn.style.color = tab===pair[1] ? 'var(--navy)' : 'var(--gray)';
+    }
+  });
 }
 
 function switchPricingTab(tab, el) {
@@ -2486,7 +2902,6 @@ function renderPricingMenus() {
       html += renderPriceList('Pad / Cushion',   pricing.pad||[],    'pad',    'SY', false);
     } else if (tab==='lvp') {
       html += renderPriceList('LVP / Vinyl Plank Products', pricing.lvp||[], 'lvp', 'SF', false);
-      html += renderPriceList('Underlayment', pricing.underlayment||[], 'underlayment', 'SF', false);
     } else if (tab==='vinyl') {
       html += renderPriceList('Sheet Vinyl Products', pricing.vinyl||[], 'vinyl', 'SY', false);
     } else if (tab==='tile_mat') {
@@ -2674,31 +3089,42 @@ function renderPropPricingBody(prop, hub) {
   var propName = prop ? prop.name : '';
 
   if (_workingPropPricing) {
-    if (!_workingPropPricing.materials) _workingPropPricing.materials = {};
-    if (!_workingPropPricing.laborRates) _workingPropPricing.laborRates = {};
+    if (!_workingPropPricing.materials)        _workingPropPricing.materials        = {};
+    if (!_workingPropPricing.laborSelections)  _workingPropPricing.laborSelections  = {};
+    if (!_workingPropPricing.laborRates)       _workingPropPricing.laborRates       = {};
+    if (!_workingPropPricing.sharedSelections) _workingPropPricing.sharedSelections = [];
+    if (!_workingPropPricing.sharedRates)      _workingPropPricing.sharedRates      = {};
     ov = _workingPropPricing;
   }
 
   // Count selections/overrides for badge display
   var matCount = 0;
-  ['carpet','pad','lvp','underlayment','vinyl'].forEach(function(k){
+  ['carpet','pad','lvp','vinyl'].forEach(function(k){
     if (ov.materials && ov.materials[k]) matCount += ov.materials[k].length;
   });
   var laborOvCount = ov.laborRates ? Object.keys(ov.laborRates).length : 0;
 
-  var isMat   = (curPropTab === 'materials');
-  var isLabor = (curPropTab === 'labor');
+  var isMat    = (curPropTab === 'materials');
+  var isLabor  = (curPropTab === 'labor');
+  var isShared = (curPropTab === 'shared');
+
+  // Count labor selections
+  var laborSelCount  = (ov.laborSelections) ? Object.values(ov.laborSelections).reduce(function(n,arr){ return n+(arr?arr.length:0); },0) : 0;
+  var sharedSelCount = (ov.sharedSelections) ? ov.sharedSelections.length : 0;
+
+  function propTabBtn(id, tab, icon, label, badge) {
+    var active = (curPropTab === tab);
+    return '<button id="' + id + '" onclick="switchPropTab(\'' + tab + '\')" style="padding:10px 22px;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border:none;border-bottom:3px solid ' + (active ? 'var(--navy)' : 'transparent') + ';background:none;color:' + (active ? 'var(--navy)' : 'var(--gray)') + ';cursor:pointer;margin-bottom:-2px;display:flex;align-items:center;gap:6px;">' +
+      icon + ' ' + label +
+      (badge ? '<span style="font-size:10px;background:var(--navy);color:#fff;border-radius:99px;padding:1px 6px;">' + badge + '</span>' : '') +
+    '</button>';
+  }
 
   // ── Tab toggle bar ─────────────────────────────────────
   var html = '<div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;">' +
-    '<button id="ptab-mat" onclick="switchPropTab(\'materials\')" style="padding:10px 22px;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border:none;border-bottom:3px solid ' + (isMat ? 'var(--navy)' : 'transparent') + ';background:none;color:' + (isMat ? 'var(--navy)' : 'var(--gray)') + ';cursor:pointer;margin-bottom:-2px;display:flex;align-items:center;gap:6px;">' +
-      '📦 Materials' +
-      (matCount > 0 ? '<span style="font-size:10px;background:var(--navy);color:#fff;border-radius:99px;padding:1px 6px;">' + matCount + '</span>' : '') +
-    '</button>' +
-    '<button id="ptab-lab" onclick="switchPropTab(\'labor\')" style="padding:10px 22px;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border:none;border-bottom:3px solid ' + (isLabor ? 'var(--navy)' : 'transparent') + ';background:none;color:' + (isLabor ? 'var(--navy)' : 'var(--gray)') + ';cursor:pointer;margin-bottom:-2px;display:flex;align-items:center;gap:6px;">' +
-      '🔧 Labor' +
-      (laborOvCount > 0 ? '<span style="font-size:10px;background:rgba(200,149,42,.9);color:#fff;border-radius:99px;padding:1px 6px;">' + laborOvCount + ' custom</span>' : '') +
-    '</button>' +
+    propTabBtn('ptab-mat',    'materials', '📦', 'Materials',    matCount    > 0 ? matCount    : '') +
+    propTabBtn('ptab-lab',    'labor',     '🔧', 'Labor',        laborSelCount  > 0 ? laborSelCount  : '') +
+    propTabBtn('ptab-shared', 'shared',    '🔗', 'Shared Items', sharedSelCount > 0 ? sharedSelCount : '') +
   '</div>';
 
   // ── MATERIALS SECTION ─────────────────────────────────
@@ -2708,8 +3134,7 @@ function renderPropPricingBody(prop, hub) {
     { key:'carpet', label:'Carpet',     icon:'🟫', unit:'SY', max:3 },
     { key:'pad',    label:'Pad',        icon:'⬜', unit:'SY', max:2 },
     { key:'lvp',    label:'Vinyl Plank',icon:'🟨', unit:'SF', max:3 },
-    { key:'underlayment', label:'Underlayment', icon:'🔲', unit:'SF', max:2 },
-    { key:'vinyl',  label:'Sheet Vinyl',icon:'🟩', unit:'SY', max:3 }
+    { key:'vinyl',  label:'Sheet Vinyl',icon:'🟩', unit:'SF', max:3 }
   ];
 
   matCats.forEach(function(cat) {
@@ -2762,58 +3187,109 @@ function renderPropPricingBody(prop, hub) {
 
   // ── LABOR SECTION ─────────────────────────────────────
   html += '<div id="prop-sec-labor" style="display:' + (isLabor ? '' : 'none') + ';">';
-  html += '<div style="font-size:12px;color:var(--gray);margin-bottom:14px;">Rates inherit from <strong>' + capitalize(hub) + ' Hub</strong> defaults. Click <em>Override rates</em> on any service to set custom rates for this property.</div>';
+  html += '<div style="font-size:12px;color:var(--gray);margin-bottom:14px;">Check the labor items that apply to this property. Default rates inherit from <strong>' + capitalize(hub) + ' Hub</strong> — enter an override to set a custom rate for this property only.</div>';
 
   LABOR_SERVICES.forEach(function(svc) {
-    var defItems  = (defPricing.labor && defPricing.labor[svc.key]) || [];
-    var defShared = ((defPricing.labor && defPricing.labor.shared) || []).filter(function(s){ return (s.services||[]).indexOf(svc.key) >= 0; });
-    var allDef    = defItems.concat(defShared);
-    var ovItems   = ov.laborRates && ov.laborRates[svc.key];
-    var displayItems = ovItems || allDef;
+    var defItems = (defPricing.labor && defPricing.labor[svc.key]) || [];
+    if (defItems.length === 0) return;
+
+    if (!ov.laborSelections)             ov.laborSelections = {};
+    if (!ov.laborRates)                  ov.laborRates = {};
+    var selIds   = ov.laborSelections[svc.key] || [];
+    var rateOvs  = ov.laborRates[svc.key] || {};
 
     html += '<div class="price-menu-card" style="max-width:760px;margin-bottom:12px;">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<span style="font-size:16px;">' + svc.icon + '</span>' +
-          '<h4 style="margin:0;padding:0;border:none;font-size:15px;">' + svc.label + '</h4>' +
-          (ovItems ? '<span style="font-size:10px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 7px;border-radius:99px;">Custom rates</span>' : '<span style="font-size:10px;color:var(--gray);">Hub defaults</span>') +
-        '</div>' +
-        '<div>' +
-          (ovItems
-            ? '<button class="bs ol" style="padding:3px 8px;font-size:11px;" onclick="clearPropLaborOv(\'' + svc.key + '\')">↩ Use Hub defaults</button>'
-            : '<button class="bs ol" style="padding:3px 8px;font-size:11px;" onclick="activatePropLaborOv(\'' + svc.key + '\')">✏️ Override rates</button>') +
-        '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+        '<span style="font-size:16px;">' + svc.icon + '</span>' +
+        '<h4 style="margin:0;padding:0;border:none;font-size:15px;">' + svc.label + '</h4>' +
+        '<span style="font-size:10px;color:var(--gray);margin-left:4px;text-transform:uppercase;letter-spacing:.6px;">' +
+          (selIds.length > 0 ? '<span style="color:var(--navy);font-weight:700;">' + selIds.length + ' selected</span>' : '<span style="color:#b45309;">none selected</span>') +
+        '</span>' +
       '</div>';
 
-    if (displayItems.length === 0) {
-      html += '<div style="font-size:12px;color:var(--gray);font-style:italic;padding:4px 0;">No labor items defined. Add them in Default Pricing → Labor.</div>';
-    } else {
-      html += '<div style="display:grid;grid-template-columns:1fr 50px 90px 110px;gap:8px;padding:4px 8px;background:var(--cream);border-radius:3px;margin-bottom:4px;">' +
-        '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);">Item</div>' +
-        '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);text-align:center;">UOM</div>' +
-        '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);text-align:right;">Hub Rate</div>' +
-        '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#7a5c1a;text-align:right;">' + (ovItems ? 'Custom Rate' : '') + '</div>' +
-      '</div>';
+    html += '<div style="display:grid;grid-template-columns:20px 1fr 50px 90px 110px;gap:8px;padding:4px 8px;background:var(--cream);border-radius:3px;margin-bottom:4px;">' +
+      '<div></div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);">Item</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);text-align:center;">UOM</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);text-align:right;">Default</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#7a5c1a;text-align:right;">Override</div>' +
+    '</div>';
 
-      displayItems.forEach(function(item, i) {
-        var defItem = allDef.find(function(d){ return d.name === item.name; }) || item;
-        html += '<div style="display:grid;grid-template-columns:1fr 50px 90px 110px;gap:8px;padding:6px 8px;border-bottom:1px solid var(--lg);align-items:center;">' +
-          '<div style="font-size:12px;color:var(--text);">' + escHtml(item.name) + '</div>' +
-          '<div style="font-size:11px;color:var(--gray);text-align:center;">' + item.unit + '</div>' +
-          '<div style="font-size:12px;color:var(--gray);text-align:right;' + (ovItems ? 'text-decoration:line-through;opacity:.5;' : 'font-weight:600;color:var(--navy);') + '">' + fmtMoney(defItem.unitPrice) + '</div>' +
-          '<div style="position:relative;">' +
-            (ovItems ?
-              '<span style="position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--gray);pointer-events:none;">$</span>' +
-              '<input type="number" step="0.01" min="0" value="' + (item.unitPrice||0).toFixed(2) + '" style="width:100%;padding:4px 6px 4px 16px;border:1px solid var(--border);border-radius:3px;font-size:12px;text-align:right;" oninput="updatePropLaborRate(\'' + svc.key + '\',' + i + ',this.value)">'
-            : '') +
-          '</div>' +
-        '</div>';
-      });
-    }
-    html += '</div>';
+    defItems.forEach(function(item) {
+      var itemId  = item.id || item.name;
+      var isSel   = selIds.indexOf(itemId) >= 0;
+      var ovRate  = rateOvs[itemId];
+      var hasOv   = ovRate !== undefined && ovRate !== '' && ovRate !== null;
+      html += '<div style="display:grid;grid-template-columns:20px 1fr 50px 90px 110px;gap:8px;padding:6px 8px;border-bottom:1px solid var(--lg);align-items:center;background:' + (isSel ? 'rgba(2,10,91,.04)' : '') + ';">' +
+        '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' style="width:15px;height:15px;accent-color:var(--navy);cursor:pointer;" onchange="toggleLaborSelection(\'' + svc.key + '\',\'' + itemId + '\',this)">' +
+        '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(item.name) + '</div>' +
+        '<div style="font-size:11px;color:var(--gray);text-align:center;">' + item.unit + '</div>' +
+        '<div style="font-size:12px;color:var(--gray);text-align:right;' + (hasOv ? 'text-decoration:line-through;opacity:.5;' : '') + '">' + fmtMoney(item.unitPrice) + '</div>' +
+        '<div style="position:relative;">' +
+          (isSel ?
+            '<span style="position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--gray);pointer-events:none;">$</span>' +
+            '<input type="number" step="0.01" min="0" placeholder="' + item.unitPrice.toFixed(2) + '" value="' + (hasOv ? parseFloat(ovRate).toFixed(2) : '') + '" style="width:100%;padding:4px 6px 4px 16px;border:1px solid ' + (hasOv ? 'rgba(200,149,42,.5)' : 'var(--border)') + ';border-radius:3px;font-size:12px;background:' + (hasOv ? 'rgba(200,149,42,.07)' : '') + ';text-align:right;" oninput="setLaborRateOverride(\'' + svc.key + '\',\'' + itemId + '\',this.value,this)" onclick="event.stopPropagation()">'
+          : '<span style="font-size:11px;color:var(--lg);">—</span>') +
+        '</div>' +
+      '</div>';
+    });
+
+    html += '</div>'; // end service card
   });
 
   html += '</div>'; // end prop-sec-labor
+
+  // ── SHARED ITEMS SECTION ───────────────────────────────
+  html += '<div id="prop-sec-shared" style="display:' + (isShared ? '' : 'none') + ';">';
+  html += '<div style="font-size:12px;color:var(--gray);margin-bottom:14px;">Check the shared labor items that apply to this property. Default rates inherit from <strong>' + capitalize(hub) + ' Hub</strong> — enter an override to set a custom rate.</div>';
+
+  var defSharedAll = (defPricing.labor && defPricing.labor.shared) || [];
+  if (!ov.sharedSelections) ov.sharedSelections = [];
+  if (!ov.sharedRates)      ov.sharedRates = {};
+  var sharedSel   = ov.sharedSelections;
+  var sharedRates = ov.sharedRates;
+
+  if (defSharedAll.length === 0) {
+    html += '<div style="font-size:12px;color:var(--gray);font-style:italic;padding:8px 0;">No shared items defined. Add them in Pricing Menus → Labor → Shared Items.</div>';
+  } else {
+    html += '<div class="price-menu-card" style="max-width:760px;">';
+    html += '<div style="display:grid;grid-template-columns:20px 1fr 100px 50px 90px 110px;gap:8px;padding:4px 8px;background:var(--cream);border-radius:3px;margin-bottom:4px;">' +
+      '<div></div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);">Item</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);">Applies To</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);text-align:center;">UOM</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray);text-align:right;">Default</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#7a5c1a;text-align:right;">Override</div>' +
+    '</div>';
+
+    defSharedAll.forEach(function(item) {
+      var itemId = item.id || item.name;
+      var isSel  = sharedSel.indexOf(itemId) >= 0;
+      var ovRate = sharedRates[itemId];
+      var hasOv  = ovRate !== undefined && ovRate !== '' && ovRate !== null;
+      var svcsLabel = (item.services || []).map(function(k){
+        var s = LABOR_SERVICES.find(function(x){ return x.key===k; });
+        return s ? s.icon : k;
+      }).join(' ');
+
+      html += '<div style="display:grid;grid-template-columns:20px 1fr 100px 50px 90px 110px;gap:8px;padding:6px 8px;border-bottom:1px solid var(--lg);align-items:center;background:' + (isSel ? 'rgba(2,10,91,.04)' : '') + ';">' +
+        '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' style="width:15px;height:15px;accent-color:var(--navy);cursor:pointer;" onchange="toggleSharedSelection(\'' + itemId + '\',this)">' +
+        '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(item.name) + '</div>' +
+        '<div style="font-size:11px;color:var(--gray);">' + svcsLabel + '</div>' +
+        '<div style="font-size:11px;color:var(--gray);text-align:center;">' + (item.unit||'EA') + '</div>' +
+        '<div style="font-size:12px;color:var(--gray);text-align:right;' + (hasOv ? 'text-decoration:line-through;opacity:.5;' : '') + '">' + fmtMoney(item.unitPrice) + '</div>' +
+        '<div style="position:relative;">' +
+          (isSel ?
+            '<span style="position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--gray);pointer-events:none;">$</span>' +
+            '<input type="number" step="0.01" min="0" placeholder="' + item.unitPrice.toFixed(2) + '" value="' + (hasOv ? parseFloat(ovRate).toFixed(2) : '') + '" style="width:100%;padding:4px 6px 4px 16px;border:1px solid ' + (hasOv ? 'rgba(200,149,42,.5)' : 'var(--border)') + ';border-radius:3px;font-size:12px;background:' + (hasOv ? 'rgba(200,149,42,.07)' : '') + ';text-align:right;" oninput="setSharedRateOverride(\'' + itemId + '\',this.value,this)" onclick="event.stopPropagation()">'
+          : '<span style="font-size:11px;color:var(--lg);">—</span>') +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>'; // end shared card
+  }
+
+  html += '</div>'; // end prop-sec-shared
 
   html += '<div style="text-align:right;margin-top:12px;"><button class="bs gd" onclick="savePropPricingOverrides()">💾 Save Property Selections</button></div>';
   body.innerHTML = html;
@@ -2899,6 +3375,66 @@ function addPropPriceItem(cat, unit) {
   renderPropPricingBody(prop, hub);
 }
 
+function toggleLaborSelection(svcKey, itemId, cb) {
+  if (!_workingPropPricing) return;
+  if (!_workingPropPricing.laborSelections) _workingPropPricing.laborSelections = {};
+  var sel = _workingPropPricing.laborSelections[svcKey] || [];
+  var idx = sel.indexOf(itemId);
+  if (cb.checked) { if (idx < 0) sel.push(itemId); }
+  else {
+    if (idx >= 0) sel.splice(idx, 1);
+    // Clear any rate override for this item when deselected
+    if (_workingPropPricing.laborRates && _workingPropPricing.laborRates[svcKey])
+      delete _workingPropPricing.laborRates[svcKey][itemId];
+  }
+  _workingPropPricing.laborSelections[svcKey] = sel;
+  var hub = _workingPropPricing._hub || 'memphis';
+  var prop = loadProps().find(function(p){ return p.id===_workingPropPricing._propId; });
+  renderPropPricingBody(prop, hub);
+}
+
+function setLaborRateOverride(svcKey, itemId, val, inputEl) {
+  if (!_workingPropPricing) return;
+  if (!_workingPropPricing.laborRates) _workingPropPricing.laborRates = {};
+  if (!_workingPropPricing.laborRates[svcKey]) _workingPropPricing.laborRates[svcKey] = {};
+  var parsed = parseFloat(val);
+  if (!isNaN(parsed) && val.trim() !== '') {
+    _workingPropPricing.laborRates[svcKey][itemId] = parsed;
+    if (inputEl) { inputEl.style.border = 'rgba(200,149,42,.5)'; inputEl.style.background = 'rgba(200,149,42,.07)'; }
+  } else {
+    delete _workingPropPricing.laborRates[svcKey][itemId];
+    if (inputEl) { inputEl.style.border = ''; inputEl.style.background = ''; }
+  }
+}
+
+function toggleSharedSelection(itemId, cb) {
+  if (!_workingPropPricing) return;
+  if (!_workingPropPricing.sharedSelections) _workingPropPricing.sharedSelections = [];
+  var sel = _workingPropPricing.sharedSelections;
+  var idx = sel.indexOf(itemId);
+  if (cb.checked) { if (idx < 0) sel.push(itemId); }
+  else {
+    if (idx >= 0) sel.splice(idx, 1);
+    if (_workingPropPricing.sharedRates) delete _workingPropPricing.sharedRates[itemId];
+  }
+  var hub = _workingPropPricing._hub || 'memphis';
+  var prop = loadProps().find(function(p){ return p.id===_workingPropPricing._propId; });
+  renderPropPricingBody(prop, hub);
+}
+
+function setSharedRateOverride(itemId, val, inputEl) {
+  if (!_workingPropPricing) return;
+  if (!_workingPropPricing.sharedRates) _workingPropPricing.sharedRates = {};
+  var parsed = parseFloat(val);
+  if (!isNaN(parsed) && val.trim() !== '') {
+    _workingPropPricing.sharedRates[itemId] = parsed;
+    if (inputEl) { inputEl.style.border = 'rgba(200,149,42,.5)'; inputEl.style.background = 'rgba(200,149,42,.07)'; }
+  } else {
+    delete _workingPropPricing.sharedRates[itemId];
+    if (inputEl) { inputEl.style.border = ''; inputEl.style.background = ''; }
+  }
+}
+
 function activatePropLaborOv(svcKey) {
   if (!_workingPropPricing) return;
   var hub = _workingPropPricing._hub || 'memphis';
@@ -2931,11 +3467,14 @@ function savePropPricingOverrides() {
   if (!_workingPropPricing || !_workingPropPricing._propId) { toast('No property selected.','err'); return; }
   var propId = _workingPropPricing._propId;
   var toSave = {};
-  if (_workingPropPricing.materials)     toSave.materials     = _workingPropPricing.materials;
-  if (_workingPropPricing.materialRates) toSave.materialRates = _workingPropPricing.materialRates;
-  if (_workingPropPricing.laborRates)    toSave.laborRates    = _workingPropPricing.laborRates;
-  if (_workingPropPricing.addons)        toSave.addons        = _workingPropPricing.addons;
-  if (_workingPropPricing.waste)         toSave.waste         = _workingPropPricing.waste;
+  if (_workingPropPricing.materials)        toSave.materials        = _workingPropPricing.materials;
+  if (_workingPropPricing.materialRates)    toSave.materialRates    = _workingPropPricing.materialRates;
+  if (_workingPropPricing.laborSelections)  toSave.laborSelections  = _workingPropPricing.laborSelections;
+  if (_workingPropPricing.laborRates)       toSave.laborRates       = _workingPropPricing.laborRates;
+  if (_workingPropPricing.sharedSelections) toSave.sharedSelections = _workingPropPricing.sharedSelections;
+  if (_workingPropPricing.sharedRates)      toSave.sharedRates      = _workingPropPricing.sharedRates;
+  if (_workingPropPricing.addons)           toSave.addons           = _workingPropPricing.addons;
+  if (_workingPropPricing.waste)            toSave.waste            = _workingPropPricing.waste;
   savePropPricing(propId, toSave);
   var prop = loadProps().find(function(p){ return p.id===propId; });
   toast('\u2713 Property selections saved for '+(prop?prop.name:'this property')+'.','ok');
@@ -3086,7 +3625,10 @@ function renderScopePropTiles() {
 
 function filterScopePropTiles() { renderScopePropTiles(); }
 
-function selectScopeTile(propId) { loadScopePresetsPanel(propId); }
+function selectScopeTile(propId) {
+  curPropPricingId = propId; // keep Property Selections in sync
+  loadScopePresetsPanel(propId);
+}
 function loadScopePresetsPanel(propId) {
   _curScopePropId = propId;
   renderScopePropTiles();
@@ -3149,7 +3691,7 @@ function loadScopePresetsPanel(propId) {
             'data-pid="' + propId + '" data-fpid="' + fp.id + '" data-sid="' + sid + '_' + fp.id + '" ' +
             'oninput="setScopeDefaultQty(this.dataset.pid, this.dataset.fpid, this.dataset.sid, this.value)" ' +
             'title="Default quantity pre-filled in proposals">' +
-          '<div style="font-size:12px;color:var(--gray);font-weight:600;">' + (svcDef ? svcDef.unit : 'SF') + '</div>' +
+          '<div style="font-size:12px;color:var(--gray);font-weight:600;">' + (svcDef ? svcDef.unit : 'SY') + '</div>' +
         '</div>';
       });
 
@@ -3167,7 +3709,7 @@ function loadScopePresetsPanel(propId) {
             'data-pid="' + propId + '" data-fpid="' + fp.id + '" data-sid="' + customSid + '" ' +
             'oninput="setScopeDefaultQty(this.dataset.pid, this.dataset.fpid, this.dataset.sid, this.value)" ' +
             'title="Default quantity pre-filled in proposals">' +
-          '<div style="font-size:12px;color:var(--gray);font-weight:600;">' + (svcDef ? svcDef.unit : 'SF') + '</div>' +
+          '<div style="font-size:12px;color:var(--gray);font-weight:600;">' + (svcDef ? svcDef.unit : 'SY') + '</div>' +
         '</div>';
       });
     }
@@ -3294,7 +3836,7 @@ function importData(input) {
 var LABOR_SERVICES = [
   {key:'carpet',       label:'Carpet',         icon:'🟫', matCat:'carpet', unit:'SY'},
   {key:'lvp',          label:'Glue LVP',       icon:'🟨', matCat:'lvp',    unit:'SF'},
-  {key:'vinyl',        label:'Sheet Vinyl',    icon:'🟩', matCat:'vinyl',  unit:'SF'},
+  {key:'vinyl',        label:'Sheet Vinyl',    icon:'🟩', matCat:'vinyl',  unit:'SY'},
   {key:'floating_lvp', label:'Floating LVP',   icon:'🪵', matCat:'lvp',    unit:'SF'},
   {key:'tile',         label:'Tile',           icon:'⬜', matCat:null,     unit:'SF'}
 ];
@@ -3737,6 +4279,21 @@ function ppCheckSession() {
       return;
     }
   } catch(e) {}
+  // Try SSO from portal.html
+  try {
+    var sso = JSON.parse(localStorage.getItem('pf_sso') || 'null');
+    if (sso && sso.email && (Date.now() - sso.ts) < 8*60*60*1000) {
+      var team = getTeam ? getTeam() : [];
+      var tu = team.find(function(u){ return u.id === sso.id && u.email.toLowerCase() === sso.email.toLowerCase() && u.status === 'active'; });
+      if (tu) {
+        window.ppCurrentUser = {id:tu.id, name:tu.name, email:tu.email, role:tu.role, hub:tu.hub, initials:tu.initials, phone:tu.phone||tu.smsPhone||'', jobTitle:tu.jobTitle||''};
+        sessionStorage.setItem('pp_user', JSON.stringify(window.ppCurrentUser));
+        localStorage.setItem('pf_sso', JSON.stringify({id:tu.id, email:tu.email, ts:Date.now()}));
+        ppShowApp();
+        return;
+      }
+    }
+  } catch(e) {}
   // No session — show login
   document.getElementById('pp-login').style.display = 'flex';
 }
@@ -3767,12 +4324,16 @@ function ppShowApp() {
   if (typeof initBuilder === 'function') initBuilder();
   if (typeof renderDashboard === 'function') renderDashboard();
   if (typeof initCalc === 'function') initCalc();
+  // Ensure sticky save starts hidden (it's outside pp-app so always in DOM)
+  var _ss = document.getElementById('pricing-sticky-save');
+  if (_ss) _ss.style.display = 'none';
 }
 
 window.addEventListener('load', ppCheckSession);
 
 function ppLogout() {
   try { sessionStorage.removeItem('pp_user'); } catch(e) {}
+  try { localStorage.removeItem('pf_sso'); } catch(e) {}
   window.ppCurrentUser = null;
   document.getElementById('pp-login').style.display = 'flex';
   var wrapper = document.getElementById('pp-app');
@@ -3783,5 +4344,8 @@ function ppLogout() {
 
 </script>
 </div>
+
+<div id="pricing-sticky-save" style="display:none;"><button class="bs gd" onclick="savePricingMenus()" style="box-shadow:0 4px 24px rgba(2,10,91,.35);padding:13px 28px;font-size:13px;font-weight:700;">💾 Save Pricing</button></div>
+
 </body>
 </html>

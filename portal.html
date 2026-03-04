@@ -2222,6 +2222,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
         <div class="fg"><label>Last Name *</label><input type="text" id="tm_last" placeholder="Smith"></div>
       </div>
       <div class="fg"><label>Email Address *</label><input type="email" id="tm_email" placeholder="jane@protectiveflooring.com"></div>
+      <div class="fg"><label>Mobile Phone <span style="font-weight:400;color:var(--gray);font-size:11px;text-transform:none;letter-spacing:0;">(optional — appears on proposals)</span></label><input type="tel" id="tm_phone" placeholder="(555) 000-0000" oninput="fmtPhoneInput(this)" autocomplete="tel"></div>
       <div class="form-row">
         <div class="fg"><label>Password *</label><input type="password" id="tm_pw" placeholder="Min 8 characters"></div>
         <div class="fg"><label>Confirm Password *</label><input type="password" id="tm_pw2" placeholder="Repeat password"></div>
@@ -2241,6 +2242,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="">All Hubs</option>
           </select>
         </div>
+        <div class="fg" style="max-width:200px;"><label>Job Title <span style="font-weight:400;color:var(--gray);font-size:11px;text-transform:none;letter-spacing:0;">(optional)</span></label><input type="text" id="tm_title" placeholder="e.g. Account Executive"></div>
       </div>
       <div class="role-defaults-hint">&#8505;&#65039; Permissions below are pre-set based on the selected role. You can customize individual access for this user.</div>
       <!-- PERMISSIONS -->
@@ -2324,6 +2326,7 @@ th.sort-desc::after{content:' \2193';opacity:1;color:var(--gold);}
             <option value="inactive">Inactive / Suspended</option>
           </select>
         </div>
+        <div class="fg" style="max-width:200px;"><label>Job Title <span style="font-weight:400;color:var(--gray);font-size:11px;text-transform:none;letter-spacing:0;">(optional)</span></label><input type="text" id="te_title" placeholder="e.g. Account Executive"></div>
       </div>
       <div class="role-defaults-hint">&#8505;&#65039; Permissions are pre-set by role. Customize individual access as needed — changes here override the role defaults.</div>
       <!-- PERMISSIONS -->
@@ -3385,11 +3388,72 @@ function renderPropList() {
             +'<span class="nt-track"><span class="nt-thumb"></span></span>'
           +'</label>'
         +'</div>'
+        +'<div class="pr-section-title" style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">&#128196; Proposal History</div>'+
+        +'<div id="prop-proposals-'+prop.id+'" style="margin-bottom:8px;">'+renderPropProposals(prop.id, prop.name)+'</div>'+
       +'</div>';
     list.appendChild(card);
   });
   filterProps();
   applyImportBtnVisibility();
+}
+
+// ─────────────────────────────────────────────
+// PROPOSAL HISTORY (shared localStorage with proposals app)
+// ─────────────────────────────────────────────
+function loadProposals() {
+  try { var s=localStorage.getItem('pf_proposals'); return s?JSON.parse(s):[]; } catch(e){ return []; }
+}
+function saveProposals(arr) { try { localStorage.setItem('pf_proposals',JSON.stringify(arr)); } catch(e){} }
+
+function fmtProposalDate(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function renderPropProposals(propId, propName) {
+  var proposals = loadProposals().filter(function(p){ return p.propertyId===propId; });
+  if (!proposals.length) {
+    return '<div style="font-size:12px;color:var(--gray);padding:6px 0;">No proposals on file.</div>';
+  }
+  proposals.sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); });
+  var now = new Date();
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
+    '<thead><tr style="background:#f1f5f9;">' +
+    '<th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;">#</th>' +
+    '<th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;">Scope</th>' +
+    '<th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;">Rep</th>' +
+    '<th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;">Sent To</th>' +
+    '<th style="padding:6px 8px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;">Total</th>' +
+    '<th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;">Date</th>' +
+    '<th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;">Status</th>' +
+    '</tr></thead><tbody>';
+  proposals.forEach(function(p) {
+    var isSent = !!p.sentAt;
+    var isLocked = !!p.locked;
+    var followDue = p.followUpDue && !p.followUpDone && isSent && new Date() >= new Date(p.followUpDue);
+    var fmtTotal = p.totalAmount ? '$'+Number(p.totalAmount).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+    var statusCell = isSent
+      ? '<span style="padding:2px 7px;background:#dcfce7;color:#15803d;border-radius:3px;font-size:10px;font-weight:700;">Sent'+(isLocked?' 🔒':'')+'</span>'
+      : '<span style="padding:2px 7px;background:#fef9c3;color:#92400e;border-radius:3px;font-size:10px;font-weight:700;">Draft</span>';
+    var followCell = followDue
+      ? '<span style="display:block;margin-top:3px;font-size:10px;color:#ef4444;font-weight:700;">⏰ Follow-up due</span>'
+      : (p.followUpDone ? '<span style="display:block;margin-top:3px;font-size:10px;color:#15803d;">✓ Followed up</span>' : '');
+    var sentToCell = p.sentTo
+      ? '<span title="'+p.sentTo+'">'+p.sentTo.split(',')[0].trim()+(p.sentTo.indexOf(',')>0?' +more':'')+'</span>'
+      : '<span style="color:var(--gray);">—</span>';
+    html += '<tr style="border-bottom:1px solid #f1f5f9;'+(followDue?'background:#fff5f5;':'')+'">' +
+      '<td style="padding:7px 8px;"><strong>#'+p.number+'</strong></td>' +
+      '<td style="padding:7px 8px;max-width:180px;"><span title="'+p.scope+'">'+p.scope.split(',').slice(0,2).join(', ')+(p.scope.split(',').length>2?' …':'')+'</span></td>' +
+      '<td style="padding:7px 8px;">'+p.repName+'</td>' +
+      '<td style="padding:7px 8px;">'+sentToCell+'</td>' +
+      '<td style="padding:7px 8px;text-align:right;font-weight:700;">'+fmtTotal+'</td>' +
+      '<td style="padding:7px 8px;white-space:nowrap;">'+fmtProposalDate(p.sentAt||p.createdAt)+'</td>' +
+      '<td style="padding:7px 8px;">'+statusCell+followCell+'</td>' +
+      '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
 }
 
 // ── PROPERTY CRUD ──
@@ -5714,7 +5778,7 @@ function resolveOrderDate(o) {
     // Long-form: "February 20, 2025" or "Feb 20, 2025"
     var longMonth = {January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',
       July:'07',August:'08',September:'09',October:'10',November:'11',December:'12',
-      Jan:'01',Feb:'02',Mar:'03',Apr:'04',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+      Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
     var lm = d.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
     if (lm) {
       var mo = longMonth[lm[1]];
@@ -6343,11 +6407,14 @@ function renderClientDash(filterMode) {
   orders = loadOrders(); // refresh from localStorage
   var tbody = document.getElementById('cd_tbody');
   if (!tbody || !currentUser) return;
+
+  // Portal team users (any _portalRole set) see ALL orders
+  var isTeamUser = !!(window._portalRole);
   var userProps = currentUser.props || [];
   var allPNames = getActiveProps().map(function(pr){ return pr.name; });
-  var isAdminView = userProps.length >= allPNames.length - 1;
+  var isAdminView = isTeamUser || userProps.length >= allPNames.length - 1;
 
-  // Get all orders for this client
+  // Get all orders for this user
   var ids = Object.keys(orders).filter(function(id) {
     var o = orders[id];
     return isAdminView || userProps.indexOf(o.property) !== -1;
@@ -6865,6 +6932,9 @@ function doLogin() {
       // Store logged-in team user info for permission checks
       window.currentTeamUser = tu;
       window._portalRole = tu.role || 'admin';
+      try { localStorage.setItem('pf_sso', JSON.stringify({id:tu.id, email:tu.email, ts:Date.now()})); } catch(e) {}
+      // SSO: write shared token so proposals.html can auto-login
+      try { localStorage.setItem('pf_sso', JSON.stringify({id:tu.id, email:tu.email, ts:Date.now()})); } catch(e) {}
       // Update admin sidebar with real user info
       var avn = document.getElementById('aavatar'); if (avn) avn.textContent = tu.initials || (tu.name||'?')[0];
       var anm = document.getElementById('aname');   if (anm) anm.textContent = tu.name || tu.email;
@@ -7022,6 +7092,8 @@ function adminPlaceOrder(propName) {
 function doLogout() {
   currentUser = null;
   window.currentTeamUser = null;
+  try { localStorage.removeItem('pf_sso'); } catch(e) {}
+  try { localStorage.removeItem('pf_sso'); } catch(e) {}
   document.getElementById('lemail').value = 'manager'+'@'+'cherrycreek.com';
   document.getElementById('lpw').value = 'Cherry2025!';
   document.getElementById('lerr').style.display = 'none';
@@ -8834,7 +8906,7 @@ function renderTeamTable() {
 }
 
 function openAddTeamUser() {
-  ['tm_first','tm_last','tm_email','tm_pw','tm_pw2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  ['tm_first','tm_last','tm_email','tm_phone','tm_title','tm_pw','tm_pw2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('tm_role').value = 'admin';
   document.getElementById('tm_err').style.display = 'none';
   populateHubSelect('tm_hub', '', 'All Hubs');
@@ -8910,10 +8982,13 @@ function saveNewTeamUser() {
   var team = getTeam();
   for (var i=0;i<team.length;i++) { if(team[i].email===email){err.textContent='Email already exists.';err.style.display='block';return;} }
   var today=new Date(), months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var tmPhone = ((document.getElementById('tm_phone')||{}).value||'').replace(/\D/g,'');
+  var tmTitle = ((document.getElementById('tm_title')||{}).value||'').trim();
   team.push({
     id:'t'+Date.now(), email:email, password:pw,
     name:first+' '+last, initials:(first[0]+last[0]).toUpperCase(),
     role:role, hub:hub, status:'active', perms:readPermCheckboxes('tm'),
+    phone: tmPhone, jobTitle: tmTitle,
     created:months[today.getMonth()]+' '+today.getDate()+', '+today.getFullYear()
   });
   saveTeam(team);
@@ -8937,6 +9012,11 @@ function openEditTeamUser(uid) {
   document.getElementById('te_role').value=u.role||'admin';
   populateHubSelect('te_hub', u.hub||'', 'All Hubs');
   document.getElementById('te_status').value=u.status||'active';
+  document.getElementById('te_title').value=u.jobTitle||'';
+  // Populate mobile phone (stored as smsPhone or phone)
+  var existingPhone = u.phone || u.smsPhone || '';
+  var fmtExisting = existingPhone ? existingPhone.replace(/(\d{3})(\d{3})(\d{4})/,'($1) $2-$3') : '';
+  document.getElementById('te_sms_phone').value = fmtExisting;
   document.getElementById('te_err').style.display='none';
   // Load saved perms or fall back to role defaults
   if (u.perms) { setPermCheckboxes('te', u.perms); }
@@ -8972,20 +9052,23 @@ function saveEditTeamUser() {
       team[i].role=document.getElementById('te_role').value;
       team[i].hub=(document.getElementById('te_hub')||{value:''}).value;
       team[i].status=document.getElementById('te_status').value;
+      team[i].jobTitle=((document.getElementById('te_title')||{}).value||'').trim();
       team[i].perms=readPermCheckboxes('te');
       if(pw) team[i].password=pw;
+      // Save mobile phone (proposals use this)
+      var tePhone = ((document.getElementById('te_sms_phone')||{}).value||'').replace(/\D/g,'');
+      team[i].phone = tePhone;
+      // Save SMS opt-in fields
+      var teOpt = document.getElementById('te_sms_optin').checked;
+      var teStp = document.getElementById('te_sms_stopped').checked;
+      team[i].smsPhone   = tePhone;
+      team[i].smsOptIn   = teOpt && !teStp;
+      team[i].smsStopped = teStp;
+      if (teStp && !team[i].smsStoppedDate) team[i].smsStoppedDate = new Date().toLocaleDateString('en-US');
+      if (!teStp && tePhone && teOpt && !team[i].smsOptInDate) team[i].smsOptInDate = new Date().toLocaleDateString('en-US');
       break;
     }
   }
-  // Save SMS fields
-  var teRaw = (document.getElementById('te_sms_phone').value||'').replace(/\D/g,'');
-  var teOpt = document.getElementById('te_sms_optin').checked;
-  var teStp = document.getElementById('te_sms_stopped').checked;
-  u.smsPhone   = teRaw;
-  u.smsOptIn   = teOpt && !teStp;
-  u.smsStopped = teStp;
-  if (teStp && !u.smsStoppedDate) u.smsStoppedDate = new Date().toLocaleDateString('en-US');
-  if (!teStp && teRaw && teOpt && !u.smsOptInDate) u.smsOptInDate = new Date().toLocaleDateString('en-US');
   saveTeam(team);
   ADMIN_USERS=getTeam();
   closeM('mteamedit');
@@ -9472,6 +9555,40 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!localStorage.getItem('pf_orders')) { saveOrders(); }
   SVC_LIST = loadServices().map(function(s){ return s.name; });
   applyNotifSettings();
+
+  // SSO: auto-login if proposals.html wrote a valid token
+  try {
+    var sso = JSON.parse(localStorage.getItem('pf_sso') || 'null');
+    if (sso && sso.email && (Date.now() - sso.ts) < 8*60*60*1000) {
+      var team = getTeam();
+      var tu = null;
+      for (var i=0; i<team.length; i++) {
+        if (team[i].id === sso.id && team[i].email.toLowerCase() === sso.email.toLowerCase() && team[i].status === 'active') {
+          tu = team[i]; break;
+        }
+      }
+      if (tu) {
+        window.currentTeamUser = tu;
+        window._portalRole = tu.role || 'admin';
+        var avn = document.getElementById('aavatar'); if (avn) avn.textContent = tu.initials || (tu.name||'?')[0];
+        var anm = document.getElementById('aname');   if (anm) anm.textContent = tu.name || tu.email;
+        var arl = document.getElementById('arole');   if (arl) arl.textContent = ({superadmin:'Super Admin',admin:'Admin',management:'Management',sales:'Sales',editor:'Editor'})[tu.role] || 'Portal User';
+        go('ad');
+        applyRoleRestrictions(tu.role || 'admin');
+        var defaultHub = tu.hub || '';
+        if (defaultHub) {
+          populateHubSelect('adash_hub', defaultHub, 'All Hubs');
+          populateHubSelect('aord_hub', defaultHub, 'All Hubs');
+          window._loginDefaultHub = defaultHub.toLowerCase();
+        }
+        var dashNavEl = document.querySelector('#ad .ni[onclick*="adash"]');
+        anav('adash', dashNavEl);
+        renderAdashStats();
+        // Refresh token timestamp
+        localStorage.setItem('pf_sso', JSON.stringify({id:tu.id, email:tu.email, ts:Date.now()}));
+      }
+    }
+  } catch(e) {}
 });
 
 
@@ -10640,12 +10757,19 @@ function renderCal(prefix) {
     .map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
   // Build orders map for this month keyed by ISO date (YYYY-MM-DD)
   var byDate = {};
+  // Respect the dashboard hub filter (same as all other dashboard tabs)
+  var calHub = (document.getElementById('adash_hub')||{value:''}).value;
+  var monthPrefix = year+'-'+String(month+1).padStart(2,'0');
   Object.keys(orders||{}).forEach(function(id) {
     var o = orders[id];
     if (!o || o.status==='vd') return;
+    // Hub filter
+    if (calHub && (o.hub||'').toLowerCase() !== calHub.toLowerCase()) return;
     // Always normalise to ISO so the key matches the grid cell lookup
     var d = resolveOrderDate(o);
     if (!d) return;
+    // Only include dates that fall within the displayed month
+    if (d.slice(0,7) !== monthPrefix) return;
     if (prefix==='cl_cal' && currentUser) {
       var props = currentUser.props||[];
       if (props.length && props.indexOf(o.property)<0) return;
