@@ -229,9 +229,9 @@ tr:hover td{background:var(--navy-lt);}
 
 /* BUILDER STEPS */
 .step-bar{display:flex;gap:0;margin-bottom:28px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);}
-.step{flex:1;padding:14px;text-align:center;font-size:12px;font-weight:600;color:var(--gray);background:var(--white);border-right:1px solid var(--border);transition:all .2s;position:relative;}
+.step{flex:1;padding:14px;text-align:center;font-size:12px;font-weight:600;color:var(--gray);background:var(--white);border-right:1px solid var(--border);transition:all .2s;position:relative;cursor:pointer;user-select:none;}
 .step:last-child{border-right:none;}
-.step.done{background:#f0fdf4;color:#15803d;}
+.step.done{background:#f0fdf4;color:#15803d;cursor:pointer;}.step.done:hover{background:#dcfce7;}.step.active{cursor:default;}.step:not(.done):not(.active){cursor:not-allowed;opacity:.55;}.step:not(.done):not(.active):hover{opacity:.65;}
 .step.active{background:var(--navy);color:var(--white);}
 .step-num{display:block;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;line-height:1;}
 .step-lbl{font-size:10px;letter-spacing:.8px;text-transform:uppercase;margin-top:2px;}
@@ -560,10 +560,10 @@ tr:hover td{background:var(--navy-lt);}
       <div class="panel" id="p-builder">
         <div class="shd"><h2>New Proposal</h2></div>
         <div class="step-bar">
-          <div class="step active" id="step1"><span class="step-num">1</span><span class="step-lbl">Property</span></div>
-          <div class="step" id="step2"><span class="step-num">2</span><span class="step-lbl">Floor Plans</span></div>
-          <div class="step" id="step3"><span class="step-num">3</span><span class="step-lbl">Pricing</span></div>
-          <div class="step" id="step4"><span class="step-num">4</span><span class="step-lbl">Review & Send</span></div>
+          <div class="step active" id="step1" onclick="goToStep(1)"><span class="step-num">1</span><span class="step-lbl">Property</span></div>
+          <div class="step" id="step2" onclick="goToStep(2)"><span class="step-num">2</span><span class="step-lbl">Floor Plans</span></div>
+          <div class="step" id="step3" onclick="goToStep(3)"><span class="step-num">3</span><span class="step-lbl">Pricing</span></div>
+          <div class="step" id="step4" onclick="goToStep(4)"><span class="step-num">4</span><span class="step-lbl">Review &amp; Send</span></div>
         </div>
         <div id="builder-body"></div>
       </div>
@@ -998,20 +998,23 @@ function saveProposals(arr) { try { localStorage.setItem('pf_proposals',JSON.str
 var DEFAULT_PRICING = {
   memphis: {
     carpet:[
-      {id:'c1',name:'Best Offer - Chrome',unitPrice:6.79,unit:'SY'},
-      {id:'c2',name:'Premium Carpet',unitPrice:8.50,unit:'SY'},
-      {id:'c3',name:'Economy Carpet',unitPrice:5.25,unit:'SY'}
+      {id:'c1',style:'Best Offer',color:'Chrome',unitPrice:6.79,unit:'SY'},
+      {id:'c2',style:'Premium Carpet',color:'',unitPrice:8.50,unit:'SY'},
+      {id:'c3',style:'Economy Carpet',color:'',unitPrice:5.25,unit:'SY'}
     ],
     pad:[
-      {id:'p1',name:'3/8" Rebond 5 lb.',unitPrice:1.85,unit:'SY'},
-      {id:'p2',name:'1/2" Rebond 6 lb.',unitPrice:2.25,unit:'SY'}
+      {id:'p1',style:'3/8" Rebond 5 lb.',color:'',unitPrice:1.85,unit:'SY'},
+      {id:'p2',style:'1/2" Rebond 6 lb.',color:'',unitPrice:2.25,unit:'SY'}
+    ],
+    underlayment:[
+      {id:'u1',style:'Standard Underlayment',color:'',unitPrice:0.25,unit:'SF'}
     ],
     lvp:[
-      {id:'l1',name:'Gallatin - Woodland Taupe',unitPrice:2.89,unit:'SF'},
-      {id:'l2',name:'Premium LVP',unitPrice:3.50,unit:'SF'}
+      {id:'l1',style:'Gallatin',color:'Woodland Taupe',unitPrice:2.89,unit:'SF'},
+      {id:'l2',style:'Premium LVP',color:'',unitPrice:3.50,unit:'SF'}
     ],
     vinyl:[
-      {id:'v1',name:'Standard Sheet Vinyl',unitPrice:1.95,unit:'SY'}
+      {id:'v1',style:'Standard Sheet Vinyl',color:'',unitPrice:1.95,unit:'SY'}
     ],
     labor:{
       // ── CORE LABOR: items that belong to a specific service ──
@@ -1077,6 +1080,15 @@ DEFAULT_PRICING.nashville = JSON.parse(JSON.stringify(DEFAULT_PRICING.memphis));
 // Deep-merges a saved pricing object with DEFAULT_PRICING so that
 // any keys missing from a stale localStorage save are restored from defaults.
 // Saved values always win — this only fills in MISSING keys/sub-keys.
+// Returns display name for a material item — combines style + color if both present
+function matName(item) {
+  if (!item) return '';
+  if (item.style !== undefined) {
+    return item.color ? item.style + ' - ' + item.color : item.style;
+  }
+  return item.name || '';
+}
+
 function mergePricingWithDefaults(saved, hub) {
   var def = JSON.parse(JSON.stringify(DEFAULT_PRICING[hub] || DEFAULT_PRICING.memphis));
   var merged = JSON.parse(JSON.stringify(saved));
@@ -1089,7 +1101,7 @@ function mergePricingWithDefaults(saved, hub) {
     }
   });
 
-  // Labor: always ensure every service sub-key exists and has items.
+  // Labor: ensure every service sub-key exists and has items.
   // Stale saves from before labor was in the schema may have labor:{} or missing keys.
   var defLabor = def.labor || {};
   if (!merged.labor || typeof merged.labor !== 'object') {
@@ -1097,8 +1109,18 @@ function mergePricingWithDefaults(saved, hub) {
   } else {
     Object.keys(defLabor).forEach(function(svcKey) {
       var savedArr = merged.labor[svcKey];
-      if (!savedArr || !Array.isArray(savedArr) || savedArr.length === 0) {
-        merged.labor[svcKey] = JSON.parse(JSON.stringify(defLabor[svcKey]));
+      // For 'shared': always preserve what was saved — even if empty (user may have cleared all)
+      // Only backfill from defaults if the key is completely absent (undefined/null)
+      if (svcKey === 'shared') {
+        if (savedArr === undefined || savedArr === null) {
+          merged.labor.shared = JSON.parse(JSON.stringify(defLabor.shared || []));
+        }
+        // else: keep exactly what was saved (including empty array or custom items)
+      } else {
+        // For core service keys: backfill only if missing or empty array
+        if (!savedArr || !Array.isArray(savedArr) || savedArr.length === 0) {
+          merged.labor[svcKey] = JSON.parse(JSON.stringify(defLabor[svcKey]));
+        }
       }
     });
   }
@@ -1178,7 +1200,7 @@ function nav(panelId, el) {
   if (panelId==='history') renderHistory();
   var _ss=document.getElementById('pricing-sticky-save');
   if (_ss) _ss.style.display = (panelId==='pricing') ? '' : 'none';
-  if (panelId==='pricing') { renderHubButtons(); renderPricingMenus(); }
+  if (panelId==='pricing') { renderHubButtons(); renderPricingMenus(); updateStickySaveLabel(); }
   if (panelId==='users') renderUsers();
 }
 
@@ -1226,13 +1248,31 @@ function initBuilder() {
 function renderBuilderStep() {
   [1,2,3,4].forEach(function(i){
     var el = document.getElementById('step'+i);
-    el.className = 'step' + (i<builder.step?' done':i===builder.step?' active':'');
+    if (el) el.className = 'step' + (i<builder.step?' done':i===builder.step?' active':'');
   });
   var body = document.getElementById('builder-body');
   if (builder.step===1) body.innerHTML = renderStep1();
   else if (builder.step===2) body.innerHTML = renderStep2();
   else if (builder.step===3) body.innerHTML = renderStep3();
   else if (builder.step===4) body.innerHTML = renderStep4();
+}
+
+function goToStep(n) {
+  // Always allow going back to any earlier step (or re-clicking current)
+  if (n <= builder.step) {
+    builder.step = n;
+    renderBuilderStep();
+    document.getElementById('p-builder').scrollTop = 0;
+    return;
+  }
+  // Going forward: validate prerequisites
+  if (n >= 2 && !builder.prop) { toast('Select a property first.', 'err'); return; }
+  if (n >= 3 && builder.fps.length === 0) { toast('Select at least one floor plan first.', 'err'); return; }
+  // Only allow jumping ahead if we've already been to the intermediate steps
+  if (n > builder.step + 1) { toast('Complete the current step first.', 'err'); return; }
+  builder.step = n;
+  renderBuilderStep();
+  document.getElementById('p-builder').scrollTop = 0;
 }
 
 function renderStep1() {
@@ -1488,6 +1528,8 @@ function toggleFp(fpId, checkbox) {
   } else {
     builder.fps = builder.fps.filter(function(f){ return f.fpId!==fpId; });
   }
+  var body = document.getElementById('builder-body');
+  if (body) body.innerHTML = renderStep2();
 }
 
 function toggleFpScope(fpId, scopeId, checkbox) {
@@ -1601,10 +1643,11 @@ function buildDefaultLines(pricing, scopeId, fp) {
 
   // Property-selected materials (carpet, pad, lvp, vinyl)
   var propMats = propId ? getPropSelectedMaterials(propId, hub) : {
-    carpet: (pricing.carpet||[]).slice(0,1),
-    pad:    (pricing.pad||[]).slice(0,1),
-    lvp:    (pricing.lvp||[]).slice(0,1),
-    vinyl:  (pricing.vinyl||[]).slice(0,1)
+    carpet:       (pricing.carpet||[]).slice(0,1),
+    pad:          (pricing.pad||[]).slice(0,1),
+    underlayment: (pricing.underlayment||[]).slice(0,1),
+    lvp:          (pricing.lvp||[]).slice(0,1),
+    vinyl:        (pricing.vinyl||[]).slice(0,1)
   };
 
   // Core labor + applicable shared labor for this service type
@@ -1615,12 +1658,13 @@ function buildDefaultLines(pricing, scopeId, fp) {
 
   // ── Material lines ──
   if (scopeId === 'carpet') {
-    (propMats.carpet||[]).forEach(function(m){ lines.push({name:m.name, qty:sy, unit:'SY', unitPrice:m.unitPrice}); });
-    (propMats.pad||[]).forEach(function(m){    lines.push({name:m.name, qty:sy, unit:'SY', unitPrice:m.unitPrice}); });
+    (propMats.carpet||[]).forEach(function(m){ lines.push({name:matName(m), qty:sy, unit:'SY', unitPrice:m.unitPrice}); });
+    (propMats.pad||[]).forEach(function(m){    lines.push({name:matName(m), qty:sy, unit:'SY', unitPrice:m.unitPrice}); });
   } else if (scopeId === 'lvp' || scopeId === 'floating_lvp') {
-    (propMats.lvp||[]).forEach(function(m){ lines.push({name:m.name, qty:sf, unit:'SF', unitPrice:m.unitPrice}); });
+    (propMats.lvp||[]).forEach(function(m){ lines.push({name:matName(m), qty:sf, unit:'SF', unitPrice:m.unitPrice}); });
+    (propMats.underlayment||[]).forEach(function(m){ lines.push({name:matName(m), qty:sf, unit:'SF', unitPrice:m.unitPrice}); });
   } else if (scopeId === 'vinyl') {
-    (propMats.vinyl||[]).forEach(function(m){ lines.push({name:m.name, qty:Math.ceil(sf/9*10)/10, unit:'SY', unitPrice:m.unitPrice}); });
+    (propMats.vinyl||[]).forEach(function(m){ lines.push({name:matName(m), qty:Math.ceil(sf/9*10)/10, unit:'SY', unitPrice:m.unitPrice}); });
   }
 
   // ── Core labor lines (all items specific to this service) ──
@@ -2636,7 +2680,7 @@ function getEffectivePricing(propId, hub) {
   var ov  = loadPropPricing(propId);
   var merged = JSON.parse(JSON.stringify(def));
   // Material and other category overrides
-  ['carpet','pad','lvp','vinyl','addons','waste'].forEach(function(k){
+  ['carpet','pad','underlayment','lvp','vinyl','addons','waste'].forEach(function(k){
     if (ov[k] !== undefined) merged[k] = ov[k];
   });
   // Labor rate overrides: stored as laborRates[svcKey] = [{name,unit,unitPrice}...]
@@ -2662,6 +2706,7 @@ var curPropPricingId = '';
 
 // Per-hub working copies — switching locations never loses unsaved edits
 var _workingPricingMap  = {};  // {hub: pricingObject} — one entry per location
+var _skipNextFlush      = false; // set true after save to prevent stale DOM flush
 var _workingPricing     = null; // alias — always _workingPricingMap[curPricingHub]
 var _workingPropPricing = null; // for property overrides
 
@@ -2679,6 +2724,7 @@ function switchPriceLevel(level, el) {
   if (scpSec)  scpSec.style.display  = level==='scopes'    ? '' : 'none';
   var stickySave = document.getElementById('pricing-sticky-save');
   if (stickySave) stickySave.style.display = '';
+  updateStickySaveLabel();
   if (level==='materials') {
     curPricingGroup = 'materials';
     renderHubButtons();
@@ -2878,6 +2924,21 @@ function switchLaborTab(svcKey, el) {
   renderPricingMenus();
 }
 
+function flushPricingInputs() {
+  // Flush any currently-focused or recently-edited inputs into _workingPricing
+  // This captures values typed without triggering oninput (e.g. clicking same tab)
+  ['pricing-tab-body','pricing-tab-body-labor'].forEach(function(bodyId) {
+    var bodyEl = document.getElementById(bodyId);
+    if (!bodyEl) return;
+    bodyEl.querySelectorAll('input.price-item-input').forEach(function(inp) {
+      inp.dispatchEvent(new Event('input', {bubbles:true}));
+    });
+    bodyEl.querySelectorAll('select').forEach(function(sel) {
+      sel.dispatchEvent(new Event('change', {bubbles:true}));
+    });
+  });
+}
+
 function renderPricingMenus() {
   var hub = curPricingHub;
   var bodyId = (curPricingGroup === 'labor') ? 'pricing-tab-body-labor' : 'pricing-tab-body';
@@ -2886,6 +2947,10 @@ function renderPricingMenus() {
     if (bodyEl) bodyEl.innerHTML = '<div style="padding:32px;text-align:center;color:var(--gray);">Select a location above.</div>';
     return;
   }
+  // Flush any in-progress edits before re-rendering
+  // Skip flush if working copy was just replaced (e.g. right after save)
+  if (_workingPricing && !_skipNextFlush) flushPricingInputs();
+  _skipNextFlush = false;
   // Per-hub working copy — load from saved only on first visit; preserve edits across hub switches
   if (!_workingPricingMap[hub]) {
     _workingPricingMap[hub] = loadPricing(hub);
@@ -2902,6 +2967,7 @@ function renderPricingMenus() {
       html += renderPriceList('Pad / Cushion',   pricing.pad||[],    'pad',    'SY', false);
     } else if (tab==='lvp') {
       html += renderPriceList('LVP / Vinyl Plank Products', pricing.lvp||[], 'lvp', 'SF', false);
+      html += renderPriceList('Underlayment', pricing.underlayment||[], 'underlayment', 'SF', false);
     } else if (tab==='vinyl') {
       html += renderPriceList('Sheet Vinyl Products', pricing.vinyl||[], 'vinyl', 'SY', false);
     } else if (tab==='tile_mat') {
@@ -3099,7 +3165,7 @@ function renderPropPricingBody(prop, hub) {
 
   // Count selections/overrides for badge display
   var matCount = 0;
-  ['carpet','pad','lvp','vinyl'].forEach(function(k){
+  ['carpet','pad','underlayment','lvp','vinyl'].forEach(function(k){
     if (ov.materials && ov.materials[k]) matCount += ov.materials[k].length;
   });
   var laborOvCount = ov.laborRates ? Object.keys(ov.laborRates).length : 0;
@@ -3133,7 +3199,8 @@ function renderPropPricingBody(prop, hub) {
   var matCats = [
     { key:'carpet', label:'Carpet',     icon:'🟫', unit:'SY', max:3 },
     { key:'pad',    label:'Pad',        icon:'⬜', unit:'SY', max:2 },
-    { key:'lvp',    label:'Vinyl Plank',icon:'🟨', unit:'SF', max:3 },
+    { key:'lvp',    label:'Vinyl Plank',       icon:'🟨', unit:'SF', max:3 },
+    { key:'underlayment', label:'Underlayment', icon:'🔲', unit:'SF', max:2 },
     { key:'vinyl',  label:'Sheet Vinyl',icon:'🟩', unit:'SF', max:3 }
   ];
 
@@ -3169,7 +3236,7 @@ function renderPropPricingBody(prop, hub) {
 
         html += '<div style="display:grid;grid-template-columns:20px 1fr 90px 110px;gap:8px;padding:6px 8px;border-bottom:1px solid var(--lg);align-items:center;background:' + (isSel ? 'rgba(2,10,91,.04)' : '') + ';">' +
           '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' style="width:15px;height:15px;accent-color:var(--navy);cursor:pointer;" onchange="toggleMatSelection(\'' + cat.key + '\',\'' + itemId + '\',' + cat.max + ',this)">' +
-          '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(item.name) + '</div>' +
+          '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(matName(item)) + '</div>' +
           '<div style="font-size:12px;color:var(--gray);text-align:right;' + (hasOv ? 'text-decoration:line-through;opacity:.5;' : '') + '">' + fmtMoney(item.unitPrice) + '</div>' +
           '<div style="position:relative;">' +
             (isSel ?
@@ -3222,7 +3289,7 @@ function renderPropPricingBody(prop, hub) {
       var hasOv   = ovRate !== undefined && ovRate !== '' && ovRate !== null;
       html += '<div style="display:grid;grid-template-columns:20px 1fr 50px 90px 110px;gap:8px;padding:6px 8px;border-bottom:1px solid var(--lg);align-items:center;background:' + (isSel ? 'rgba(2,10,91,.04)' : '') + ';">' +
         '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' style="width:15px;height:15px;accent-color:var(--navy);cursor:pointer;" onchange="toggleLaborSelection(\'' + svc.key + '\',\'' + itemId + '\',this)">' +
-        '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(item.name) + '</div>' +
+        '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(matName(item)) + '</div>' +
         '<div style="font-size:11px;color:var(--gray);text-align:center;">' + item.unit + '</div>' +
         '<div style="font-size:12px;color:var(--gray);text-align:right;' + (hasOv ? 'text-decoration:line-through;opacity:.5;' : '') + '">' + fmtMoney(item.unitPrice) + '</div>' +
         '<div style="position:relative;">' +
@@ -3274,7 +3341,7 @@ function renderPropPricingBody(prop, hub) {
 
       html += '<div style="display:grid;grid-template-columns:20px 1fr 100px 50px 90px 110px;gap:8px;padding:6px 8px;border-bottom:1px solid var(--lg);align-items:center;background:' + (isSel ? 'rgba(2,10,91,.04)' : '') + ';">' +
         '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' style="width:15px;height:15px;accent-color:var(--navy);cursor:pointer;" onchange="toggleSharedSelection(\'' + itemId + '\',this)">' +
-        '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(item.name) + '</div>' +
+        '<div style="font-size:13px;font-weight:' + (isSel ? '600' : '400') + ';color:' + (isSel ? 'var(--navy)' : 'var(--text)') + ';">' + escHtml(matName(item)) + '</div>' +
         '<div style="font-size:11px;color:var(--gray);">' + svcsLabel + '</div>' +
         '<div style="font-size:11px;color:var(--gray);text-align:center;">' + (item.unit||'EA') + '</div>' +
         '<div style="font-size:12px;color:var(--gray);text-align:right;' + (hasOv ? 'text-decoration:line-through;opacity:.5;' : '') + '">' + fmtMoney(item.unitPrice) + '</div>' +
@@ -3291,7 +3358,7 @@ function renderPropPricingBody(prop, hub) {
 
   html += '</div>'; // end prop-sec-shared
 
-  html += '<div style="text-align:right;margin-top:12px;"><button class="bs gd" onclick="savePropPricingOverrides()">💾 Save Property Selections</button></div>';
+
   body.innerHTML = html;
 }
 
@@ -3490,7 +3557,7 @@ function getPropSelectedMaterials(propId, hub) {
   var matRates = ov.materialRates || {};
   var hasMaterialsConfig = !!(ov.materials); // false = never configured
   var result = {};
-  ['carpet','pad','lvp','vinyl'].forEach(function(cat){
+  ['carpet','pad','underlayment','lvp','vinyl'].forEach(function(cat){
     var allItems = defPricing[cat] || [];
     var selectedIds = ov.materials && ov.materials[cat];
     var items;
@@ -3932,13 +3999,24 @@ function addCoreLaborItem(svcKey) {
 
 // ── Shared labor mutations ──
 function updateSharedLaborItem(idx, field, val) {
+  // Always sync _workingPricing from map in case it was replaced after a save
+  if (curPricingHub && _workingPricingMap[curPricingHub]) {
+    _workingPricing = _workingPricingMap[curPricingHub];
+  }
   if (!_workingPricing || !_workingPricing.labor || !_workingPricing.labor.shared) return;
   var item = _workingPricing.labor.shared[idx];
   if (!item) return;
-  if (field==='unitPrice') item[field] = parseFloat(val)||0;
-  else item[field] = val;
+  if (field === 'unitPrice') {
+    var n = parseFloat(val);
+    item.unitPrice = isNaN(n) ? 0 : n;
+  } else {
+    item[field] = val;
+  }
 }
 function toggleSharedLaborService(idx, svcKey, checked) {
+  if (curPricingHub && _workingPricingMap[curPricingHub]) {
+    _workingPricing = _workingPricingMap[curPricingHub];
+  }
   if (!_workingPricing || !_workingPricing.labor || !_workingPricing.labor.shared) return;
   var item = _workingPricing.labor.shared[idx];
   if (!item) return;
@@ -3948,13 +4026,25 @@ function toggleSharedLaborService(idx, svcKey, checked) {
   if (!checked && pos >= 0) item.services.splice(pos, 1);
 }
 function removeSharedLaborItem(idx) {
-  if (!_workingPricing || !_workingPricing.labor || !_workingPricing.labor.shared) return;
+  if (!_workingPricing) {
+    if (!curPricingHub || !_workingPricingMap[curPricingHub]) return;
+    _workingPricing = _workingPricingMap[curPricingHub];
+  }
+  if (!_workingPricing.labor || !_workingPricing.labor.shared) return;
   _workingPricing.labor.shared.splice(idx, 1);
   renderPricingMenus();
 }
 function addSharedLaborItem() {
-  if (!_workingPricing) return;
-  if (!_workingPricing.labor) _workingPricing.labor = {};
+  // Ensure working pricing is initialised (may be null if hub auto-select hasn't fired)
+  if (!_workingPricing) {
+    if (!curPricingHub) { toast('Select a location first.','err'); return; }
+    if (!_workingPricingMap[curPricingHub]) {
+      _workingPricingMap[curPricingHub] = loadPricing(curPricingHub);
+      _workingPricingMap[curPricingHub]._hub = curPricingHub;
+    }
+    _workingPricing = _workingPricingMap[curPricingHub];
+  }
+  if (!_workingPricing.labor)        _workingPricing.labor = {};
   if (!_workingPricing.labor.shared) _workingPricing.labor.shared = [];
   _workingPricing.labor.shared.push({id:'ls-'+Date.now(), name:'New Shared Item', unitPrice:0, unit:'LF', services:[]});
   renderPricingMenus();
@@ -3972,6 +4062,8 @@ function renderPriceListRows(items, category, defaultUnit, isProp) {
   var updateFn = isProp ? 'updatePropPriceItem' : 'updateDefaultPriceItem';
   var removeFn = isProp ? 'removePropPriceItem' : 'removePricingItem';
   var moveFn   = isProp ? null : 'movePricingItem';
+  // Material categories that use style+color split (not pad, addons, or labor)
+  var isMaterial = ['carpet','lvp','underlayment','vinyl','tile_mat'].indexOf(category) >= 0;
   return items.map(function(item, i){
     var drag = moveFn
       ? 'draggable="true" ' +
@@ -3982,9 +4074,15 @@ function renderPriceListRows(items, category, defaultUnit, isProp) {
         'ondrop="event.preventDefault();this.classList.remove(\'drag-over\');var d=event.dataTransfer.getData(\'text\').split(\',\');movePricingItem(d[0],parseInt(d[1]),'+i+')"'
       : '';
     var handle = moveFn ? '<span class="pi-drag-handle" title="Drag to reorder">⠿</span>' : '';
+    var styleVal = item.style !== undefined ? item.style : (item.name||'');
+    var colorVal = item.color !== undefined ? item.color : '';
+    var nameFields = isMaterial
+      ? '<input class="price-item-input" style="flex:1;text-align:left;" type="text" value="'+escHtml(styleVal)+'" placeholder="Style name" oninput="'+updateFn+'(\''+category+'\','+i+',\'style\',this.value)">'+
+        '<input class="price-item-input" style="flex:1;text-align:left;" type="text" value="'+escHtml(colorVal)+'" placeholder="Color" oninput="'+updateFn+'(\''+category+'\','+i+',\'color\',this.value)">'
+      : '<input class="price-item-input" style="flex:1;text-align:left;" type="text" value="'+escHtml(item.name||styleVal)+'" placeholder="Product name" oninput="'+updateFn+'(\''+category+'\','+i+',\'name\',this.value)">';
     return '<div class="price-item-row" '+drag+'>'+
       handle+
-      '<input class="price-item-input" style="flex:1;text-align:left;" type="text" value="'+escHtml(item.name)+'" placeholder="Product name" oninput="'+updateFn+'(\''+category+'\','+i+',\'name\',this.value)">'+
+      nameFields+
       '<select style="border:1px solid var(--border);padding:5px 8px;border-radius:3px;font-size:12px;" onchange="'+updateFn+'(\''+category+'\','+i+',\'unit\',this.value)">'+
         ['SY','SF','LF','EA'].map(function(u){ return '<option value="'+u+'"'+(u===item.unit?' selected':'')+'>'+u+'</option>'; }).join('')+
       '</select>'+
@@ -4018,8 +4116,54 @@ function movePricingItem(cat, fromIdx, toIdx) {
 }
 
 function moveSharedLaborItem(fromIdx, toIdx) {
-  if (!_workingPricing || !_workingPricing.labor || !_workingPricing.labor.shared) return;
   if (fromIdx === toIdx) return;
+  var hub = curPricingHub;
+  if (!hub) return;
+
+  // Before reordering, flush current DOM values into the in-memory array
+  // so that edits aren't lost when we re-render after the move
+  var laborBody = document.getElementById('pricing-tab-body-labor');
+  if (laborBody) {
+    var rows = laborBody.querySelectorAll('.shared-item-row');
+    var existingShared = (_workingPricingMap[hub] && _workingPricingMap[hub].labor && _workingPricingMap[hub].labor.shared) || [];
+    var flushed = [];
+    rows.forEach(function(row, i) {
+      var existing = existingShared[i] || {};
+      var nameVal = existing.name || '';
+      row.querySelectorAll('input[type="text"]').forEach(function(inp) { nameVal = inp.value; });
+      var priceVal = existing.unitPrice !== undefined ? existing.unitPrice : 0;
+      row.querySelectorAll('input[type="number"]').forEach(function(inp) {
+        var n = parseFloat(inp.value);
+        if (!isNaN(n)) priceVal = n;
+      });
+      var unitVal = existing.unit || 'LF';
+      var sel = row.querySelector('select');
+      if (sel) unitVal = sel.value;
+      var services = [];
+      row.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+        var oc = cb.getAttribute('onchange') || '';
+        var m = oc.match(/toggleSharedLaborService\(\d+,'([^']+)'/);
+        if (m && cb.checked) services.push(m[1]);
+      });
+      flushed.push({ id: existing.id || ('ls-' + Date.now() + '-' + i), name: nameVal, unitPrice: priceVal, unit: unitVal, services: services });
+    });
+
+    // Reorder the flushed array
+    var moved = flushed.splice(fromIdx, 1)[0];
+    flushed.splice(toIdx, 0, moved);
+
+    // Write back to map and re-render
+    if (!_workingPricingMap[hub]) { _workingPricingMap[hub] = loadPricing(hub); _workingPricingMap[hub]._hub = hub; }
+    if (!_workingPricingMap[hub].labor) _workingPricingMap[hub].labor = {};
+    _workingPricingMap[hub].labor.shared = flushed;
+    _workingPricing = _workingPricingMap[hub];
+    renderPricingMenus();
+    return;
+  }
+
+  // Fallback: reorder in-memory if DOM not available
+  if (curPricingHub && _workingPricingMap[curPricingHub]) _workingPricing = _workingPricingMap[curPricingHub];
+  if (!_workingPricing || !_workingPricing.labor || !_workingPricing.labor.shared) return;
   var arr = _workingPricing.labor.shared;
   var item = arr.splice(fromIdx, 1)[0];
   arr.splice(toIdx, 0, item);
@@ -4042,8 +4186,15 @@ function updateDefaultPriceItem(cat, idx, field, val) {
   if (!arr) return;
   var item = arr[idx];
   if (!item) return;
-  if (field==='unitPrice' || field==='minPrice') item[field] = parseFloat(val)||0;
-  else item[field] = val;
+  if (field==='unitPrice' || field==='minPrice') {
+    item[field] = parseFloat(val)||0;
+  } else if (field==='style' || field==='color') {
+    item[field] = val;
+    // Keep legacy name in sync for backward compat
+    item.name = item.color ? item.style + ' - ' + item.color : item.style;
+  } else {
+    item[field] = val;
+  }
 }
 
 function removePricingItem(cat, idx) {
@@ -4062,39 +4213,184 @@ function addPricingItem(cat, unit) {
   _workingPricing = _workingPricingMap[curPricingHub];
   var arr = _resolveCat(cat);
   if (!arr) { _workingPricing[cat] = []; arr = _workingPricing[cat]; }
-  arr.push({id:'custom-'+Date.now(), name:'New Item', unitPrice:0.00, unit:unit});
+  var isMat = ['carpet','lvp','vinyl','tile_mat'].indexOf(cat) >= 0;
+  if (isMat) {
+    arr.push({id:'custom-'+Date.now(), style:'', color:'', name:'', unitPrice:0.00, unit:unit});
+  } else {
+    arr.push({id:'custom-'+Date.now(), name:'New Item', unitPrice:0.00, unit:unit});
+  }
   renderPricingMenus();
+}
+
+function pricingStickySave() {
+  if (curPriceLevel === 'property') {
+    savePropPricingOverrides();
+  } else if (curPricingGroup === 'labor' && curLaborTab === 'shared') {
+    saveSharedItems();
+  } else {
+    savePricingMenus();
+  }
+}
+
+function updateStickySaveLabel() {
+  var btn = document.getElementById('pricing-sticky-btn');
+  if (!btn) return;
+  if (curPriceLevel === 'property') {
+    btn.textContent = '💾 Save Property Selections';
+  } else if (curPriceLevel === 'scopes') {
+    btn.textContent = '💾 Save Scope Presets';
+  } else {
+    btn.textContent = '💾 Save Pricing';
+  }
+}
+
+function saveSharedItems() {
+  var hub = curPricingHub;
+  if (!hub) { toast('Select a location first.', 'err'); return; }
+
+  // Read every row directly from DOM — no event dispatch, no reference issues
+  var laborBody = document.getElementById('pricing-tab-body-labor');
+  if (!laborBody) { toast('Cannot find shared items panel.', 'err'); return; }
+
+  var rows = laborBody.querySelectorAll('.shared-item-row');
+  var freshShared = [];
+
+  // Get existing items for ID preservation
+  var existingShared = [];
+  try {
+    var saved = localStorage.getItem('pf_pricing_' + hub);
+    if (saved) {
+      var parsed = JSON.parse(saved);
+      existingShared = (parsed.labor && parsed.labor.shared) || [];
+    }
+  } catch(e) {}
+
+  rows.forEach(function(row, i) {
+    var existing = existingShared[i] || {};
+
+    // Name
+    var nameVal = existing.name || '';
+    row.querySelectorAll('input[type="text"]').forEach(function(inp) {
+      nameVal = inp.value;
+    });
+
+    // Unit price
+    var priceVal = existing.unitPrice !== undefined ? existing.unitPrice : 0;
+    row.querySelectorAll('input[type="number"]').forEach(function(inp) {
+      var n = parseFloat(inp.value);
+      if (!isNaN(n)) priceVal = n;
+    });
+
+    // Unit (select)
+    var unitVal = existing.unit || 'LF';
+    var sel = row.querySelector('select');
+    if (sel) unitVal = sel.value;
+
+    // Services (checkboxes — read key from onchange attribute)
+    var services = [];
+    row.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+      var oc = cb.getAttribute('onchange') || '';
+      var m = oc.match(/toggleSharedLaborService\(\d+,'([^']+)'/);
+      if (m && cb.checked) services.push(m[1]);
+    });
+
+    freshShared.push({
+      id:        existing.id || ('ls-' + Date.now() + '-' + i),
+      name:      nameVal,
+      unitPrice: priceVal,
+      unit:      unitVal,
+      services:  services
+    });
+  });
+
+  // Load current saved pricing, patch ONLY labor.shared, re-save
+  var currentPricing = {};
+  try {
+    var s = localStorage.getItem('pf_pricing_' + hub);
+    currentPricing = s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_PRICING[hub] || DEFAULT_PRICING.memphis));
+  } catch(e) {
+    currentPricing = JSON.parse(JSON.stringify(DEFAULT_PRICING[hub] || DEFAULT_PRICING.memphis));
+  }
+  if (!currentPricing.labor) currentPricing.labor = {};
+  currentPricing.labor.shared = freshShared;
+
+  // Strip _ov_ and _hub keys before writing
+  Object.keys(currentPricing.labor).forEach(function(k) {
+    if (k.indexOf('_ov_') === 0) delete currentPricing.labor[k];
+  });
+  delete currentPricing._hub;
+
+  localStorage.setItem('pf_pricing_' + hub, JSON.stringify(currentPricing));
+
+  // Update in-memory working copy to match
+  if (!_workingPricingMap[hub]) {
+    _workingPricingMap[hub] = JSON.parse(JSON.stringify(currentPricing));
+    _workingPricingMap[hub]._hub = hub;
+  } else {
+    if (!_workingPricingMap[hub].labor) _workingPricingMap[hub].labor = {};
+    _workingPricingMap[hub].labor.shared = JSON.parse(JSON.stringify(freshShared));
+  }
+  _workingPricing = _workingPricingMap[hub];
+
+  renderHubButtons();
+  toast('\u2713 Shared items saved for ' + capitalize(hub) + ' Hub.', 'ok');
 }
 
 function savePricingMenus() {
   var hub = curPricingHub;
   if (!hub) { toast('Select a location first.','err'); return; }
-  if (!_workingPricingMap[hub]) { toast('Nothing to save.','err'); return; }
+  // Ensure working copy exists
+  if (!_workingPricingMap[hub]) {
+    _workingPricingMap[hub] = loadPricing(hub);
+    _workingPricingMap[hub]._hub = hub;
+  }
+  // Always re-sync _workingPricing to map entry before flushing
   _workingPricing = _workingPricingMap[hub];
   var wp = _workingPricing;
-  // Flush all visible number/text inputs into working copy before saving
-  // This catches any values typed without triggering oninput
+
+  // Flush all visible inputs into working copy via event dispatch
   var bodyId = (curPricingGroup === 'labor') ? 'pricing-tab-body-labor' : 'pricing-tab-body';
   var bodyEl = document.getElementById(bodyId);
   if (bodyEl) {
-    bodyEl.querySelectorAll('input[type="number"].price-item-input, input[type="text"].price-item-input').forEach(function(inp) {
-      // Dispatch an input event so the existing handlers capture the value
-      var ev = new Event('input', {bubbles: true});
-      inp.dispatchEvent(ev);
+    bodyEl.querySelectorAll('input.price-item-input').forEach(function(inp) {
+      inp.dispatchEvent(new Event('input', {bubbles:true}));
+    });
+    bodyEl.querySelectorAll('select').forEach(function(sel) {
+      sel.dispatchEvent(new Event('change', {bubbles:true}));
     });
   }
+
   // Grab waste factors from DOM if on the waste tab
   var wcEl = document.getElementById('wf-carpet');
   var wlEl = document.getElementById('wf-lvp');
   var wvEl = document.getElementById('wf-vinyl');
   if (wcEl) wp.waste = {carpet:parseFloat(wcEl.value)||12, lvp:parseFloat(wlEl.value)||10, vinyl:parseFloat(wvEl.value)||10};
+
   var toSave = JSON.parse(JSON.stringify(wp));
   delete toSave._hub;
+  // Strip property-override keys (_ov_*) from labor before saving to localStorage
+  if (toSave.labor) {
+    Object.keys(toSave.labor).forEach(function(k) {
+      if (k.indexOf('_ov_') === 0) delete toSave.labor[k];
+    });
+  }
   savePricing(hub, toSave);
-  // Keep working copy live and fully merged
-  _workingPricingMap[hub] = mergePricingWithDefaults(toSave, hub); // toSave already clean
-  _workingPricingMap[hub]._hub = hub;
-  _workingPricing = _workingPricingMap[hub];
+  // Replace map entry with clean saved copy — do NOT run through mergePricingWithDefaults
+  // which creates a new object and breaks the _workingPricing reference chain.
+  // Manually backfill any missing labor keys without touching shared.
+  var freshCopy = JSON.parse(JSON.stringify(toSave));
+  var defLabor = (DEFAULT_PRICING[hub] || DEFAULT_PRICING.memphis).labor || {};
+  if (!freshCopy.labor) freshCopy.labor = {};
+  Object.keys(defLabor).forEach(function(k) {
+    if (k === 'shared') return; // never overwrite shared with defaults
+    if (!freshCopy.labor[k] || freshCopy.labor[k].length === 0) {
+      freshCopy.labor[k] = JSON.parse(JSON.stringify(defLabor[k]));
+    }
+  });
+  freshCopy._hub = hub;
+  _workingPricingMap[hub] = freshCopy;
+  _workingPricing = freshCopy;
+  _skipNextFlush = true;
   renderHubButtons();
   renderPricingMenus();
   toast('\u2713 Pricing saved for '+capitalize(hub)+' Hub.','ok');
@@ -4345,7 +4641,7 @@ function ppLogout() {
 </script>
 </div>
 
-<div id="pricing-sticky-save" style="display:none;"><button class="bs gd" onclick="savePricingMenus()" style="box-shadow:0 4px 24px rgba(2,10,91,.35);padding:13px 28px;font-size:13px;font-weight:700;">💾 Save Pricing</button></div>
+<div id="pricing-sticky-save" style="display:none;"><button class="bs gd" id="pricing-sticky-btn" onclick="pricingStickySave()" style="box-shadow:0 4px 24px rgba(2,10,91,.35);padding:13px 28px;font-size:13px;font-weight:700;">💾 Save</button></div>
 
 </body>
 </html>
