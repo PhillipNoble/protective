@@ -5778,7 +5778,7 @@ function resolveOrderDate(o) {
     // Long-form: "February 20, 2025" or "Feb 20, 2025"
     var longMonth = {January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',
       July:'07',August:'08',September:'09',October:'10',November:'11',December:'12',
-      Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+      Jan:'01',Feb:'02',Mar:'03',Apr:'04',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
     var lm = d.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
     if (lm) {
       var mo = longMonth[lm[1]];
@@ -8437,35 +8437,40 @@ function refreshMatSelection() {
   } catch(e) {}
 
   var matOpts = getMatOptionsForProp(propId, hub);
+
+  // Auto-select single-option categories silently (no UI needed).
+  // Only show the section for categories with 2+ choices.
+  var hiddenInputs = '';
   var html = '<div class="mat-select-grid">';
   var anyVisible = false;
 
   matCats.forEach(function(cat) {
     var items = matOpts[cat] || [];
     if (!items.length) return;
+    if (items.length === 1) {
+      // Only one option — auto-select silently, no UI shown
+      hiddenInputs += '<input type="hidden" id="mat-sel-' + cat + '" value="' + escHtml(items[0].name) + '">';
+      return;
+    }
+    // Multiple options — show dropdown for client to choose
     anyVisible = true;
     html += '<div class="mat-select-group">';
     html += '<label>' + (MAT_LABELS[cat] || cat) + '</label>';
-    if (items.length === 1) {
-      // Only one option — display it, no dropdown needed
-      html += '<div class="mat-single">' + escHtml(items[0].name) + '</div>';
-      html += '<input type="hidden" id="mat-sel-' + cat + '" value="' + escHtml(items[0].name) + '">';
-    } else {
-      // Multiple options — show dropdown
-      html += '<select id="mat-sel-' + cat + '">';
-      html += '<option value="">— Select ' + (MAT_LABELS[cat]||cat).replace(/^[^ ]+ /,'') + ' —</option>';
-      items.forEach(function(item) {
-        html += '<option value="' + escHtml(item.name) + '">' + escHtml(item.name) + '</option>';
-      });
-      html += '</select>';
-    }
+    html += '<select id="mat-sel-' + cat + '">';
+    html += '<option value="">— Select ' + (MAT_LABELS[cat]||cat).replace(/^[^ ]+ /,'') + ' —</option>';
+    items.forEach(function(item) {
+      html += '<option value="' + escHtml(item.name) + '">' + escHtml(item.name) + '</option>';
+    });
+    html += '</select>';
     html += '</div>';
   });
 
-  html += '</div>';
+  html += '</div>' + hiddenInputs;
 
   if (!anyVisible) {
+    // No multi-option categories — hide the whole section but store hidden inputs
     wrap.style.display = 'none';
+    body.innerHTML = hiddenInputs;
     return;
   }
 
@@ -10757,19 +10762,12 @@ function renderCal(prefix) {
     .map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
   // Build orders map for this month keyed by ISO date (YYYY-MM-DD)
   var byDate = {};
-  // Respect the dashboard hub filter (same as all other dashboard tabs)
-  var calHub = (document.getElementById('adash_hub')||{value:''}).value;
-  var monthPrefix = year+'-'+String(month+1).padStart(2,'0');
   Object.keys(orders||{}).forEach(function(id) {
     var o = orders[id];
     if (!o || o.status==='vd') return;
-    // Hub filter
-    if (calHub && (o.hub||'').toLowerCase() !== calHub.toLowerCase()) return;
     // Always normalise to ISO so the key matches the grid cell lookup
     var d = resolveOrderDate(o);
     if (!d) return;
-    // Only include dates that fall within the displayed month
-    if (d.slice(0,7) !== monthPrefix) return;
     if (prefix==='cl_cal' && currentUser) {
       var props = currentUser.props||[];
       if (props.length && props.indexOf(o.property)<0) return;
