@@ -1087,14 +1087,6 @@ th.sort-desc::after{content:' ↓';opacity:1;color:var(--gold);}
     </div>
     <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px;" onclick="doLogin()">Sign In</button>
     <div class="login-err" id="li-err">Invalid email or password.</div>
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);">
-      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Quick Sign In</div>
-      <div style="display:flex;flex-direction:column;gap:5px;">
-        <button onclick="quickLogin('admin@protectiveflooring.com','PF-Admin-2025!')" style="background:rgba(200,149,42,.12);border:1px solid rgba(200,149,42,.25);color:var(--gold);padding:6px 10px;border-radius:2px;font-size:11px;font-weight:600;text-align:left;cursor:pointer;">🔒 Admin — <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4021242d292e0030322f34252334293625262c2f2f32292e276e232f2d">[email&#160;protected]</a></button>
-        <button onclick="quickLogin('manager@cherrycreek.com','Cherry2025!')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.55);padding:6px 10px;border-radius:2px;font-size:11px;font-weight:600;text-align:left;cursor:pointer;">👤 Client — <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9cf1fdf2fdfbf9eedcfff4f9eeeee5ffeef9f9f7b2fff3f1">[email&#160;protected]</a></button>
-        <button onclick="quickLogin('manager@riverside.com','PF-River25!')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.55);padding:6px 10px;border-radius:2px;font-size:11px;font-weight:600;text-align:left;cursor:pointer;">👤 Client — <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9af7fbf4fbfdffe8dae8f3ecffe8e9f3feffb4f9f5f7">[email&#160;protected]</a></button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -10996,12 +10988,6 @@ function renderDashYesterday() {
 // ════════════════════════════════════════════════════════════════
 
 
-function quickLogin(email, pass){
-  document.getElementById('li-email').value=email;
-  document.getElementById('li-pass').value=pass;
-  doLogin();
-}
-
 // Override/extend existing doLogin to handle client accounts
 var _origDoLogin = doLogin;
 doLogin = function(){
@@ -11038,19 +11024,11 @@ doLogin = function(){
   document.getElementById('li-err').style.display='block';
 };
 
-// Update tryAutoLogin to handle client SSO
+// Auto-login disabled — always require manual sign-in
 var _origTryAutoLogin = tryAutoLogin;
 tryAutoLogin = function(){
-  var sso=lsg('pf_sso',null);
-  if(!sso||Date.now()-sso.ts>8*3600000)return;
-  if(sso.type==='client'){
-    var client=loadClients().find(function(c){return c.id===sso.userId&&c.status==='active';});
-    if(client){enterClientPortal(client,false);return;}
-  } else {
-    var team=loadTeam();
-    var user=team.find(function(u){return u.id===sso.userId&&u.status==='active';});
-    if(user){currentUser=user;document.getElementById('login-screen').classList.remove('on');applyAuth();return;}
-  }
+  // Clear any stale session — require fresh login every time
+  try{localStorage.removeItem('pf_sso');}catch(e){}
 };
 
 // renderClientsPanel now handled directly in goTo()
